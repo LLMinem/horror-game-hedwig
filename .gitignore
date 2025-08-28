@@ -105,3 +105,6 @@ temp/
 *.bak
 *.backup
 *.old
+
+# Sensitive files
+.mcp.json
