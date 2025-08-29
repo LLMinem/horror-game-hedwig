@@ -1,0 +1,2338 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/40068348",
+        "landuse": "cemetery",
+        "name": "Neuer Friedhof"
+      },
+      "geometry": {
+        "coordinates": [
+          [
+            [8.9355215, 50.1736701],
+            [8.9346298, 50.1732709],
+            [8.9345603, 50.1732404],
+            [8.9340517, 50.1730172],
+            [8.9336276, 50.1726953],
+            [8.9349237, 50.171551],
+            [8.9358559, 50.1720381],
+            [8.9367136, 50.1724863],
+            [8.9355215, 50.1736701]
+          ]
+        ],
+        "type": "Polygon"
+      },
+      "id": 122
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/362596059",
+        "amenity": "funeral_hall",
+        "building": "funeral_hall"
+      },
+      "geometry": {
+        "coordinates": [
+          [
+            [8.9346911, 50.1727808],
+            [8.934809, 50.1726619],
+            [8.935137, 50.1727952],
+            [8.9350184, 50.1729148],
+            [8.9348591, 50.1728501],
+            [8.9348494, 50.1728599],
+            [8.9348058, 50.1728421],
+            [8.9348162, 50.1728316],
+            [8.9346911, 50.1727808]
+          ]
+        ],
+        "type": "Polygon"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165078822",
+        "building": "garages"
+      },
+      "geometry": {
+        "coordinates": [
+          [
+            [8.9351393, 50.1727336],
+            [8.9352194, 50.1726523],
+            [8.9353154, 50.1726911],
+            [8.9352352, 50.1727724],
+            [8.9351393, 50.1727336]
+          ]
+        ],
+        "type": "Polygon"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165078823",
+        "building": "warehouse",
+        "description": "Lager"
+      },
+      "geometry": {
+        "coordinates": [
+          [
+            [8.9349207, 50.1726324],
+            [8.9348399, 50.1725984],
+            [8.9349601, 50.1724811],
+            [8.935041, 50.1725151],
+            [8.9349207, 50.1726324]
+          ]
+        ],
+        "type": "Polygon"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165085659",
+        "man_made": "storage"
+      },
+      "geometry": {
+        "coordinates": [
+          [
+            [8.9357493, 50.1722019],
+            [8.9358915, 50.1722787],
+            [8.9358328, 50.1723197],
+            [8.935701, 50.1722462],
+            [8.9357493, 50.1722019]
+          ]
+        ],
+        "type": "Polygon"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165085660",
+        "man_made": "storage"
+      },
+      "geometry": {
+        "coordinates": [
+          [
+            [8.9359411, 50.1722445],
+            [8.9357911, 50.1721584],
+            [8.935885, 50.172064],
+            [8.9360585, 50.1721601],
+            [8.9359411, 50.1722445]
+          ]
+        ],
+        "type": "Polygon"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/24979422",
+        "highway": "service",
+        "lit": "no",
+        "service": "parking_aisle",
+        "surface": "asphalt"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.9354003, 50.1737497],
+          [8.9345108, 50.1733578],
+          [8.9344411, 50.1733271]
+        ],
+        "type": "LineString"
+      },
+      "id": 299
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/40068471",
+        "highway": "path",
+        "lit": "no",
+        "surface": "asphalt"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.9354003, 50.1737497],
+          [8.9354698, 50.1737281],
+          [8.935559, 50.1736714]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/157427253",
+        "highway": "path",
+        "lit": "no",
+        "surface": "fine_gravel",
+        "width": "1 m"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.9355684, 50.1736664],
+          [8.9368165, 50.1725028]
+        ],
+        "type": "LineString"
+      },
+      "id": 301
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/256539582",
+        "highway": "service",
+        "lit": "no",
+        "service": "parking_aisle",
+        "surface": "asphalt"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.9344411, 50.1733271],
+          [8.9341235, 50.1731405]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/256552602",
+        "highway": "path",
+        "lit": "no",
+        "surface": "fine_gravel"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.935559, 50.1736714],
+          [8.9355684, 50.1736664]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/992683839",
+        "highway": "footway",
+        "lit": "yes",
+        "surface": "asphalt"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.935559, 50.1736714],
+          [8.9355799, 50.1736837]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1006675902",
+        "barrier": "fence"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.9340517, 50.1730172],
+          [8.9345603, 50.1732404]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165077095",
+        "access": "private",
+        "highway": "service",
+        "lit": "no",
+        "service": "driveway",
+        "surface": "asphalt"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.9345108, 50.1733578],
+          [8.9346034, 50.173258],
+          [8.9346215, 50.1732385],
+          [8.9346348, 50.1732242],
+          [8.9348595, 50.1729818],
+          [8.9348699, 50.1729619],
+          [8.9348681, 50.1729441],
+          [8.9348526, 50.172922],
+          [8.9348301, 50.1729009],
+          [8.9347954, 50.1728843],
+          [8.9347114, 50.1728447],
+          [8.9346708, 50.1728255],
+          [8.9346431, 50.1728056],
+          [8.9346395, 50.1727964],
+          [8.9346345, 50.1727834],
+          [8.9346414, 50.1727623],
+          [8.9346519, 50.172742],
+          [8.9347396, 50.1726479],
+          [8.9347431, 50.1726441],
+          [8.9347731, 50.1726151],
+          [8.9348197, 50.172633],
+          [8.9348699, 50.1726537],
+          [8.9350083, 50.1727102],
+          [8.9350809, 50.172738],
+          [8.9351057, 50.1727177],
+          [8.9351329, 50.1726914],
+          [8.9352107, 50.1726228],
+          [8.935279, 50.1725609],
+          [8.9353956, 50.1724561],
+          [8.9354603, 50.1723973],
+          [8.9355143, 50.1723482],
+          [8.9355746, 50.1722933],
+          [8.9356271, 50.1722455],
+          [8.9357265, 50.1721554],
+          [8.9357979, 50.1720906],
+          [8.9358559, 50.1720381],
+          [8.9359086, 50.1719921]
+        ],
+        "type": "LineString"
+      },
+      "id": 306
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165078820",
+        "barrier": "fence"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.9340517, 50.1730172],
+          [8.9336276, 50.1726953],
+          [8.9349237, 50.171551],
+          [8.9358559, 50.1720381],
+          [8.9367136, 50.1724863],
+          [8.9355215, 50.1736701]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165078821",
+        "barrier": "fence"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.9349207, 50.1726324],
+          [8.9350103, 50.1726709],
+          [8.9350486, 50.1726929],
+          [8.9351057, 50.1727177],
+          [8.9351393, 50.1727336]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165078824",
+        "barrier": "fence"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.9353154, 50.1726911],
+          [8.9353332, 50.1726725],
+          [8.9352393, 50.1726342],
+          [8.9352107, 50.1726228],
+          [8.9351917, 50.1726153],
+          [8.9352174, 50.1725905],
+          [8.935041, 50.1725151]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165079380",
+        "access": "private",
+        "highway": "service",
+        "service": "driveway",
+        "surface": "asphalt"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.9347731, 50.1726151],
+          [8.934859, 50.1725228],
+          [8.9349166, 50.1724609]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165079381",
+        "access": "private",
+        "highway": "service",
+        "service": "driveway",
+        "surface": "asphalt"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.9350809, 50.172738],
+          [8.9352047, 50.1727886],
+          [8.9352121, 50.1727916]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165081776",
+        "highway": "path",
+        "surface": "gravel"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.9349166, 50.1724609],
+          [8.934953, 50.1724269],
+          [8.9349865, 50.1723956],
+          [8.9350113, 50.1723725],
+          [8.9350426, 50.1723432],
+          [8.9350721, 50.1723157],
+          [8.9351288, 50.1722628],
+          [8.935183, 50.1722122],
+          [8.9352417, 50.1721573],
+          [8.9352702, 50.1721307]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165081777",
+        "highway": "path",
+        "surface": "gravel"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.934262, 50.1722332],
+          [8.9343574, 50.1722206],
+          [8.9345092, 50.1721994],
+          [8.9346558, 50.1721811],
+          [8.9348064, 50.1721612],
+          [8.9350452, 50.1721297],
+          [8.9350925, 50.1721234],
+          [8.9352063, 50.1721084],
+          [8.9352357, 50.1721045]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165081778",
+        "highway": "path",
+        "surface": "gravel"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.9351073, 50.1717301],
+          [8.9351876, 50.171772],
+          [8.9352591, 50.1718094],
+          [8.9353679, 50.1718661],
+          [8.9354349, 50.1719011],
+          [8.9355115, 50.1719411],
+          [8.9356237, 50.1719998],
+          [8.9356927, 50.1720359],
+          [8.9357979, 50.1720906]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165081779",
+        "highway": "path",
+        "surface": "gravel"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.9356271, 50.1722455],
+          [8.935351, 50.1721199]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165081780",
+        "highway": "path",
+        "surface": "gravel"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.9355115, 50.1719411],
+          [8.9353488, 50.1720632]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165081781",
+        "highway": "path",
+        "surface": "gravel"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.9352433, 50.1721152],
+          [8.9352551, 50.1721242],
+          [8.9352702, 50.1721307],
+          [8.9352914, 50.1721348],
+          [8.9353136, 50.1721342],
+          [8.9353342, 50.1721291],
+          [8.935351, 50.1721199],
+          [8.9353612, 50.1721094],
+          [8.9353662, 50.1720975],
+          [8.9353657, 50.1720851],
+          [8.9353598, 50.1720734],
+          [8.9353488, 50.1720632],
+          [8.9353312, 50.1720545],
+          [8.93531, 50.17205],
+          [8.9352877, 50.1720502],
+          [8.9352667, 50.1720551],
+          [8.9352494, 50.1720642],
+          [8.9352378, 50.1720763],
+          [8.935233, 50.1720903],
+          [8.9352357, 50.1721045],
+          [8.9352433, 50.1721152]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165083049",
+        "highway": "service",
+        "service": "driveway",
+        "surface": "asphalt"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.9357265, 50.1721554],
+          [8.9360128, 50.1723205]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165088832",
+        "highway": "path",
+        "surface": "gravel"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.9356927, 50.1720359],
+          [8.9356079, 50.172112]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165088833",
+        "highway": "path",
+        "surface": "gravel"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.9355374, 50.1720702],
+          [8.9356237, 50.1719998]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165088834",
+        "highway": "path",
+        "surface": "gravel"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.9353535, 50.1719583],
+          [8.9354349, 50.1719011]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165088835",
+        "highway": "path",
+        "surface": "gravel"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.9352909, 50.1719182],
+          [8.9353679, 50.1718661]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165088836",
+        "highway": "path",
+        "surface": "gravel"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.9351852, 50.1718589],
+          [8.9352591, 50.1718094]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165088837",
+        "highway": "path",
+        "surface": "gravel"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.9351213, 50.1718188],
+          [8.9351876, 50.171772]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165088838",
+        "highway": "path",
+        "surface": "gravel"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.9351073, 50.1717301],
+          [8.9349361, 50.1718639]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165088839",
+        "highway": "path",
+        "surface": "gravel"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.9347809, 50.1718589],
+          [8.9348083, 50.1718405],
+          [8.9348357, 50.171833],
+          [8.934867, 50.171833],
+          [8.9348983, 50.171843],
+          [8.9349361, 50.1718639],
+          [8.9352667, 50.1720551]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165088840",
+        "highway": "path",
+        "surface": "gravel"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.9347809, 50.1718589],
+          [8.9347154, 50.1719148],
+          [8.9343574, 50.1722206]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165088841",
+        "highway": "path",
+        "surface": "gravel"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.9347809, 50.1718589],
+          [8.9352063, 50.1721084]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165088842",
+        "highway": "path",
+        "surface": "gravel"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.9347154, 50.1719148],
+          [8.9347911, 50.1719566],
+          [8.9348668, 50.1719985],
+          [8.9349465, 50.1720426],
+          [8.9350925, 50.1721234]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165088843",
+        "highway": "path",
+        "surface": "gravel"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.9347911, 50.1719566],
+          [8.9345092, 50.1721994]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165088844",
+        "highway": "path",
+        "surface": "gravel"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.9348668, 50.1719985],
+          [8.9346558, 50.1721811]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165088845",
+        "highway": "path",
+        "surface": "gravel"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.9349465, 50.1720426],
+          [8.9348064, 50.1721612]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165088846",
+        "highway": "path",
+        "surface": "gravel"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.9343574, 50.1722206],
+          [8.9349166, 50.1724609]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165088847",
+        "highway": "path",
+        "surface": "gravel"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.9345092, 50.1721994],
+          [8.9349865, 50.1723956]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165088848",
+        "highway": "path",
+        "surface": "gravel"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.9346558, 50.1721811],
+          [8.9348793, 50.1722748],
+          [8.9349661, 50.1723112],
+          [8.9350426, 50.1723432]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165088849",
+        "highway": "path",
+        "surface": "gravel"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.9348793, 50.1722748],
+          [8.9350452, 50.1721297]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165088850",
+        "highway": "path",
+        "surface": "gravel"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.9349661, 50.1723112],
+          [8.9352063, 50.1721084]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165093208",
+        "highway": "path",
+        "surface": "gravel"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.935279, 50.1725609],
+          [8.934953, 50.1724269]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165093209",
+        "highway": "path",
+        "surface": "gravel"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.9353956, 50.1724561],
+          [8.9350721, 50.1723157]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165093210",
+        "highway": "path",
+        "surface": "gravel"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.9356222, 50.1727161],
+          [8.9357496, 50.172595],
+          [8.935804, 50.1725433],
+          [8.93586, 50.1724901],
+          [8.9358711, 50.1724795],
+          [8.9359133, 50.1724393],
+          [8.9359509, 50.1724036],
+          [8.9360175, 50.1723643],
+          [8.9360128, 50.1723205]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165093211",
+        "highway": "path",
+        "surface": "gravel"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.935279, 50.1725609],
+          [8.9356222, 50.1727161]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165093212",
+        "highway": "path",
+        "surface": "gravel"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.935183, 50.1722122],
+          [8.9355143, 50.1723482],
+          [8.93586, 50.1724901]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165093213",
+        "highway": "path",
+        "surface": "gravel"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.9353956, 50.1724561],
+          [8.9357496, 50.172595]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165093214",
+        "highway": "path",
+        "surface": "gravel"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.93527, 50.1724813],
+          [8.9350113, 50.1723725]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165093215",
+        "highway": "path",
+        "surface": "gravel"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.9353835, 50.1723769],
+          [8.9351288, 50.1722628]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165093216",
+        "highway": "path",
+        "surface": "gravel"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.9354918, 50.1722699],
+          [8.9352417, 50.1721573]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165093217",
+        "highway": "path",
+        "surface": "gravel"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.935804, 50.1725433],
+          [8.9354603, 50.1723973]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165093218",
+        "highway": "path",
+        "surface": "gravel"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.9359133, 50.1724393],
+          [8.9355746, 50.1722933]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165093219",
+        "highway": "path",
+        "surface": "gravel"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.9360175, 50.1723643],
+          [8.936196, 50.1724681],
+          [8.9362698, 50.172511],
+          [8.9363389, 50.1725512],
+          [8.9364108, 50.1725929],
+          [8.9364831, 50.172635],
+          [8.9366305, 50.1724947]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165093220",
+        "highway": "path",
+        "surface": "gravel"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.9364108, 50.1725929],
+          [8.9365692, 50.1724612]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165093221",
+        "highway": "path",
+        "surface": "gravel"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.9363389, 50.1725512],
+          [8.9365014, 50.1724253]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165093222",
+        "highway": "path",
+        "surface": "gravel"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.9362698, 50.172511],
+          [8.936431, 50.1723852]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165093223",
+        "highway": "path",
+        "surface": "gravel"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.936196, 50.1724681],
+          [8.9363566, 50.1723493]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165093224",
+        "highway": "path",
+        "surface": "gravel"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.9364831, 50.172635],
+          [8.9364016, 50.1727144],
+          [8.9363458, 50.1727688],
+          [8.9361296, 50.1729792],
+          [8.9360618, 50.173046],
+          [8.9358622, 50.1732424],
+          [8.9357802, 50.1732089],
+          [8.9356966, 50.1731747]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165093225",
+        "highway": "path",
+        "surface": "gravel"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.9364016, 50.1727144],
+          [8.9359956, 50.1725346],
+          [8.9358711, 50.1724795]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165093226",
+        "highway": "path",
+        "surface": "gravel"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.9352121, 50.1727916],
+          [8.9352855, 50.1728208],
+          [8.935444, 50.1728839],
+          [8.9354994, 50.1729059],
+          [8.9358348, 50.1730394]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165093227",
+        "highway": "path",
+        "surface": "gravel"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.9356222, 50.1727161],
+          [8.9355945, 50.1727421],
+          [8.9355103, 50.1728214],
+          [8.935444, 50.1728839]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165093228",
+        "highway": "path",
+        "surface": "gravel"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.9355945, 50.1727421],
+          [8.9357211, 50.1727982],
+          [8.9361296, 50.1729792]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165093229",
+        "highway": "path",
+        "surface": "gravel"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.9357211, 50.1727982],
+          [8.9359367, 50.1725911],
+          [8.9359956, 50.1725346]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165093230",
+        "highway": "path",
+        "surface": "gravel"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.9363458, 50.1727688],
+          [8.9359367, 50.1725911]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165093231",
+        "highway": "path",
+        "surface": "gravel"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.9360618, 50.173046],
+          [8.9359784, 50.1730121],
+          [8.9358965, 50.1729787],
+          [8.9355103, 50.1728214]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165093232",
+        "highway": "path",
+        "surface": "gravel"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.9358965, 50.1729787],
+          [8.9358348, 50.1730394],
+          [8.9357719, 50.173101],
+          [8.93572, 50.1731518],
+          [8.9356966, 50.1731747],
+          [8.9356611, 50.1732101],
+          [8.9356123, 50.1732587],
+          [8.9355589, 50.173312],
+          [8.9355077, 50.1733631],
+          [8.9354361, 50.1734345],
+          [8.935378, 50.1734923],
+          [8.9353287, 50.1735415]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165093233",
+        "highway": "path",
+        "surface": "gravel"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.9357802, 50.1732089],
+          [8.9359784, 50.1730121]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165093234",
+        "highway": "path",
+        "surface": "gravel"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.9356611, 50.1732101],
+          [8.9354912, 50.1731438],
+          [8.9353796, 50.1731002],
+          [8.9353235, 50.1730783],
+          [8.9352875, 50.1730643],
+          [8.9352051, 50.1730321],
+          [8.9351094, 50.1729947],
+          [8.935035, 50.1729656],
+          [8.9349709, 50.1729405],
+          [8.9348681, 50.1729441]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165093235",
+        "highway": "path",
+        "surface": "gravel"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.9353235, 50.1730783],
+          [8.9354994, 50.1729059]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165093236",
+        "highway": "path",
+        "surface": "gravel"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.9354793, 50.1730508],
+          [8.93572, 50.1731518]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165093237",
+        "highway": "path",
+        "surface": "gravel"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.9355314, 50.1729978],
+          [8.9357719, 50.173101]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165093238",
+        "highway": "path",
+        "surface": "gravel"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.9351094, 50.1729947],
+          [8.9352855, 50.1728208]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165093239",
+        "highway": "path",
+        "surface": "gravel"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.935035, 50.1729656],
+          [8.9352047, 50.1727886]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165095164",
+        "highway": "path",
+        "surface": "gravel"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.9353287, 50.1735415],
+          [8.9351538, 50.1734665],
+          [8.935039, 50.1734174],
+          [8.9349536, 50.1733808],
+          [8.9348709, 50.1733453],
+          [8.9347865, 50.1733092],
+          [8.9346215, 50.1732385]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165095165",
+        "highway": "path",
+        "surface": "gravel"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.9351538, 50.1734665],
+          [8.9352031, 50.1734194],
+          [8.9352597, 50.1733652],
+          [8.9353328, 50.1732953],
+          [8.9353854, 50.1732449],
+          [8.9354443, 50.1731886],
+          [8.9354912, 50.1731438]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165095166",
+        "highway": "path",
+        "surface": "gravel"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.9356123, 50.1732587],
+          [8.9358175, 50.1733436],
+          [8.9357672, 50.1733926],
+          [8.9357133, 50.173445],
+          [8.9355077, 50.1733631]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165095167",
+        "highway": "path",
+        "surface": "gravel"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.9357672, 50.1733926],
+          [8.9355589, 50.173312],
+          [8.9353854, 50.1732449]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165095168",
+        "highway": "path",
+        "surface": "gravel"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.9356123, 50.1732587],
+          [8.9354443, 50.1731886]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165095169",
+        "highway": "path",
+        "surface": "gravel"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.9355077, 50.1733631],
+          [8.9353328, 50.1732953]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165095170",
+        "highway": "path",
+        "surface": "gravel"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.9354361, 50.1734345],
+          [8.9352597, 50.1733652]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165095171",
+        "highway": "path",
+        "surface": "gravel"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.935378, 50.1734923],
+          [8.9352031, 50.1734194]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165095172",
+        "highway": "path",
+        "surface": "gravel"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.935039, 50.1734174],
+          [8.9353796, 50.1731002]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165095173",
+        "highway": "path",
+        "surface": "gravel"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.9349536, 50.1733808],
+          [8.9352875, 50.1730643]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165095174",
+        "highway": "path",
+        "surface": "gravel"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.9348709, 50.1733453],
+          [8.9352051, 50.1730321]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165095175",
+        "highway": "path",
+        "surface": "gravel"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.9347865, 50.1733092],
+          [8.9351094, 50.1729947]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165095176",
+        "highway": "path",
+        "surface": "gravel"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.9346348, 50.1732242],
+          [8.9345084, 50.1731718],
+          [8.9344175, 50.1731341],
+          [8.9343351, 50.1730999],
+          [8.9342466, 50.1730632],
+          [8.934136, 50.1730174],
+          [8.9340516, 50.1729824],
+          [8.9340003, 50.1729611],
+          [8.93397, 50.1729383],
+          [8.9339021, 50.172887],
+          [8.9338334, 50.1728351],
+          [8.9337659, 50.1727841],
+          [8.9336905, 50.1727272],
+          [8.9339397, 50.1725003],
+          [8.9340743, 50.1723748],
+          [8.9342083, 50.17225],
+          [8.9342154, 50.1722434],
+          [8.934262, 50.1722332]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165095177",
+        "highway": "path",
+        "surface": "gravel"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.934859, 50.1725228],
+          [8.9342083, 50.17225]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165095178",
+        "highway": "path",
+        "surface": "sett"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.9343169, 50.1724752],
+          [8.9346053, 50.1725929],
+          [8.9346698, 50.1726194],
+          [8.9347396, 50.1726479]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165095179",
+        "highway": "path",
+        "surface": "gravel"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.9343169, 50.1724752],
+          [8.9340743, 50.1723748]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165095180",
+        "highway": "path",
+        "surface": "gravel"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.9339397, 50.1725003],
+          [8.9340155, 50.1725312],
+          [8.9341057, 50.1725679],
+          [8.934185, 50.1726003],
+          [8.9342741, 50.1726366],
+          [8.9343594, 50.1726713],
+          [8.934443, 50.1727054],
+          [8.9344727, 50.1727175],
+          [8.9345385, 50.1727443],
+          [8.9345568, 50.1727518],
+          [8.9346345, 50.1727834]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165095181",
+        "highway": "path",
+        "surface": "gravel"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.9345385, 50.1727443],
+          [8.9346698, 50.1726194]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165095182",
+        "highway": "path",
+        "surface": "asphalt"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.9344727, 50.1727175],
+          [8.9346053, 50.1725929]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165096157",
+        "highway": "path",
+        "surface": "gravel"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.9340155, 50.1725312],
+          [8.9337659, 50.1727841]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165096158",
+        "highway": "path",
+        "surface": "gravel"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.9341057, 50.1725679],
+          [8.9338334, 50.1728351]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165096159",
+        "highway": "path",
+        "surface": "gravel"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.934185, 50.1726003],
+          [8.9339021, 50.172887]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165096160",
+        "highway": "path",
+        "surface": "gravel"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.9342741, 50.1726366],
+          [8.93397, 50.1729383]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165096161",
+        "highway": "path",
+        "surface": "gravel"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.9343594, 50.1726713],
+          [8.9340516, 50.1729824]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165096162",
+        "highway": "path",
+        "surface": "gravel"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.934443, 50.1727054],
+          [8.934136, 50.1730174]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165096163",
+        "highway": "path",
+        "surface": "gravel"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.9345568, 50.1727518],
+          [8.9342466, 50.1730632]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165096164",
+        "highway": "path",
+        "surface": "gravel"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.9343351, 50.1730999],
+          [8.9346395, 50.1727964]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165096165",
+        "highway": "path",
+        "surface": "gravel"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.9344175, 50.1731341],
+          [8.9347114, 50.1728447]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165096166",
+        "highway": "path",
+        "surface": "gravel"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.9345084, 50.1731718],
+          [8.9347954, 50.1728843]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165110876",
+        "cemetery": "columbarium",
+        "covered": "no"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.9356182, 50.1727076],
+          [8.9353105, 50.1725666],
+          [8.9353862, 50.1725011],
+          [8.9357008, 50.1726321],
+          [8.9356182, 50.1727076]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1165110877",
+        "cemetery": "columbarium",
+        "covered": "no"
+      },
+      "geometry": {
+        "coordinates": [
+          [8.9357175, 50.1727844],
+          [8.9358079, 50.1726975],
+          [8.9357087, 50.1726573],
+          [8.9356182, 50.1727448],
+          [8.9357175, 50.1727844]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10836993153",
+        "access": "private",
+        "barrier": "gate",
+        "locked": "yes"
+      },
+      "geometry": {
+        "coordinates": [8.9351057, 50.1727177],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10836993155",
+        "access": "private",
+        "barrier": "gate",
+        "locked": "yes"
+      },
+      "geometry": {
+        "coordinates": [8.9358559, 50.1720381],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10836993156",
+        "access": "private",
+        "barrier": "gate",
+        "locked": "yes"
+      },
+      "geometry": {
+        "coordinates": [8.9352107, 50.1726228],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10836993157",
+        "barrier": "gate",
+        "locked": "no"
+      },
+      "geometry": {
+        "coordinates": [8.9346034, 50.173258],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10837322627",
+        "man_made": "tower",
+        "tower:construction": "wood",
+        "tower:type": "bell_tower"
+      },
+      "geometry": {
+        "coordinates": [8.9345821, 50.1727991],
+        "type": "Point"
+      },
+      "id": 405
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10837322628",
+        "amenity": "recycling",
+        "recycling:green_waste": "yes",
+        "recycling_type": "container"
+      },
+      "geometry": {
+        "coordinates": [8.9346981, 50.1732128],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10837322629",
+        "amenity": "bicycle_parking"
+      },
+      "geometry": {
+        "coordinates": [8.9348278, 50.1730919],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10837322630",
+        "amenity": "toilets",
+        "unisex": "yes"
+      },
+      "geometry": {
+        "coordinates": [8.9347128, 50.1727752],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10837322631",
+        "man_made": "water_tap",
+        "type": "water_tap"
+      },
+      "geometry": {
+        "coordinates": [8.9343336, 50.1724699],
+        "type": "Point"
+      },
+      "id": 409
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10837322632",
+        "man_made": "water_tap",
+        "type": "water_tap"
+      },
+      "geometry": {
+        "coordinates": [8.9354454, 50.1728548],
+        "type": "Point"
+      },
+      "id": 410
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10837322633",
+        "man_made": "water_tap",
+        "type": "water_tap"
+      },
+      "geometry": {
+        "coordinates": [8.9350624, 50.1725028],
+        "type": "Point"
+      },
+      "id": 411
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "man_made": "water_tap",
+        "type": "water_tap"
+      },
+      "geometry": {
+        "coordinates": [8.935300941188984, 50.17209199152862],
+        "type": "Point"
+      },
+      "id": 412
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "man_made": "water_tap",
+        "type": "water_tap"
+      },
+      "geometry": {
+        "coordinates": [8.934940943366087, 50.171835751961964],
+        "type": "Point"
+      },
+      "id": 413
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "man_made": "water_tap",
+        "type": "water_tap"
+      },
+      "geometry": {
+        "coordinates": [8.93601630241875, 50.17238120417642],
+        "type": "Point"
+      },
+      "id": 414
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "man_made": "water_tap",
+        "type": "water_tap"
+      },
+      "geometry": {
+        "coordinates": [8.935296315658633, 50.17354614585008],
+        "type": "Point"
+      },
+      "id": 415
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "barrier": "hedge",
+        "type": "hedge",
+        "width": 1,
+        "height": 1.5
+      },
+      "geometry": {
+        "coordinates": [
+          [8.935272205419182, 50.17264185623756],
+          [8.935321496193922, 50.172597678607104],
+          [8.935361066950634, 50.172616078648986]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "barrier": "hedge",
+        "type": "hedge",
+        "width": 1,
+        "height": 1.5
+      },
+      "geometry": {
+        "coordinates": [
+          [8.935378418815333, 50.17262419679574],
+          [8.935462998080567, 50.172662657370864]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "barrier": "hedge",
+        "type": "hedge",
+        "width": 1,
+        "height": 1.5
+      },
+      "geometry": {
+        "coordinates": [
+          [8.93547950312643, 50.17267043007621],
+          [8.935588222470159, 50.172719550122764],
+          [8.935531750060193, 50.17277117940833]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "barrier": "hedge",
+        "type": "hedge",
+        "width": 1,
+        "height": 1.5
+      },
+      "geometry": {
+        "coordinates": [
+          [8.935516438883468, 50.172785142637224],
+          [8.935462434394026, 50.172834852725316]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "barrier": "hedge",
+        "type": "hedge",
+        "width": 1,
+        "height": 1.5
+      },
+      "geometry": {
+        "coordinates": [
+          [8.93545301374914, 50.17284374490043],
+          [8.93544686018842, 50.17284933189822],
+          [8.935283603419776, 50.17278142242128]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "barrier": "hedge",
+        "type": "hedge",
+        "width": 1,
+        "height": 1.5
+      },
+      "geometry": {
+        "coordinates": [
+          [8.935222181096464, 50.17290866946723],
+          [8.935325920783214, 50.172951345330574]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "barrier": "hedge",
+        "type": "hedge",
+        "width": 1,
+        "height": 1.5
+      },
+      "geometry": {
+        "coordinates": [
+          [8.934377098316816, 50.172667554207266],
+          [8.934492878592522, 50.17255844885739]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "barrier": "hedge",
+        "type": "hedge",
+        "width": 1,
+        "height": 1.5
+      },
+      "geometry": {
+        "coordinates": [
+          [8.934511446566404, 50.172543157841915],
+          [8.934616818434023, 50.17243735447511]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "barrier": "hedge",
+        "type": "hedge",
+        "width": 1,
+        "height": 1.5
+      },
+      "geometry": {
+        "coordinates": [
+          [8.935049758907013, 50.17180638356581],
+          [8.935387787612768, 50.172006870127944]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "barrier": "hedge",
+        "type": "hedge",
+        "width": 1,
+        "height": 1.5
+      },
+      "geometry": {
+        "coordinates": [
+          [8.935427348896326, 50.17203243005304],
+          [8.93562949353884, 50.17215395475887],
+          [8.93571515036652, 50.17207462678462]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "barrier": "hedge",
+        "type": "hedge",
+        "width": 1,
+        "height": 1.5
+      },
+      "geometry": {
+        "coordinates": [
+          [8.9356294141067, 50.172154026879554],
+          [8.93558195686009, 50.17219797157517]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "barrier": "hedge",
+        "type": "hedge",
+        "width": 1,
+        "height": 1.5
+      },
+      "geometry": {
+        "coordinates": [
+          [8.935732161408453, 50.1721885241121],
+          [8.935624706067244, 50.172294345096816]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "barrier": "hedge",
+        "type": "hedge",
+        "width": 1,
+        "height": 1.5
+      },
+      "geometry": {
+        "coordinates": [
+          [8.935933878489834, 50.17239408724467],
+          [8.935670452349541, 50.172249271110815]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "barrier": "hedge",
+        "type": "hedge",
+        "width": 1,
+        "height": 1.5
+      },
+      "geometry": {
+        "coordinates": [
+          [8.935913392347146, 50.17228704982318],
+          [8.935836934362527, 50.172341132995086]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "barrier": "hedge",
+        "type": "hedge",
+        "width": 1,
+        "height": 1.5
+      },
+      "geometry": {
+        "coordinates": [
+          [8.935781924617913, 50.17216507893434],
+          [8.936037336504398, 50.17231298054722]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "barrier": "hedge",
+        "type": "hedge",
+        "width": 1,
+        "height": 1.5
+      },
+      "geometry": {
+        "coordinates": [
+          [8.935964911586893, 50.172271470940416],
+          [8.936079811619749, 50.17219206215711]
+        ],
+        "type": "LineString"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "barrier": "hedge",
+        "type": "hedge",
+        "width": 1,
+        "height": 1.5
+      },
+      "geometry": {
+        "coordinates": [
+          [8.935996169660115, 50.17242857978272],
+          [8.936409619416821, 50.172666091202984]
+        ],
+        "type": "LineString"
+      }
+    }
+  ]
+}

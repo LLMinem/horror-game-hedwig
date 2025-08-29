@@ -14,9 +14,8 @@ Core loop: plan routes, manage water and light, avoid the husband, water 8 grave
 ## Contents
 
 - `docs/spec.md` — single, dense spec (mechanics, level pipeline, AI, configs, budgets, tests)
-- `data/` — GeoJSON and optional script for buffering/regeneration
-  - `cemetery_game_final.geojson` — authoritative map
-  - `buffer-surfaces.js` — optional line→polygon buffer tool (Turf)
+- `data/` — Line-based GeoJSON for runtime geometry generation
+  - `cemetery_final.geojson` — line-based map with width metadata (69KB)
 - `config/` — JSON configs (optional; see spec for schemas)
   - `level.json`, `player.json`, `flashlight.json`, `water.json`, `ai_husband.json`, `targets.json`, `audio.json`, `debug.json`
 - `src/` — game code (WIP)
@@ -50,15 +49,15 @@ Full details in `docs/spec.md`.
 
 ## Level Pipeline (summary)
 
-1. **Preprocess GeoJSON (offline):**
-   - Reproject to local meters (origin at centroid), rotate to principal axis (~146°).
-   - **Surfaces:** union by class; remove slivers `<0.20 m²`.
-   - **Hedges:** clip against surfaces; remove slivers `<0.05 m²`. Hedges must never cover paths.
-   - Subtract buildings from surfaces. Closed gates block nav edges.
+1. **Load GeoJSON at runtime:**
+   - Convert coordinates to local meters (origin at centroid), rotate to principal axis (~146°).
+   - **Paths:** Generate geometry from LineStrings + width metadata (2.0-3.5m).
+   - **Hedges:** Generate from lines with 1.0m width, 1.5m height.
+   - Buildings use polygons directly.
 2. **Runtime:**
-   - Draw order: ground < hedges < surfaces < props.
-   - Build **path graph** from path lines (or surface skeleton), nodes every **8–10 m**.
-   - Player free movement with collisions; husband uses graph (no wells logic).
+   - Z-order: ground (0.0) < hedges (0.01) < paths (0.02) < props (0.03).
+   - Build **path graph** directly from LineStrings, nodes every **8–10 m**.
+   - Player free movement with collisions; husband uses graph centerlines.
 
 See `docs/spec.md` for exact thresholds and schemas.
 
@@ -75,9 +74,8 @@ See `docs/spec.md` for exact thresholds and schemas.
 
 This repo intentionally avoids prescribing specific build tools. Use any static web server + bundling workflow you prefer.
 
-- Place `docs/spec.md`.
-- Place `data/cemetery_game_final.geojson`.
-- (Optional) Run `buffer-surfaces.js` via `npx` when regenerating from raw OSM (see `data/` README notes in spec).
+- Load `data/cemetery_final.geojson` at runtime.
+- Generate path/hedge geometry from LineStrings + width metadata.
 - Implement configs in `/config` as needed; defaults live in code if missing.
 
 > The game should run from `/src` with your chosen bundler/server. Keep environment-specific steps out of the spec; document them here if needed.

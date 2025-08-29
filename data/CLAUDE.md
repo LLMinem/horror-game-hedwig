@@ -1,164 +1,108 @@
-# Cemetery GeoJSON (Neuer Friedhof, Bruchköbel) — for Three.js
+# Cemetery GeoJSON (Neuer Friedhof, Bruchköbel) — Line-Based Map Data
 
-This directory contains a single production-ready GeoJSON you can feed to your game logic, plus one optional script if you ever want to regenerate buffered surfaces/hedges yourself.
+This directory contains line-based GeoJSON data for runtime geometry generation in Three.js.
 
-## Files you actually need
+## Files
 
-- `~/Projects/horror-game/data/cemetery_game_final.geojson`  
-  The dataset. Includes boundary, fence, paths-as-polygons, hedges-as-polygons, buildings and POIs (toilets, bicycle parking, water taps, etc.). **Use this file.**
+- `cemetery_final.geojson` — **The production map file** (69KB)
+  - Contains lines with width metadata (not polygons)
+  - Includes cemetery boundary, paths, hedges, buildings, and POIs
+  - All coordinates verified to be within cemetery bounds
 
-- `~/Projects/horror-game/data/buffer-surfaces.js` _(optional)_  
-  A tiny Node script that turns OSM path/hedge lines into polygons (buffers). Only needed if you plan to re-run buffering on a different raw export.
+## Data Structure
 
----
+### Path/Road Lines
 
-## Run the script without adding dependencies to your project
+- **Type:** `LineString`
+- **Properties:**
+  - `highway`: "path" | "footway" | "service"
+  - `surface`: "gravel" | "asphalt" | "sett" (optional)
+  - Recommended widths for runtime generation:
+    - Gravel paths: 2.0m
+    - Paved paths: 2.5m
+    - Service roads: 3.5m
 
-> Skip this section if you’re only consuming `cemetery_game_final.geojson`.
+### Hedge Lines
 
-### Option A (recommended): one-off run with `npx` (no package.json changes)
+- **Type:** `LineString`
+- **Properties:**
+  - `barrier`: "hedge"
+  - `type`: "hedge"
+  - `width`: 1.0 (meters)
+  - `height`: 1.5 (meters)
+  - Positioned parallel to paths with 0.3-0.5m offset
 
-From the data folder:
+### Buildings
 
-```bash
-cd ~/Projects/horror-game/data
+- **Type:** `Polygon`
+- Buildings remain as polygons (funeral hall, garages, storage)
+- Properties include `building` and/or `amenity` tags
 
-npx -y -p @turf/turf node buffer-surfaces.js \
-  ./cemetery_raw.geojson ./cemetery_game_final.geojson \
-  --hedge-width 1.2 \
-  --paving-width 3.0 \
-  --gravel-width 2.4 \
-  --service-width 4.0 \
-  --no-clip-hedges     # remove this flag if you prefer clipping hedges to paths
+### Points of Interest
+
+- **Type:** `Point`
+- Water taps: `man_made=water_tap` (7 total)
+- Other POIs: toilets, bicycle parking, recycling, bell tower
+
+### Cemetery Boundary
+
+- **Type:** `Polygon`
+- Properties: `landuse=cemetery`, `name=Neuer Friedhof`
+- Defines playable area (~171×173m)
+
+## Coordinate System
+
+- **Format:** WGS84 (longitude, latitude)
+- **Center:** 8.935045°E, 50.172849°N
+- **Bounds:** Tight rectangle around cemetery only
+
+## Runtime Geometry Generation
+
+Instead of pre-generated polygons, generate geometry at runtime:
+
+```javascript
+// Example: Generate path geometry from line + width
+function createPathGeometry(lineCoords, width) {
+  const curve = new THREE.CatmullRomCurve3(lineCoords.map((coord) => latLonToLocal(coord)));
+
+  const shape = new THREE.Shape();
+  shape.moveTo(-width / 2, 0);
+  shape.lineTo(width / 2, 0);
+  shape.lineTo(width / 2, 0.02);
+  shape.lineTo(-width / 2, 0.02);
+
+  return new THREE.ExtrudeGeometry(shape, {
+    extrudePath: curve,
+    steps: lineCoords.length * 2
+  });
+}
 ```
 
-- Width flags are **total widths in meters**.
-- Output is pretty-printed GeoJSON by default. Add `--minify` to shrink the file.
-- If you keep `--no-clip-hedges`, hedges may intersect paths; your renderer should draw **paths above hedges**.
+## Why Lines Instead of Polygons?
 
-### Option B: create a standalone one-file build, then run with plain Node
+1. **No overlaps:** Geometry generated with proper constraints
+2. **Consistent widths:** Features maintain uniform width
+3. **Smaller file:** 69KB vs 475KB
+4. **Dynamic adjustment:** Change widths without regenerating data
+5. **Clean intersections:** Path junctions handled properly
 
-```bash
-cd ~/Projects/horror-game/data
+## Navigation Graph
 
-# Build a self-contained file that already includes Turf (no dev deps saved)
-npx -y esbuild buffer-surfaces.js --bundle --platform=node --format=cjs \
-  --outfile=buffer-surfaces.standalone.cjs
+Build AI pathfinding from path centerlines:
 
-# Use it any time without installing anything:
-node buffer-surfaces.standalone.cjs ./cemetery_raw.geojson ./cemetery_game_final.geojson \
-  --hedge-width 1.2 --no-clip-hedges
-```
+- Sample points every 8-10m along lines
+- Connect at intersections
+- Block edges at closed gates
 
----
+## Feature Counts
 
-## Geometry & Layers
+- **Paths:** 89 lines (various types)
+- **Hedges:** 17 lines (manually positioned)
+- **Water taps:** 7 points
+- **Buildings:** 6 polygons
+- **Gates:** 4 points
+- **Fences:** 4 lines
 
-What’s in `cemetery_game_final.geojson`:
+## Attribution
 
-- **Cemetery boundary** — `Polygon` (outer boundary of the site).
-
-  - Marks playable area and can serve as a hard fence line.
-  - Properties include `landuse=cemetery`, `name=Neuer Friedhof`, and `kind: "cemetery_boundary"`.
-
-- **Fence** — `LineString` around the boundary (derived).
-
-  - Use to spawn/visualize a fence mesh or to mark a non-traversable border.
-  - Properties include `barrier=fence` and `from: "boundary"`.
-
-- **Surfaces (paths/driveways)** — `Polygon` (generated by buffering OSM `highway` lines).
-
-  - Properties:
-    - `type: "surface"`
-    - `highway: "path" | "footway" | "service"`
-    - `surface` (e.g. `asphalt`, `gravel`, `sett`)
-    - `surface_class: "paving" | "gravel"`
-    - `generated_from: "line_buffer"`
-    - `generated_width_m` (total width used for buffering)
-
-- **Hedges** — `Polygon` (generated by buffering `barrier=hedge`).
-
-  - Properties:
-    - `type: "hedge"`
-    - `generated_from: "line_buffer"`
-    - `generated_width_m` (e.g. `1.2`)
-  - Note: some hedge polygons may overlap surface polygons if you used `--no-clip-hedges`. Your renderer should give **paths priority** (draw above) so hedges don’t “grow over” paths.
-
-- **Buildings** — `Polygon`
-
-  - Includes `amenity=funeral_hall`, `building=funeral_hall`, `building=garages`, `building=warehouse`, etc.
-
-- **POIs** — `Point`
-  - `amenity=toilets` (with `unisex=yes`)
-  - `man_made=water_tap` (multiple taps)
-  - `amenity=bicycle_parking`
-  - `amenity=recycling` (`recycling_type=container`, `recycling:green_waste=yes`)
-  - `man_made=tower` with `tower:type=bell_tower`, `tower:construction=wood`
-
----
-
-## Properties (columns) observed
-
-These are the keys you’ll encounter across features (not every feature has every key):
-
-```
-@id
-amenity
-building
-description
-man_made
-barrier
-cemetery
-covered
-construction:cemetery
-access
-locked
-noexit
-tower:construction
-tower:type
-recycling:green_waste
-recycling_type
-unisex
-highway
-lit
-service
-surface
-type
-surface_class
-generated_from
-generated_width_m
-kind          # used by cemetery boundary (e.g. "cemetery_boundary")
-from          # used by fence to note it was derived "from":"boundary"
-```
-
----
-
-## Using this file with an AI agent / game pipeline
-
-- **Don’t load the entire file into an LLM context.** Instead:
-
-  - Parse the GeoJSON in code.
-  - Filter by `type`, `highway`, `amenity`, etc.
-  - Build meshes per layer (boundary, surfaces, hedges, buildings, POIs).
-  - Render order tip: draw _surfaces_ above ground; draw _hedges_ after ground but **below** surfaces if you kept `--no-clip-hedges`.
-
-- **Example filter (pseudocode):**
-
-```js
-// surfaces
-features.filter((f) => f.properties?.type === "surface");
-
-// hedges
-features.filter((f) => f.properties?.type === "hedge");
-
-// water taps
-features.filter((f) => f.properties?.man_made === "water_tap");
-```
-
-- **Coordinate system:** WGS84 lon/lat. Buffer widths were specified in meters when generating polygons, so reproject to a planar space or let your engine handle scaling when placing meshes.
-
----
-
-## License & attribution
-
-Data is derived from OpenStreetMap and is available under the ODbL. Please attribute OSM contributors in your game/credits.
+Data derived from OpenStreetMap (ODbL). Please attribute OSM contributors in credits.

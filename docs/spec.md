@@ -3,9 +3,11 @@
 ## 0. Overview & Scope (MVP)
 
 ### Premise
+
 Explore a large cemetery at dusk. Water 8 specific graves using a can refilled at 6 taps. One roaming "husband" NPC patrols paths; contact ends run.
 
 ### Platform & Specs
+
 - **Platform:** Desktop web (Three.js)
 - **Session:** ~20–30 min
 - **Map:** OSM-based "Neuer Friedhof" (≈171×173 m playable)
@@ -13,6 +15,7 @@ Explore a large cemetery at dusk. Water 8 specific graves using a can refilled a
 - **Lose condition:** Contact with husband (≤5 m) → short cutscene → game over
 
 ### Core Loop
+
 1. Plan route between targets and taps
 2. Walk/sprint, manage light and water
 3. Water graves (hold 5 s total per grave, partial allowed)
@@ -20,9 +23,11 @@ Explore a large cemetery at dusk. Water 8 specific graves using a can refilled a
 5. Repeat until 8/8 or caught
 
 ### Non-goals (MVP)
+
 Mobile, interiors, complex AI, physics, item inventory, save system, complex shaders.
 
 ### Constraints
+
 - ODbL attribution for OSM data
 - One week to playable. Keep pipeline simple and data-driven
 
@@ -31,12 +36,14 @@ Mobile, interiors, complex AI, physics, item inventory, save system, complex sha
 ## 1. Mechanics Spec (Authoritative Numbers)
 
 ### Movement
+
 - **Walk:** 3.5 m/s
 - **Sprint:** 5.0 m/s for 4.0 s → fatigue 2.8 m/s for 6.0 s → cooldown 4.0 s (TBD if needed)
 - **Jump:** None
 - **Collision:** Fence, buildings, hedges (post-clip)
 
 ### Flashlight & Darkness
+
 - **Ambient darkness timeline (real time):**
   - 0:00 - Dusk
   - 5:00 - "Need flashlight"
@@ -47,17 +54,20 @@ Mobile, interiors, complex AI, physics, item inventory, save system, complex sha
 - **Battery spawn:** Random among 5 predefined points (configurable)
 
 ### Watering & Refill
+
 - **Can capacity:** 0–100 units
 - **Watering:** Hold; 100 units → 5.0 s (linear). Partial allowed; progress persists per grave
 - **Refill:** At any of 6 taps: hold; 0→100 in 3.0 s (linear). Partial allowed
 - **Restrictions:** Cannot move while watering/refilling; can look. Flashlight off while watering; on allowed while refilling (default ON/OFF persists)
 
 ### Interaction
+
 - **Controls:** Single action key for interact/water/refill
 - **HUD:** Water 0–100, Targets X/8, Flashlight %, minimal crosshair + radial progress during holds
 - **Audio:** Wind/leaves base loop; husband mumbling cues; small chimes on progress events
 
 ### Failure & End
+
 - **Game over:** Husband within 5.0 m of player center → short stare cutscene → "Der Onkel hat dich gefunden!" → restart
 
 ---
@@ -65,39 +75,39 @@ Mobile, interiors, complex AI, physics, item inventory, save system, complex sha
 ## 2. Level Pipeline (GeoJSON → Game)
 
 ### Files
-- `data/cemetery_game_final.geojson` (authoritative map)
-- Optional: `buffer-surfaces.js` (for regeneration)
+
+- `data/cemetery_final.geojson` (line-based map, 69KB)
 
 ### World Transform
+
 - **Units:** 1 unit = 1 m
 - **Origin:** GeoJSON centroid (~50.172849°N, 8.935045°E)
 - **Rotation:** Align to principal axis ≈146° (NW–SE)
 - **Storage:** `level.json`: `{ origin_lat, origin_lon, rotation_deg, scale: 1 }`
 
-### Preprocessing (Offline Step, Fast)
-1. Reproject to local meters (origin at centroid)
-2. **Surfaces** (polygons with `type=surface`):
-   - Union by class (gravel, paving, service)
-   - Remove slivers <0.20 m²
-3. **Hedges** (`type=hedge`):
-   - Clip against unioned surfaces (hedges never cover paths)
-   - Remove slivers <0.05 m²
-   - Note: Visual width may vary after clipping (acceptable for MVP)
-4. **Buildings:** Subtract from surfaces where overlapping
-5. **Gates:** Mark closed as blockers for AI graph; open gates remain traversable
-6. **Z-order at runtime:** ground (grass) < hedges < surfaces < props
+### Runtime Geometry Generation (No Preprocessing Needed)
+
+1. **Load GeoJSON** and convert coordinates to local meters
+2. **Generate path geometry** from LineStrings:
+   - Use line coordinates as centerline
+   - Apply width: gravel 2.0m, paved 2.5m, service 3.5m
+   - Extrude rectangular cross-section along path
+3. **Generate hedge geometry** from LineStrings:
+   - Width: 1.0m, height: 1.5m
+   - Create as tube or extruded rectangle
+4. **Buildings:** Use polygons directly
+5. **Z-order:** ground (0.0) < hedges (0.01) < paths (0.02) < props (0.03)
 
 ### Navigation Graph
-- Build from original path lines (or skeletonize surfaces)
-- Node spacing 8–10 m; edges along paths
-- Remove edges crossing closed gates/fence
-- Mark tap nodes (nearest path point) for proximity queries
 
-### Two Acceptable Geometry Tracks
-- **Track A (clean source, best):** Keep lines + widths as source; buffer with tolerances; auto-offset hedges from paths to maintain minimum hedge width (e.g., ≥1.0 m). TBD post-MVP
-- **Track B (ship now):** Accept current polygons; union/clip as above; optionally shrink hedge collider width (e.g., 0.9 m) to avoid snags; log hotspots for later fix
+- Build directly from path LineStrings
+- Sample points every 8–10m along lines
+- Connect nodes at intersections
+- Remove edges crossing closed gates/fence
+- Mark tap nodes (nearest path point)
 
 ### Spawn
+
 - **Location:** Inside main gate: 1.0 m inward, perpendicular to fence; facing gate
 - **Resolution:** From gate feature @id + normal
 
@@ -106,6 +116,7 @@ Mobile, interiors, complex AI, physics, item inventory, save system, complex sha
 ## 3. AI — Husband
 
 ### Rules
+
 - **Movement:** Only on path graph (from `highway=path|footway|service`, blocked by closed gates/fence)
 - **Speed:** 3.675 m/s (1.05× player walk). No sprint
 - **Behavior:** Random path segments with bias toward areas containing targets (configurable weight)
@@ -113,11 +124,13 @@ Mobile, interiors, complex AI, physics, item inventory, save system, complex sha
 - **Audio:** Mumbling max radius 25 m; low drone under 10 m; stereo panning by relative angle
 
 ### Fairness
+
 - No well anti-camping rules
 - Does not enter within 12 m of spawn only
 - Watering does not auto-cancel when he's close (player risk)
 
 ### Tuning (Configurable)
+
 - Waypoint dwell 1–3 s random
 - Turn rate limit during patrol to avoid jitter
 - Optional "visit target graves sometimes" probability
@@ -129,6 +142,7 @@ Mobile, interiors, complex AI, physics, item inventory, save system, complex sha
 All configs are small JSONs. Scalars are meters/seconds unless noted. IDs refer to GeoJSON @id where possible.
 
 ### level.json
+
 ```json
 {
   "version": 1,
@@ -140,14 +154,15 @@ All configs are small JSONs. Scalars are meters/seconds unless noted. IDs refer 
   "spawn_offset_m": 1.0,
   "fog": { "near": 8, "far": 50 },
   "draw_order": ["ground", "hedge", "surface", "props"],
-  "battery_spawn_point_ids": ["ID1","ID2","ID3","ID4","ID5"],
+  "battery_spawn_point_ids": ["ID1", "ID2", "ID3", "ID4", "ID5"],
   "battery_count_per_run": 1,
-  "tap_ids": ["TAP_ID_1","TAP_ID_2","TAP_ID_3","TAP_ID_4","TAP_ID_5","TAP_ID_6"],
+  "tap_ids": ["TAP_ID_1", "TAP_ID_2", "TAP_ID_3", "TAP_ID_4", "TAP_ID_5", "TAP_ID_6"],
   "closed_gate_ids": ["..."]
 }
 ```
 
 ### player.json
+
 ```json
 {
   "walk_speed": 3.5,
@@ -162,16 +177,18 @@ All configs are small JSONs. Scalars are meters/seconds unless noted. IDs refer 
 ```
 
 ### flashlight.json
+
 ```json
 {
   "max_energy_sec": 1200,
-  "flicker_threshold": 0.30,
+  "flicker_threshold": 0.3,
   "intensity_curve": "linear",
   "starts_on": true
 }
 ```
 
 ### ambient.json
+
 ```json
 {
   "darkness_timeline": [
@@ -186,6 +203,7 @@ All configs are small JSONs. Scalars are meters/seconds unless noted. IDs refer 
 ```
 
 ### water.json
+
 ```json
 {
   "can_max": 100,
@@ -197,6 +215,7 @@ All configs are small JSONs. Scalars are meters/seconds unless noted. IDs refer 
 ```
 
 ### ai_husband.json
+
 ```json
 {
   "speed": 3.675,
@@ -212,10 +231,11 @@ All configs are small JSONs. Scalars are meters/seconds unless noted. IDs refer 
 ```
 
 ### targets.json
+
 ```json
 {
   "sets": [
-    { "id": "A", "grave_ids": ["G1","G2","G3","G4","G5","G6","G7","G8"] },
+    { "id": "A", "grave_ids": ["G1", "G2", "G3", "G4", "G5", "G6", "G7", "G8"] },
     { "id": "B", "grave_ids": ["..."] }
   ],
   "choose_one_random": true,
@@ -224,6 +244,7 @@ All configs are small JSONs. Scalars are meters/seconds unless noted. IDs refer 
 ```
 
 ### audio.json
+
 ```json
 {
   "master_db": -12,
@@ -237,6 +258,7 @@ All configs are small JSONs. Scalars are meters/seconds unless noted. IDs refer 
 ```
 
 ### debug.json
+
 ```json
 {
   "show_navgraph": false,
@@ -263,6 +285,7 @@ All configs are small JSONs. Scalars are meters/seconds unless noted. IDs refer 
 ## 6. Build & Runbook
 
 ### Project Structure (Suggested)
+
 ```
 /data
   cemetery_game_final.geojson
@@ -289,6 +312,7 @@ All configs are small JSONs. Scalars are meters/seconds unless noted. IDs refer 
 ```
 
 ### Map Update Flow
+
 1. Edit raw OSM/export (if needed)
 2. Run preprocess (union surfaces, clip hedges, subtract buildings, mark gates)
 3. Rebuild navgraph from path lines
@@ -296,9 +320,11 @@ All configs are small JSONs. Scalars are meters/seconds unless noted. IDs refer 
 5. Log overlap hotspots to CSV (if any) for later Track A cleanup
 
 ### Swapping GeoJSON
+
 - Replace file in `/data`, run preprocess, re-export metrics (surface counts, overlap m²)
 
 ### Attribution
+
 - Include OSM contributors in credits
 
 ---
@@ -306,6 +332,7 @@ All configs are small JSONs. Scalars are meters/seconds unless noted. IDs refer 
 ## 7. Test Plan / Acceptance (MVP)
 
 ### Must Pass
+
 - Spawn inside gate, facing it; gate closed; movement works
 - Darkness curve matches 0–5–10 min timings
 - Flashlight drains on-time; battery resets to 100%
@@ -317,6 +344,7 @@ All configs are small JSONs. Scalars are meters/seconds unless noted. IDs refer 
 - FPS target met in worst-case view
 
 ### Edge Cases
+
 - Cancel watering/refill mid-hold retains progress
 - Flashlight off during watering; resumes prior state afterward
 - Battery cannot be picked twice; spawns at one of configured points
@@ -328,15 +356,18 @@ All configs are small JSONs. Scalars are meters/seconds unless noted. IDs refer 
 ## 8. Vision
 
 ### Experience
+
 Grounded, intimate horror by scarcity and sound. Navigation tension from darkness, limited water, and an ever-present human presence.
 
 ### Design Pillars
+
 1. **Route pressure:** Choose between safe refills vs efficient paths
 2. **Sensory load:** Light and sound inform safety, not HUD spam
 3. **Fair but fragile:** One mistake can end a 20-min run
 4. **Data-driven:** Every number adjustable without code
 
 ### Evolvability
+
 - Add "lady" ghost later (teleporting, line-of-sight breaks)
 - Swap target sets, tune darkness/flashlight, vary husband bias
 - Replace cemetery data without code changes (same schema)
@@ -346,30 +377,37 @@ Grounded, intimate horror by scarcity and sound. Navigation tension from darknes
 ## 9. Phases & Milestones (1 Week)
 
 ### Day 1 — Skeleton & Data
+
 - Load GeoJSON, apply world transform, draw ground/surfaces/hedges/buildings
 - Implement preprocess (union/clip/subtract/sliver cull)
 - Basic camera + movement
 
 ### Day 2 — Systems
+
 - Watering/refill mechanics + HUD
 - Darkness timeline + flashlight energy + battery spawn
 
 ### Day 3 — AI & Graph
+
 - Build path graph; husband patrol on graph; gate blocking
 - Audio cues (mumble/drone)
 
 ### Day 4 — Targets & Win/Lose
+
 - Target set loader (from `targets.json`), progress tracking
 - Game over cutscene + win screen. Polish interaction prompts
 
 ### Day 5 — Performance & Polish
+
 - Instancing for graves/props (placeholder for now)
 - Fog tuning, audio mix, collision pass
 
 ### Day 6 — Bugfix & Test
+
 - Acceptance checklist, overlap hotspot logging, navgraph debug
 
 ### Day 7 — Buffer & Nice-to-haves
+
 - Optional small props pass (benches, lamps)
 - Tune numbers; finalize credits/attribution
 
