@@ -58,8 +58,9 @@ const ambientLight = new THREE.AmbientLight(0x404060, 0.2); // Subtle blue-gray
 scene.add(ambientLight);
 
 // Moonlight (main directional light)
-const moonLight = new THREE.DirectionalLight(0x8888ff, 0.6); // Cool blue moonlight
+const moonLight = new THREE.DirectionalLight(0x8888ff, 0.8); // Slightly brighter
 moonLight.position.set(-15, 25, 10); // High and angled for better coverage
+moonLight.target.position.set(0, 0, 0); // Explicitly target the ground center
 moonLight.castShadow = true;
 
 // Configure shadow properties for soft shadows
@@ -75,6 +76,7 @@ moonLight.shadow.bias = -0.002;
 moonLight.shadow.normalBias = 0.02;
 
 scene.add(moonLight);
+scene.add(moonLight.target); // Add target to scene
 
 // Add a subtle moon glow helper (optional visual)
 const moonHelper = new THREE.DirectionalLightHelper(moonLight, 1);
@@ -83,11 +85,11 @@ scene.add(moonHelper);
 
 // Ground plane
 const groundGeometry = new THREE.PlaneGeometry(500, 500, 50, 50);
-const groundMaterial = new THREE.MeshPhongMaterial({ 
-  color: 0x1a2a1a,  // Dark green grass color
+// DEBUG: Using MeshBasicMaterial with brighter color to ensure visibility
+const groundMaterial = new THREE.MeshBasicMaterial({ 
+  color: 0x3a5a3a,  // Brighter green that doesn't need lighting
   side: THREE.DoubleSide,
-  shininess: 5,
-  specular: 0x111111
+  wireframe: false  // Set to true to see wireframe for debugging
 });
 
 // Add some vertex variation for more natural look
