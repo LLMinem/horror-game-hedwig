@@ -28,8 +28,8 @@ const camera = new THREE.PerspectiveCamera(
   0.1, // Near plane
   100 // Far plane
 );
-camera.position.set(0, 1.7, 10); // Eye height, further back
-camera.lookAt(0, 0, 0); // Look at origin (down and forward)
+camera.position.set(0, 5, 15); // Higher and further back to see ground
+camera.lookAt(0, 0, 0); // Look at origin
 
 // Renderer setup
 const renderer = new THREE.WebGLRenderer({ 
@@ -85,9 +85,9 @@ scene.add(moonHelper);
 
 // Ground plane
 const groundGeometry = new THREE.PlaneGeometry(500, 500, 50, 50);
-// DEBUG: Using MeshBasicMaterial with brighter color to ensure visibility
+// DEBUG: Using MeshBasicMaterial with visible color
 const groundMaterial = new THREE.MeshBasicMaterial({ 
-  color: 0x3a5a3a,  // Brighter green that doesn't need lighting
+  color: 0x4a6a4a,  // Visible green color
   side: THREE.DoubleSide,
   wireframe: false  // Set to true to see wireframe for debugging
 });
@@ -102,7 +102,7 @@ groundGeometry.computeVertexNormals();
 
 const ground = new THREE.Mesh(groundGeometry, groundMaterial);
 ground.rotation.x = -Math.PI / 2; // Rotate to horizontal
-ground.position.y = -0.1; // Position slightly below origin
+ground.position.y = 0; // Position at origin level
 ground.receiveShadow = true;
 scene.add(ground);
 
