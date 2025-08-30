@@ -9,18 +9,21 @@ This horror game is being built to reconnect with someone important who rarely s
 ## MANDATORY WORKING PRINCIPLES
 
 ### 1. NEVER CLAIM SOMETHING WORKS WITHOUT TESTING
+
 - Run the code
 - Verify it actually works
 - Report what you tested and the results
 - If unsure, say "I need to test this"
 
 ### 2. INCREMENTAL DEVELOPMENT ONLY
+
 - Small, working pieces
 - Commit at natural save points
 - Never move forward with broken code
 - Fix immediately if something breaks
 
 ### 3. VISUAL QUALITY MATTERS
+
 - This is NOT a prototype - it needs to look good
 - Better to have less content that looks great
 - Use proper lighting, shadows, textures
@@ -28,12 +31,14 @@ This horror game is being built to reconnect with someone important who rarely s
 - Test visuals at each step
 
 ### 4. FOLLOW THE PLAN
+
 - Read: `@docs/development-plan.md`
 - Work through phases sequentially
 - Don't skip ahead
 - Each phase has specific checkpoints
 
 ### 5. USE TODO LIST RELIGIOUSLY
+
 - Track every task
 - Mark items complete when done
 - Update if plans change
@@ -74,18 +79,21 @@ This horror game is being built to reconnect with someone important who rarely s
 ## TECHNICAL REQUIREMENTS
 
 ### Core Stack
+
 - **Three.js r170** (latest stable)
 - **Vite** (dev server and bundler)
 - **Vanilla JavaScript** (no framework)
 - **No TypeScript** for MVP
 
 ### Performance Targets
+
 - **60 FPS** on mid-range desktop
 - **≤400 draw calls** maximum
 - Instancing for repeated objects
 - Fog distance ~50-60m (not heavy)
 
 ### Visual Standards
+
 - Atmospheric lighting (moonlight, soft shadows)
 - Quality textures (1024x1024 minimum)
 - No z-fighting or overlapping geometry
@@ -96,11 +104,13 @@ This horror game is being built to reconnect with someone important who rarely s
 ## CRITICAL MAP INFORMATION
 
 ### DO NOT READ cemetery_final.geojson DIRECTLY
+
 - It's 69KB of coordinates - will pollute context
 - It's LINE-BASED, not polygons
 - Generate geometry at runtime from lines + width
 
 ### Map Pipeline
+
 1. Load GeoJSON
 2. Convert coordinates to local meters
 3. Apply 146° rotation
@@ -122,6 +132,7 @@ This horror game is being built to reconnect with someone important who rarely s
 ## TESTING CHECKLIST (USE EVERY TIME)
 
 Before claiming anything works:
+
 - [ ] Code runs without errors
 - [ ] Feature actually functions
 - [ ] Visuals look good
@@ -143,6 +154,7 @@ Before claiming anything works:
 ## COMMUNICATION STYLE
 
 When reporting:
+
 - Be specific: "WASD movement works, tested all directions at 3.5 m/s"
 - Show visuals: "The cemetery looks atmospheric with subtle fog"
 - Admit uncertainty: "I need to test if sprint works"
