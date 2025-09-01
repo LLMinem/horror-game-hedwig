@@ -92,13 +92,8 @@ const groundMaterial = new THREE.MeshBasicMaterial({
   wireframe: false  // Set to true to see wireframe for debugging
 });
 
-// Add some vertex variation for more natural look
-const positionAttribute = groundGeometry.attributes.position;
-for (let i = 0; i < positionAttribute.count; i++) {
-  const y = 0.1 * Math.random() - 0.05; // Small height variation
-  positionAttribute.setY(i, y);
-}
-groundGeometry.computeVertexNormals();
+// Note: Vertex modifications removed - modifying Y coordinates before rotation
+// caused the plane to render as a line instead of a horizontal surface
 
 const ground = new THREE.Mesh(groundGeometry, groundMaterial);
 ground.rotation.x = -Math.PI / 2; // Rotate to horizontal
