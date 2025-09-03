@@ -107,7 +107,7 @@ function setEnvIntensity(root, intensity) {
     }
   });
   
-  console.log(`Environment intensity changed to ${intensity} on ${count} materials`);
+  console.log(`Environment intensity changed to ${intensity.toFixed(2)} on ${count} materials`);
 }
 
 // =============== LIGHTS
@@ -215,12 +215,12 @@ window.addEventListener('keydown', (e) => {
   
   // Quick HDRI intensity test (+ and - keys)
   if (e.key === '+') {
-    const newIntensity = Math.min(1.0, CURRENT_ENV_INTENSITY + 0.1);  // Bigger steps
-    setEnvIntensity(scene, newIntensity);
+    const newIntensity = Math.min(1.0, CURRENT_ENV_INTENSITY + 0.05);
+    setEnvIntensity(scene, parseFloat(newIntensity.toFixed(2)));  // Round to 2 decimals
   }
   if (e.key === '-') {
-    const newIntensity = Math.max(0.0, CURRENT_ENV_INTENSITY - 0.1);  // Bigger steps
-    setEnvIntensity(scene, newIntensity);
+    const newIntensity = Math.max(0.0, CURRENT_ENV_INTENSITY - 0.05);
+    setEnvIntensity(scene, parseFloat(newIntensity.toFixed(2)));  // Round to 2 decimals
   }
 });
 
