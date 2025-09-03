@@ -204,11 +204,11 @@ window.addEventListener('keydown', (e) => {
   if (e.key.toLowerCase() === 'f') flashlight.visible = !flashlight.visible;
   
   // Exposure controls (German keyboard)
-  if (e.key === 'ä') {
+  if (e.key === 'ü') {
     renderer.toneMappingExposure *= 1.06;
     console.log('Exposure increased to:', renderer.toneMappingExposure.toFixed(2));
   }
-  if (e.key === 'ü') {
+  if (e.key === 'ä') {
     renderer.toneMappingExposure /= 1.06;
     console.log('Exposure decreased to:', renderer.toneMappingExposure.toFixed(2));
   }
