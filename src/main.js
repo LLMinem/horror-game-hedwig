@@ -125,13 +125,25 @@ scene.add(sphere);
 
 // =============== OPTIONAL: FLASHLIGHT (toggle with 'F')
 const flashlight = new THREE.SpotLight(0xfff5d6, 35, 35, Math.PI * 0.09, 0.5, 2);
-// If your version uses “legacy” light scaling, start with intensity ~5–8 instead of 35.
+// If your version uses "legacy" light scaling, start with intensity ~5–8 instead of 35.
 flashlight.visible = false;             // keep OFF by default
 flashlight.castShadow = true;
 scene.add(flashlight, flashlight.target);
 
+// =============== KEYBOARD CONTROLS
 window.addEventListener('keydown', (e) => {
+  // Flashlight toggle
   if (e.key.toLowerCase() === 'f') flashlight.visible = !flashlight.visible;
+  
+  // Exposure controls (German keyboard)
+  if (e.key === 'ä') {
+    renderer.toneMappingExposure *= 1.06;
+    console.log('Exposure increased to:', renderer.toneMappingExposure.toFixed(2));
+  }
+  if (e.key === 'ü') {
+    renderer.toneMappingExposure /= 1.06;
+    console.log('Exposure decreased to:', renderer.toneMappingExposure.toFixed(2));
+  }
 });
 
 // =============== RESIZE
