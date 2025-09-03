@@ -1,7 +1,6 @@
 // main.js (baseline playable night)
 // --------------------------------------------------
 import * as THREE from 'three';
-import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 
 // =============== SCENE & RENDERER
 const scene = new THREE.Scene();
@@ -12,7 +11,7 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.2; // ~night baseline; adjust live if needed
+renderer.toneMappingExposure = 1.0; // neutral starting point
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 document.body.appendChild(renderer.domElement);
 
@@ -23,28 +22,25 @@ camera.lookAt(0, 1.5, 0);
 
 // =============== SKY (background only; does NOT light)
 const skyCanvas = document.createElement('canvas');
-skyCanvas.width = 2; skyCanvas.height = 512;
+skyCanvas.width = 4; skyCanvas.height = 2048; // Higher res to reduce banding
 const g = skyCanvas.getContext('2d');
-const grad = g.createLinearGradient(0, 0, 0, 512);
-grad.addColorStop(0.0, '#0a0a2e');  // deep blue
-grad.addColorStop(0.45, '#07071e'); // mid
-grad.addColorStop(1.0, '#000000');  // horizon black
-g.fillStyle = grad; g.fillRect(0, 0, 2, 512);
+const grad = g.createLinearGradient(0, 0, 0, 2048);
+grad.addColorStop(0.0, '#0a0a2e');  // deep blue at top
+grad.addColorStop(0.5, '#0a0e2a');  // slightly lighter blue
+grad.addColorStop(1.0, '#000000');  // black at horizon
+g.fillStyle = grad; g.fillRect(0, 0, 4, 2048);
 scene.background = new THREE.CanvasTexture(skyCanvas);
 
 // =============== FOG (subtle; visibility to ~80m)
-scene.fog = new THREE.Fog(0x10122e, 40, 90);
+scene.fog = new THREE.Fog(0x0b1133, 35, 90); // slightly adjusted to match new lighting
 
-// =============== IMAGE-BASED LIGHTING (critical)
-const pmrem = new THREE.PMREMGenerator(renderer);
-const envTex = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
-scene.environment = envTex;               // lights PBR materials
-// If your three.js ≥ r163 you can globally dim/boost IBL:
-// scene.environmentIntensity = 0.25;     // optional (depends on your version)
+// =============== IMAGE-BASED LIGHTING
+// Step 1: Removed RoomEnvironment - it was making everything look like an indoor studio!
+// Step 2 will add proper night HDRI here
 
 // =============== LIGHTS
-// 1) Moon (directional)
-const moon = new THREE.DirectionalLight(0xbfd2ff, 1.2); // off-white moon
+// 1) Moon (directional) - main light source, cool blue-white
+const moon = new THREE.DirectionalLight(0x9bb7ff, 0.8); // cooler, dimmer moon
 moon.position.set(12, 30, 16);
 moon.target.position.set(0, 0, 0);
 moon.castShadow = true;
@@ -59,23 +55,22 @@ moon.shadow.bias = -0.001;
 moon.shadow.normalBias = 0.02;
 scene.add(moon, moon.target);
 
-// 2) Hemisphere (sky/ground bounce)
-const hemi = new THREE.HemisphereLight(0x2c3a5a, 0x0a0a18, 0.35);
+// 2) Hemisphere (sky/ground bounce) - subtle blue from above, dark from below
+const hemi = new THREE.HemisphereLight(0x20324f, 0x0a0f18, 0.25);
 scene.add(hemi);
 
-// 3) Ambient (tiny base lift; keep low or it flattens)
-const amb = new THREE.AmbientLight(0x222244, 0.08);
+// 3) Ambient (tiny base lift; keep very low or it flattens everything)
+const amb = new THREE.AmbientLight(0x1b1e34, 0.05);
 scene.add(amb);
 
 // =============== GROUND
 const groundGeo = new THREE.PlaneGeometry(500, 500);
 const groundMat = new THREE.MeshStandardMaterial({
-  color: 0x3b4d3b,  // a bit lighter than before
+  color: 0x3b4d3b,
   roughness: 0.85,
   metalness: 0.0,
-  emissive: 0x0f0f10,
-  emissiveIntensity: 0.12,
-  side: THREE.DoubleSide
+  emissive: 0x0c0d10,
+  emissiveIntensity: 0.08  // reduced emissive glow
 });
 const ground = new THREE.Mesh(groundGeo, groundMat);
 ground.rotation.x = -Math.PI / 2;
@@ -85,9 +80,9 @@ scene.add(ground);
 // =============== TEST OBJECTS (lighten albedo a touch)
 for (let i = 0; i < 5; i++) {
   const tombMat = new THREE.MeshStandardMaterial({
-    color: 0x6a6f78,   // lighter gray-blue stone
-    roughness: 0.7,
-    metalness: 0.05
+    color: 0x7a808a,   // stone color
+    roughness: 0.65,
+    metalness: 0.0      // stone isn't metal!
   });
   const tomb = new THREE.Mesh(new THREE.BoxGeometry(1.5, 2.5, 0.3), tombMat);
   tomb.position.set(Math.random() * 20 - 10, 1.25, Math.random() * 20 - 10);
@@ -108,7 +103,7 @@ for (let i = 0; i < 3; i++) {
 for (let i = 0; i < 8; i++) {
   const post = new THREE.Mesh(
     new THREE.BoxGeometry(0.15, 3, 0.15),
-    new THREE.MeshStandardMaterial({ color: 0x505050, roughness: 0.8, metalness: 0.3 })
+    new THREE.MeshStandardMaterial({ color: 0x7a7a7a, roughness: 0.6, metalness: 1.0 }) // proper metal
   );
   post.position.set(-20 + i * 5, 1.5, -15);
   post.castShadow = post.receiveShadow = true;
@@ -117,14 +112,14 @@ for (let i = 0; i < 8; i++) {
 
 const sphere = new THREE.Mesh(
   new THREE.SphereGeometry(1, 32, 32),
-  new THREE.MeshStandardMaterial({ color: 0x808699, roughness: 0.55, metalness: 0.2 })
+  new THREE.MeshStandardMaterial({ color: 0x9aa2b5, roughness: 0.5, metalness: 0.0 })
 );
 sphere.position.set(5, 1, 5);
 sphere.castShadow = sphere.receiveShadow = true;
 scene.add(sphere);
 
 // =============== OPTIONAL: FLASHLIGHT (toggle with 'F')
-const flashlight = new THREE.SpotLight(0xfff5d6, 35, 35, Math.PI * 0.09, 0.5, 2);
+const flashlight = new THREE.SpotLight(0xfff2d0, 20, 35, Math.PI * 0.1, 0.5, 2); // warmer, less intense
 // If your version uses "legacy" light scaling, start with intensity ~5–8 instead of 35.
 flashlight.visible = false;             // keep OFF by default
 flashlight.castShadow = true;
