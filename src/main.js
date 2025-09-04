@@ -236,48 +236,38 @@ function setEnvIntensity(root, intensity) {
 // =============== GUI SETUP (Step 3: Developer Panel)
 const gui = new GUI();
 
-// TODO: Consider adding individual value reset on double-click
-// lil-gui supports this natively with .listen() and double-click behavior
-
-// State object to track all adjustable values
-const state = {
-  // Rendering
-  exposure: renderer.toneMappingExposure,
-
-  // Environment
-  envIntensity: CURRENT_ENV_INTENSITY,
-  hdri: HDRI_CHOICE,
-
-  // Lights
-  moonIntensity: moon.intensity,
-  moonX: moon.position.x,
-  moonY: moon.position.y,
-  moonZ: moon.position.z,
-  hemiIntensity: hemi.intensity,
-  ambientIntensity: amb.intensity,
-
-  // Fog (near = where fog starts, far = where fog reaches full density)
-  fogNear: scene.fog.near,
-  fogFar: scene.fog.far,
+// Default values for double-click reset functionality
+const defaults = {
+  exposure: 1.0,
+  envIntensity: 0.25,
+  hdri: "moonless_golf",
+  moonIntensity: 0.8,
+  moonX: 12,
+  moonY: 30,
+  moonZ: 16,
+  hemiIntensity: 0.25,
+  ambientIntensity: 0.05,
+  fogNear: 35,
+  fogFar: 90,
   fogColor: "#0b1133",
-
-  // Flashlight (updated defaults from testing)
-  flashlightIntensity: flashlight.intensity,
-  flashlightAngle: (flashlight.angle * 180) / Math.PI, // Convert to degrees for GUI
-  flashlightPenumbra: flashlight.penumbra,
-  flashlightDistance: flashlight.distance,
-
-  // Shadows
-  shadowBias: moon.shadow.bias,
-  shadowNormalBias: moon.shadow.normalBias,
+  flashlightIntensity: 50,
+  flashlightAngle: 28,
+  flashlightPenumbra: 0.4,
+  flashlightDistance: 45,
+  shadowBias: -0.001,
+  shadowNormalBias: 0.02,
 };
+
+// State object initialized from defaults (enables double-click reset)
+const state = { ...defaults };
 
 // Rendering folder
 const renderFolder = gui.addFolder("Rendering");
 renderFolder
   .add(state, "exposure", 0.3, 3.0, 0.01)
   .name("Exposure")
-  .onChange((v) => (renderer.toneMappingExposure = v));
+  .onChange((v) => (renderer.toneMappingExposure = v))
+  .listen(); // Enable double-click reset
 renderFolder.open();
 
 // Environment folder
@@ -285,7 +275,8 @@ const envFolder = gui.addFolder("Environment");
 envFolder
   .add(state, "envIntensity", 0, 1, 0.01)
   .name("Env Intensity")
-  .onChange((v) => setEnvIntensity(scene, v));
+  .onChange((v) => setEnvIntensity(scene, v))
+  .listen(); // Enable double-click reset
 envFolder
   .add(state, "hdri", {
     "Darkest (moonless_golf)": "moonless_golf",
@@ -298,7 +289,8 @@ envFolder
   .onChange((v) => {
     HDRI_CHOICE = v;
     loadHDRI(v);
-  });
+  })
+  .listen(); // Enable double-click reset
 envFolder.open();
 
 // Lights folder
@@ -306,27 +298,33 @@ const lightsFolder = gui.addFolder("Lights");
 lightsFolder
   .add(state, "moonIntensity", 0, 2, 0.01)
   .name("Moon Intensity")
-  .onChange((v) => (moon.intensity = v));
+  .onChange((v) => (moon.intensity = v))
+  .listen(); // Enable double-click reset
 lightsFolder
   .add(state, "moonX", -50, 50, 0.5)
   .name("Moon X")
-  .onChange((v) => (moon.position.x = v));
+  .onChange((v) => (moon.position.x = v))
+  .listen(); // Enable double-click reset
 lightsFolder
   .add(state, "moonY", 10, 50, 0.5)
   .name("Moon Y")
-  .onChange((v) => (moon.position.y = v));
+  .onChange((v) => (moon.position.y = v))
+  .listen(); // Enable double-click reset
 lightsFolder
   .add(state, "moonZ", -50, 50, 0.5)
   .name("Moon Z")
-  .onChange((v) => (moon.position.z = v));
+  .onChange((v) => (moon.position.z = v))
+  .listen(); // Enable double-click reset
 lightsFolder
   .add(state, "hemiIntensity", 0, 1, 0.01)
   .name("Hemisphere")
-  .onChange((v) => (hemi.intensity = v));
+  .onChange((v) => (hemi.intensity = v))
+  .listen(); // Enable double-click reset
 lightsFolder
   .add(state, "ambientIntensity", 0, 0.3, 0.001)
   .name("Ambient")
-  .onChange((v) => (amb.intensity = v));
+  .onChange((v) => (amb.intensity = v))
+  .listen(); // Enable double-click reset
 
 // Fog folder
 const fogFolder = gui.addFolder("Fog");
@@ -343,7 +341,8 @@ fogFolder
       });
     }
     scene.fog.near = v;
-  });
+  })
+  .listen(); // Enable double-click reset
 fogFolder
   .add(state, "fogFar", 50, 200, 1)
   .name("Far (Full)")
@@ -357,30 +356,36 @@ fogFolder
       });
     }
     scene.fog.far = v;
-  });
+  })
+  .listen(); // Enable double-click reset
 fogFolder
   .addColor(state, "fogColor")
   .name("Color")
-  .onChange((v) => scene.fog.color.set(v));
+  .onChange((v) => scene.fog.color.set(v))
+  .listen(); // Enable double-click reset
 
 // Flashlight folder
 const flashFolder = gui.addFolder("Flashlight");
 flashFolder
   .add(state, "flashlightIntensity", 0, 100, 0.5) // Increased max to 100
   .name("Intensity")
-  .onChange((v) => (flashlight.intensity = v));
+  .onChange((v) => (flashlight.intensity = v))
+  .listen(); // Enable double-click reset
 flashFolder
   .add(state, "flashlightAngle", 5, 45, 1)
   .name("Angle (degrees)")
-  .onChange((v) => (flashlight.angle = (v * Math.PI) / 180));
+  .onChange((v) => (flashlight.angle = (v * Math.PI) / 180))
+  .listen(); // Enable double-click reset
 flashFolder
   .add(state, "flashlightPenumbra", 0, 1, 0.01)
   .name("Penumbra")
-  .onChange((v) => (flashlight.penumbra = v));
+  .onChange((v) => (flashlight.penumbra = v))
+  .listen(); // Enable double-click reset
 flashFolder
   .add(state, "flashlightDistance", 10, 100, 1)
   .name("Distance")
-  .onChange((v) => (flashlight.distance = v));
+  .onChange((v) => (flashlight.distance = v))
+  .listen(); // Enable double-click reset
 flashFolder.add(flashlight, "visible").name("Enabled");
 
 // Shadows folder
@@ -388,11 +393,13 @@ const shadowFolder = gui.addFolder("Shadows");
 shadowFolder
   .add(state, "shadowBias", -0.005, 0.005, 0.0001)
   .name("Bias")
-  .onChange((v) => (moon.shadow.bias = v));
+  .onChange((v) => (moon.shadow.bias = v))
+  .listen(); // Enable double-click reset
 shadowFolder
   .add(state, "shadowNormalBias", 0, 0.1, 0.001)
   .name("Normal Bias")
-  .onChange((v) => (moon.shadow.normalBias = v));
+  .onChange((v) => (moon.shadow.normalBias = v))
+  .listen(); // Enable double-click reset
 
 // Presets button
 const presetsObj = {
@@ -560,6 +567,7 @@ animate();
 console.log("🎮 Night Scene with GUI Controls");
 console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
 console.log("GUI panel in top-right corner");
+console.log("💡 DOUBLE-CLICK any slider to reset to default!");
 console.log("Keyboard shortcuts still work:");
 console.log("  F - Toggle flashlight");
 console.log("  ü/ä - Adjust exposure");
