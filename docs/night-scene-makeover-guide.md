@@ -29,7 +29,7 @@
 **Context**  
 - three.js: **r179.1** (modern pipeline: physically-correct lights by default, strict color management).  
 - Goal: turn a too-bright/too-flat "indoor-ish" look into a **believable, playable moonlit cemetery**.  
-- Collaboration style: **slow, methodical, one change at a time**. After each change the agent must pause, explain *why*, and ask for approval before moving on.  
+- Collaboration style: **slow, methodical, one change at a time**. After each change the agent **MUST** pause, explain *why*, and ask for approval before moving on.  
 - The human (Michael) is a **beginner** and wants to learn. The agent must give plain-language explanations and short acceptance tests for each step.
 
 ---
