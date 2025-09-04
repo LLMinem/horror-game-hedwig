@@ -54,6 +54,7 @@ desktop.ini
 # Logs
 logs/
 *.log
+.chatlogs/
 
 # Cache
 .cache/
