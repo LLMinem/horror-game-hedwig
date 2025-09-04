@@ -40,6 +40,7 @@
     "is-arguments": "^1.2.0",
     "is-date-object": "^1.1.0",
     "is-regex": "^1.2.1",
+    "lil-gui": "^0.20.0",
     "math-intrinsics": "^1.1.0",
     "nanoid": "^3.3.11",
     "object-assign": "^4.1.1",

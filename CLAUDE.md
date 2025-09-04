@@ -170,6 +170,12 @@ When reporting:
 
 ---
 
+## COMMON COMMANDS
+
+- **Always** use `npm run dev -- --host` to run the dev server.
+
+---
+
 ## REMEMBER THE GOAL
 
 We're building something to make someone's face light up with enthusiasm. Every decision should support both technical excellence and visual appeal. Work methodically, test everything, and create something beautiful.
