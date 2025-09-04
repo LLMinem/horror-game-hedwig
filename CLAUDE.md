@@ -4,25 +4,40 @@
 
 This horror game is being built to reconnect with someone important who rarely shows enthusiasm for anything. The visual quality matters as much as functionality. A single bad-looking build can kill all interest permanently.
 
+## 👨‍💻 DEVELOPER CONTEXT
+
+Michael is a beginner developer with 8 months of programming experience and ZERO experience with Three.js. This project serves two equally important purposes: building a beautiful horror game AND providing an interactive, patient learning environment for Three.js concepts. Every implementation should be explained in beginner-friendly terms, focusing on the WHY as much as the WHAT.
+
 ---
 
 ## MANDATORY WORKING PRINCIPLES
 
-### 1. NEVER CLAIM SOMETHING WORKS WITHOUT TESTING
+### 1. INCREMENTAL DEVELOPMENT - ONE STEP AT A TIME
 
-- Run the code
-- Verify it actually works
-- Report what you tested and the results
-- If unsure, say "I need to test this"
+**This is the MOST IMPORTANT principle.** Our workflow is:
+- Implement exactly ONE feature or change
+- Stop and explain what was done and why
+- Show full, working code (not diffs)
+- Wait for explicit approval before continuing
+- NEVER cascade changes or jump ahead
+- Maintain organic back-and-forth conversation
 
-### 2. INCREMENTAL DEVELOPMENT ONLY
+### 2. USE TODO LIST RELIGIOUSLY
 
-- Small, working pieces
-- Commit at natural save points
-- Never move forward with broken code
-- Fix immediately if something breaks
+- Track every task with TodoWrite tool
+- Mark items complete when done
+- Update if plans change
+- Never work without tracking
 
-### 3. VISUAL QUALITY MATTERS
+### 3. FOLLOW THE CURRENT PLAN
+
+- **Current implementation guide:** `@docs/night-scene-makeover-guide.md`
+- High-level project overview: `@docs/development-plan.md` (for context only)
+- Work through phases sequentially
+- Don't skip ahead
+- Each phase has specific checkpoints
+
+### 4. VISUAL QUALITY MATTERS
 
 - This is NOT a prototype - it needs to look good
 - Better to have less content that looks great
@@ -30,48 +45,61 @@ This horror game is being built to reconnect with someone important who rarely s
 - No heavy fog that obscures everything
 - Test visuals at each step
 
-### 4. FOLLOW THE PLAN
+### 5. NEVER CLAIM SOMETHING WORKS WITHOUT TESTING
 
-- Read: `@docs/development-plan.md`
-- Work through phases sequentially
-- Don't skip ahead
-- Each phase has specific checkpoints
-
-### 5. USE TODO LIST RELIGIOUSLY
-
-- Track every task
-- Mark items complete when done
-- Update if plans change
-- Never work without tracking
+- Run the code
+- Verify it actually works
+- Report what you tested and the results
+- If unsure, say "I need to test this"
 
 ---
 
-## PROJECT STRUCTURE
+## COLLABORATION PROTOCOL (Follow Exactly)
+
+1. **Summarize before doing.** Read relevant docs, summarize the plan back to Michael, produce a small TODO list with checkboxes.
+
+2. **One step per turn.** Implement **exactly one step**, then stop. Show the code as a **full, self-contained file** (not a diff).
+
+3. **Explain the why.** Before code, explain the concept(s) introduced in that step in beginner terms. Focus on Three.js learning.
+
+4. **Call out manual actions.** If Michael must download a file or choose an asset, say so clearly and wait.
+
+5. **Acceptance test.** Tell Michael *what to look for on screen*. Ask for approval before continuing.
+
+6. **No cascade of changes.** Never jump to the next step without explicit "continue".
+
+7. **Version awareness.** We use Three.js r179 - prefer up-to-date APIs; avoid outdated patterns.
+
+8. **Rollback friendly.** If something looks worse, revert to the previous working state.
+
+---
+
+## PROJECT STRUCTURE (Planned - Not Yet Implemented)
+
+Currently, we're working entirely in `src/main.js` during the learning/prototyping phase. The planned structure for later refactoring:
 
 ```
 /src
-  main.js              # Entry point
-  /core               # Engine and game loop
-  /world              # Level generation from GeoJSON
-  /player             # Movement and controls
-  /entities           # Husband, graves, taps
-  /systems            # Darkness, audio, HUD
-  /utils              # Helpers and constants
+  main.js              # Current working file (everything here for now)
+  /core               # Future: Engine and game loop
+  /world              # Future: Level generation from GeoJSON
+  /player             # Future: Movement and controls
+  /entities           # Future: Husband, graves, taps
+  /systems            # Future: Darkness, audio, HUD
+  /utils              # Future: Helpers and constants
 
 /data
   cemetery_final.geojson  # Line-based map (DO NOT read directly - too much context)
-  CLAUDE.md              # This file
-
-/config               # JSON configuration files
-
+  
 /docs
-  spec.md              # Technical specification
-  development-plan.md  # Phased development approach
-  project-plan-draft.md # Original planning
+  night-scene-makeover-guide.md  # CURRENT IMPLEMENTATION GUIDE
+  development-plan.md             # High-level phases (reference only)
+  spec.md                        # Technical specification (older, take with grain of salt)
 
-/assets
-  /audio              # Sound effects and ambience
-  /textures           # Visual assets
+/public/assets
+  /hdri               # Night environment maps
+  /textures           # Visual assets (to be added)
+  /audio              # Sound effects (future)
 ```
 
 ---
@@ -80,17 +108,18 @@ This horror game is being built to reconnect with someone important who rarely s
 
 ### Core Stack
 
-- **Three.js r170** (latest stable)
+- **Three.js r179.1** (latest stable)
 - **Vite** (dev server and bundler)
 - **Vanilla JavaScript** (no framework)
 - **No TypeScript** for MVP
+- **lil-gui** for developer controls
 
 ### Performance Targets
 
 - **60 FPS** on mid-range desktop
 - **≤400 draw calls** maximum
 - Instancing for repeated objects
-- Fog distance ~50-60m (not heavy)
+- Fog distance ~50-60m (subtle, not heavy)
 
 ### Visual Standards
 
@@ -98,6 +127,7 @@ This horror game is being built to reconnect with someone important who rarely s
 - Quality textures (1024x1024 minimum)
 - No z-fighting or overlapping geometry
 - Clean, minimal UI
+- Night HDRI for image-based lighting
 
 ---
 
@@ -109,23 +139,36 @@ This horror game is being built to reconnect with someone important who rarely s
 - It's LINE-BASED, not polygons
 - Generate geometry at runtime from lines + width
 
-### Map Pipeline
+### Map Pipeline (Future Discussion)
 
-1. Load GeoJSON
-2. Convert coordinates to local meters
-3. Apply 146° rotation
-4. Generate geometry from lines:
-   - Paths: 2.0-3.5m width
-   - Hedges: 1.0m width, 1.5m height
-5. Build navigation graph from path centerlines
+The approach to converting the GeoJSON map is still to be determined. Options include:
+1. Runtime generation from lines (original plan)
+2. Alternative simplified approach
+3. Manual placement for MVP
+
+This will be discussed and decided when we reach that phase.
 
 ---
 
-## CURRENT PHASE TRACKING
+## CURRENT DEVELOPMENT STATUS
 
-**Current Phase:** [Check development-plan.md]
-**Last Working Commit:** [Update when committing]
-**Known Issues:** [Track any problems]
+**Current Phase:** Night Scene Makeover (Step 3 Complete)
+**Next Step:** Ground textures with micro-detail
+**Reference:** `@docs/night-scene-makeover-guide.md`
+
+### Completed:
+- ✅ Basic Three.js setup with atmospheric night scene
+- ✅ Night HDRI environment lighting (5 options)
+- ✅ lil-gui developer panel with full controls
+- ✅ Double-click reset on all GUI values
+- ✅ Proper fog validation
+- ✅ Updated flashlight defaults
+
+### Next Steps:
+- Ground texture application (color + normal maps)
+- Fog fine-tuning
+- Shadow quality optimization
+- Dev room for asset testing
 
 ---
 
@@ -134,20 +177,20 @@ This horror game is being built to reconnect with someone important who rarely s
 Before claiming anything works:
 
 - [ ] Code runs without errors
-- [ ] Feature actually functions
+- [ ] Feature actually functions as intended
 - [ ] Visuals look good
-- [ ] Performance is acceptable
+- [ ] Performance is acceptable (60 FPS)
 - [ ] No console errors or warnings
+- [ ] Tested all edge cases
 
 ---
 
-## COMMON PITFALLS TO AVOID
+## COMMON COMMANDS
 
-1. **Movement not working** → Test WASD in all directions, verify camera-relative
-2. **Overlapping geometry** → Generate from lines, not polygons
-3. **Too much fog** → Start at 30m, fade to 60m
-4. **Ugly lighting** → Use soft shadows, warm colors
-5. **Claiming fixes** → Always verify with actual testing
+- **Always** use `npm run dev -- --host` to run the dev server (accessible from network)
+- **Format code:** `npx prettier --write "**/*.{js,json,md,html,css}"`
+- **Check git status:** `git status`
+- **View recent commits:** `git log --oneline -10`
 
 ---
 
@@ -156,28 +199,36 @@ Before claiming anything works:
 When reporting:
 
 - Be specific: "WASD movement works, tested all directions at 3.5 m/s"
-- Show visuals: "The cemetery looks atmospheric with subtle fog"
-- Admit uncertainty: "I need to test if sprint works"
-- Request feedback: "Should I proceed to the next phase?"
+- Show what was tested: "Flashlight toggles with F key, intensity at 50"
+- Admit uncertainty: "I need to test if the double-click reset works on color picker"
+- Request feedback: "Should I proceed to ground textures or adjust something first?"
+- Explain Three.js concepts: "A normal map adds surface detail without geometry..."
+
+Always maintain the educational, patient tone. Remember that Michael is learning Three.js through this project.
 
 ---
 
 ## KEY FILES TO REFERENCE
 
-- Game specification: `@docs/spec.md`
-- Development phases: `@docs/development-plan.md`
-- Map data info: `@data/CLAUDE.md`
+- **CURRENT GUIDE:** `@docs/night-scene-makeover-guide.md` - The step-by-step implementation plan
+- High-level overview: `@docs/development-plan.md` - General project phases
+- Technical details: `@docs/spec.md` - Original spec (take with grain of salt)
+- This file: `CLAUDE.md` - Project context and working principles
 
 ---
 
-## COMMON COMMANDS
+## COMMON PITFALLS TO AVOID
 
-- **Always** use `npm run dev -- --host` to run the dev server.
+1. **Rushing ahead** → Always wait for "continue" between steps
+2. **Not explaining concepts** → Every Three.js feature needs beginner explanation
+3. **Claiming without testing** → Always verify with actual testing
+4. **Breaking the incremental flow** → One change at a time, no cascading
+5. **Forgetting the learning aspect** → This is education + development
 
 ---
 
 ## REMEMBER THE GOAL
 
-We're building something to make someone's face light up with enthusiasm. Every decision should support both technical excellence and visual appeal. Work methodically, test everything, and create something beautiful.
+We're building something to make someone's face light up with enthusiasm. Every decision should support both technical excellence and visual appeal. Work methodically, test everything, explain clearly, and create something beautiful.
 
-**Success = Working game + Beautiful visuals + Maintained enthusiasm**
+**Success = Working game + Beautiful visuals + Maintained enthusiasm + Three.js knowledge gained**
