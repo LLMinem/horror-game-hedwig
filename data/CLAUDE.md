@@ -63,7 +63,9 @@ Instead of pre-generated polygons, generate geometry at runtime:
 ```javascript
 // Example: Generate path geometry from line + width
 function createPathGeometry(lineCoords, width) {
-  const curve = new THREE.CatmullRomCurve3(lineCoords.map((coord) => latLonToLocal(coord)));
+  const curve = new THREE.CatmullRomCurve3(
+    lineCoords.map((coord) => latLonToLocal(coord)),
+  );
 
   const shape = new THREE.Shape();
   shape.moveTo(-width / 2, 0);
@@ -73,7 +75,7 @@ function createPathGeometry(lineCoords, width) {
 
   return new THREE.ExtrudeGeometry(shape, {
     extrudePath: curve,
-    steps: lineCoords.length * 2
+    steps: lineCoords.length * 2,
   });
 }
 ```

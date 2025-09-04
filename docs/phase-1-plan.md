@@ -1,9 +1,11 @@
 # Phase 1: Beautiful Foundation - Detailed Plan
 
 ## Objective
+
 Create a visually stunning Three.js scene that immediately captures interest and builds confidence. No gameplay yet - just pure atmosphere.
 
 ## Success Criteria
+
 - ✅ Atmospheric night scene that looks better than Slender
 - ✅ Smooth camera controls that feel natural
 - ✅ No technical issues or console errors
@@ -16,7 +18,9 @@ Create a visually stunning Three.js scene that immediately captures interest and
 ### Step 1.1: Project Setup (30 minutes)
 
 #### Tasks:
+
 1. **Initialize npm project**
+
    ```bash
    npm init -y
    npm install three vite
@@ -24,15 +28,17 @@ Create a visually stunning Three.js scene that immediately captures interest and
    ```
 
 2. **Create Vite config**
+
    ```javascript
    // vite.config.js
    export default {
      server: { port: 3000 },
-     build: { outDir: 'dist' }
-   }
+     build: { outDir: "dist" },
+   };
    ```
 
 3. **Create folder structure**
+
    ```
    /src
      main.js
@@ -43,19 +49,25 @@ Create a visually stunning Three.js scene that immediately captures interest and
    ```
 
 4. **Basic HTML**
+
    ```html
    <!DOCTYPE html>
    <html>
-   <head>
-     <title>Horror Game</title>
-     <style>
-       body { margin: 0; overflow: hidden; }
-       canvas { display: block; }
-     </style>
-   </head>
-   <body>
-     <script type="module" src="/src/main.js"></script>
-   </body>
+     <head>
+       <title>Horror Game</title>
+       <style>
+         body {
+           margin: 0;
+           overflow: hidden;
+         }
+         canvas {
+           display: block;
+         }
+       </style>
+     </head>
+     <body>
+       <script type="module" src="/src/main.js"></script>
+     </body>
    </html>
    ```
 
@@ -76,6 +88,7 @@ Create a visually stunning Three.js scene that immediately captures interest and
 ### Step 1.2: Atmospheric Scene (1 hour)
 
 #### Visual Goals:
+
 - Deep blue/purple night sky (not pure black)
 - Subtle fog that adds depth, not obscurity
 - Moonlight creating long shadows
@@ -102,9 +115,11 @@ Create a visually stunning Three.js scene that immediately captures interest and
    - Soft shadows with proper bias
 
 4. **Fog Settings**
+
    ```javascript
-   scene.fog = new THREE.Fog(0x0a0a2e, 30, 60);  // Start at 30m, end at 60m
+   scene.fog = new THREE.Fog(0x0a0a2e, 30, 60); // Start at 30m, end at 60m
    ```
+
    NOT heavy fog at 8m like before!
 
 5. **Ground Plane**
@@ -121,6 +136,7 @@ Create a visually stunning Three.js scene that immediately captures interest and
 ### Step 1.3: Camera Setup (30 minutes)
 
 #### Camera Goals:
+
 - First-person perspective
 - Natural field of view
 - Smooth, responsive controls
@@ -129,14 +145,15 @@ Create a visually stunning Three.js scene that immediately captures interest and
 #### Implementation:
 
 1. **Camera Configuration**
+
    ```javascript
    const camera = new THREE.PerspectiveCamera(
-     75,  // FOV
+     75, // FOV
      window.innerWidth / window.innerHeight,
-     0.1,  // Near
-     100   // Far (matching fog distance)
+     0.1, // Near
+     100, // Far (matching fog distance)
    );
-   camera.position.y = 1.7;  // Eye height
+   camera.position.y = 1.7; // Eye height
    ```
 
 2. **Mouse Look Controls**
@@ -160,6 +177,7 @@ Create a visually stunning Three.js scene that immediately captures interest and
 Before showing to brother:
 
 ### Visual Quality
+
 - [ ] Sky gradient visible and atmospheric
 - [ ] Moonlight creates mood without being harsh
 - [ ] Shadows are soft and realistic
@@ -168,6 +186,7 @@ Before showing to brother:
 - [ ] Overall darker than daylight but not pitch black
 
 ### Technical Quality
+
 - [ ] No console errors
 - [ ] 60 FPS consistent
 - [ ] Controls responsive
@@ -175,6 +194,7 @@ Before showing to brother:
 - [ ] Proper antialiasing
 
 ### Feel
+
 - [ ] Immediately atmospheric
 - [ ] Better looking than Slender
 - [ ] Makes you want to explore
@@ -192,6 +212,7 @@ Before showing to brother:
    - Seamless tiling
 
 Sources:
+
 - Poly Haven (textures.com)
 - Ambient CG
 - Create simple one if needed
@@ -241,6 +262,7 @@ Keep it simple for Phase 1. No over-engineering.
 ## Next Phase Preview
 
 Once Phase 1 is complete and brother approves:
+
 - Phase 2: WASD movement that works
 - Must test in all directions
 - Smooth acceleration

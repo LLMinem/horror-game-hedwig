@@ -156,7 +156,14 @@ All configs are small JSONs. Scalars are meters/seconds unless noted. IDs refer 
   "draw_order": ["ground", "hedge", "surface", "props"],
   "battery_spawn_point_ids": ["ID1", "ID2", "ID3", "ID4", "ID5"],
   "battery_count_per_run": 1,
-  "tap_ids": ["TAP_ID_1", "TAP_ID_2", "TAP_ID_3", "TAP_ID_4", "TAP_ID_5", "TAP_ID_6"],
+  "tap_ids": [
+    "TAP_ID_1",
+    "TAP_ID_2",
+    "TAP_ID_3",
+    "TAP_ID_4",
+    "TAP_ID_5",
+    "TAP_ID_6"
+  ],
   "closed_gate_ids": ["..."]
 }
 ```
@@ -235,7 +242,10 @@ All configs are small JSONs. Scalars are meters/seconds unless noted. IDs refer 
 ```json
 {
   "sets": [
-    { "id": "A", "grave_ids": ["G1", "G2", "G3", "G4", "G5", "G6", "G7", "G8"] },
+    {
+      "id": "A",
+      "grave_ids": ["G1", "G2", "G3", "G4", "G5", "G6", "G7", "G8"]
+    },
     { "id": "B", "grave_ids": ["..."] }
   ],
   "choose_one_random": true,

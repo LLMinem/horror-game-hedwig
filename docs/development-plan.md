@@ -19,9 +19,11 @@ This game is deeply personal - it's about reconnecting with someone important th
 ---
 
 ## Phase 1: Beautiful Foundation (Day 1 Morning)
+
 **Goal:** A visually appealing Three.js scene that builds confidence
 
 ### Step 1.1: Project Setup (30 min)
+
 - Initialize Three.js with Vite
 - Create basic HTML structure
 - Set up development server
@@ -29,6 +31,7 @@ This game is deeply personal - it's about reconnecting with someone important th
 - **COMMIT:** "Initial Three.js setup"
 
 ### Step 1.2: Atmospheric Scene (1 hour)
+
 - Dark blue/purple gradient sky
 - Subtle fog (start at 30m, fade to 60m - NOT heavy)
 - Moonlight with soft shadows (PCFSoft)
@@ -37,6 +40,7 @@ This game is deeply personal - it's about reconnecting with someone important th
 - **COMMIT:** "Atmospheric night scene"
 
 ### Step 1.3: Camera Setup (30 min)
+
 - First-person perspective at 1.7m height
 - Smooth mouse look (not too sensitive)
 - FOV 75 degrees
@@ -48,9 +52,11 @@ This game is deeply personal - it's about reconnecting with someone important th
 ---
 
 ## Phase 2: Movement That Feels Good (Day 1 Afternoon)
+
 **Goal:** Smooth, responsive movement that works 100%
 
 ### Step 2.1: Basic WASD (1 hour)
+
 - Forward/backward/strafe movement
 - Walk speed 3.5 m/s
 - Smooth acceleration/deceleration
@@ -59,6 +65,7 @@ This game is deeply personal - it's about reconnecting with someone important th
 - **COMMIT:** "WASD movement working"
 
 ### Step 2.2: Sprint & Polish (30 min)
+
 - Hold Shift to sprint (5.0 m/s)
 - Sprint duration/fatigue system
 - Subtle camera bob (optional)
@@ -67,6 +74,7 @@ This game is deeply personal - it's about reconnecting with someone important th
 - **COMMIT:** "Sprint and movement audio"
 
 ### Step 2.3: Movement Boundaries (30 min)
+
 - Add temporary fence boundaries
 - Simple collision detection
 - Prevent walking through boundaries
@@ -78,9 +86,11 @@ This game is deeply personal - it's about reconnecting with someone important th
 ---
 
 ## Phase 3: The Cemetery Appears (Day 2 Morning)
+
 **Goal:** Beautiful cemetery visualization without overlaps
 
 ### Step 3.1: Load GeoJSON (1 hour)
+
 - Load cemetery_final.geojson
 - Convert coordinates to local space
 - Apply rotation (146°)
@@ -88,6 +98,7 @@ This game is deeply personal - it's about reconnecting with someone important th
 - **COMMIT:** "GeoJSON loading"
 
 ### Step 3.2: Paths with Textures (2 hours)
+
 - Generate path geometry from lines + width
 - Gravel texture for paths (2.0m width)
 - Asphalt for service roads (3.5m)
@@ -97,6 +108,7 @@ This game is deeply personal - it's about reconnecting with someone important th
 - **COMMIT:** "Path generation from lines"
 
 ### Step 3.3: Hedges & Atmosphere (1 hour)
+
 - Generate hedge geometry (1.0m × 1.5m)
 - Dark green hedge texture
 - Subtle wind shader (optional)
@@ -105,6 +117,7 @@ This game is deeply personal - it's about reconnecting with someone important th
 - **COMMIT:** "Hedge generation"
 
 ### Step 3.4: Buildings & Polish (1 hour)
+
 - Simple building geometry from polygons
 - Dark windows, concrete texture
 - Adjust lighting for mood
@@ -117,9 +130,11 @@ This game is deeply personal - it's about reconnecting with someone important th
 ---
 
 ## Phase 4: Core Interaction (Day 2 Afternoon)
+
 **Goal:** Flashlight and water can mechanics
 
 ### Step 4.1: Flashlight System (1.5 hours)
+
 - Spotlight attached to camera
 - Toggle with F key
 - Warm yellow light, not harsh white
@@ -130,6 +145,7 @@ This game is deeply personal - it's about reconnecting with someone important th
 - **COMMIT:** "Flashlight system"
 
 ### Step 4.2: Darkness Timeline (1 hour)
+
 - Gradual darkness over 10 minutes
 - Start: twilight blue
 - Middle: need flashlight
@@ -138,6 +154,7 @@ This game is deeply personal - it's about reconnecting with someone important th
 - **COMMIT:** "Darkness timeline"
 
 ### Step 4.3: Water Can UI (30 min)
+
 - Water gauge (0-100)
 - Clean, minimal design
 - Interaction prompts ("E to water")
@@ -149,9 +166,11 @@ This game is deeply personal - it's about reconnecting with someone important th
 ---
 
 ## Phase 5: The World Comes Alive (Day 3)
+
 **Goal:** Graves, water taps, and interaction
 
 ### Step 5.1: Grave Placement (2 hours)
+
 - Place ~50 graves initially (not 200 yet)
 - Simple but nice grave models
 - Stone texture with wear
@@ -161,6 +180,7 @@ This game is deeply personal - it's about reconnecting with someone important th
 - **COMMIT:** "Grave placement system"
 
 ### Step 5.2: Water Taps (1 hour)
+
 - Place 6 taps from GeoJSON
 - Old metal tap models
 - Rust/wear textures
@@ -169,6 +189,7 @@ This game is deeply personal - it's about reconnecting with someone important th
 - **COMMIT:** "Water tap placement"
 
 ### Step 5.3: Interaction System (2 hours)
+
 - Raycast for nearest interactable
 - Hold E to water/refill
 - Progress ring animation
@@ -183,9 +204,11 @@ This game is deeply personal - it's about reconnecting with someone important th
 ---
 
 ## Phase 6: The Threat (Day 4)
+
 **Goal:** The husband AI that creates tension
 
 ### Step 6.1: Navigation Graph (2 hours)
+
 - Build graph from path lines
 - Visualize nodes (debug mode)
 - Pathfinding algorithm
@@ -193,6 +216,7 @@ This game is deeply personal - it's about reconnecting with someone important th
 - **COMMIT:** "Navigation graph"
 
 ### Step 6.2: Husband Model & Animation (2 hours)
+
 - Simple dark figure
 - Walking animation
 - Subtle idle movements
@@ -201,6 +225,7 @@ This game is deeply personal - it's about reconnecting with someone important th
 - **COMMIT:** "Husband character"
 
 ### Step 6.3: AI Behavior (2 hours)
+
 - Patrol along paths
 - 3.675 m/s movement
 - Mumbling sound (25m radius)
@@ -210,6 +235,7 @@ This game is deeply personal - it's about reconnecting with someone important th
 - **COMMIT:** "Husband AI patrol"
 
 ### Step 6.4: Game Over (1 hour)
+
 - Detection triggers cutscene
 - Husband stares at player
 - Fade to black
@@ -223,9 +249,11 @@ This game is deeply personal - it's about reconnecting with someone important th
 ---
 
 ## Phase 7: Complete Game Loop (Day 5)
+
 **Goal:** Win condition and full playability
 
 ### Step 7.1: Target System (1 hour)
+
 - Track watered graves
 - UI shows progress (X/8)
 - Save progress per grave
@@ -233,6 +261,7 @@ This game is deeply personal - it's about reconnecting with someone important th
 - **COMMIT:** "Target tracking"
 
 ### Step 7.2: Win Condition (1 hour)
+
 - Check for 8/8 completion
 - Victory screen
 - Completion time shown
@@ -240,6 +269,7 @@ This game is deeply personal - it's about reconnecting with someone important th
 - **COMMIT:** "Win condition"
 
 ### Step 7.3: Battery Pickup (1 hour)
+
 - Place battery at random spot
 - Glowing pickup effect
 - Restores flashlight to 100%
@@ -247,6 +277,7 @@ This game is deeply personal - it's about reconnecting with someone important th
 - **COMMIT:** "Battery pickup"
 
 ### Step 7.4: Audio Polish (2 hours)
+
 - Wind ambience loop
 - Footstep variations
 - Water sounds
@@ -260,9 +291,11 @@ This game is deeply personal - it's about reconnecting with someone important th
 ---
 
 ## Phase 8: Polish & Performance (Day 6)
+
 **Goal:** Beautiful, optimized experience
 
 ### Step 8.1: Visual Polish (2 hours)
+
 - Better textures where needed
 - Particle effects (leaves, dust)
 - Improved lighting
@@ -271,6 +304,7 @@ This game is deeply personal - it's about reconnecting with someone important th
 - **COMMIT:** "Visual polish pass"
 
 ### Step 8.2: Performance (2 hours)
+
 - Instanced rendering for graves
 - LOD for distant objects
 - Texture optimization
@@ -279,6 +313,7 @@ This game is deeply personal - it's about reconnecting with someone important th
 - **COMMIT:** "Performance optimization"
 
 ### Step 8.3: More Graves (1 hour)
+
 - Scale up to 200 graves
 - Maintain performance
 - **TEST:** Still runs at 60 FPS
@@ -289,20 +324,24 @@ This game is deeply personal - it's about reconnecting with someone important th
 ---
 
 ## Phase 9: Final Testing (Day 7)
+
 **Goal:** Bug-free, balanced experience
 
 ### Step 9.1: Full Playthrough Testing
+
 - Complete game start to finish
 - Test all edge cases
 - Verify all mechanics
 - Check for exploits
 
 ### Step 9.2: Balance Tuning
+
 - Adjust speeds/timings
 - Tweak difficulty
 - Polish UI/UX
 
 ### Step 9.3: Final Build
+
 - Production build
 - Deploy to server
 - Final testing
