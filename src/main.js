@@ -7,7 +7,7 @@ import GUI from 'lil-gui';
 // =============== HDRI SELECTION (easy to switch!)
 // Options: 'moonless_golf', 'satara_night_no_lamps', 'satara_night', 'dikhololo_night', 'kloppenheim_02'
 let HDRI_CHOICE = 'moonless_golf';  // Very dark, perfect for horror atmosphere
-let CURRENT_ENV_INTENSITY = 0.15;  // Track the current intensity
+let CURRENT_ENV_INTENSITY = 0.25;  // Increased for better object visibility with moonless_golf
 
 // =============== SCENE & RENDERER
 const scene = new THREE.Scene();
@@ -123,8 +123,8 @@ sphere.castShadow = sphere.receiveShadow = true;
 scene.add(sphere);
 
 // =============== OPTIONAL: FLASHLIGHT (toggle with 'F')
-const flashlight = new THREE.SpotLight(0xfff2d0, 20, 35, Math.PI * 0.1, 0.5, 2); // warmer, less intense
-// If your version uses "legacy" light scaling, start with intensity ~5–8 instead of 35.
+// Updated defaults based on testing: intensity 50, angle 28°, penumbra 0.4, distance 45
+const flashlight = new THREE.SpotLight(0xfff2d0, 50, 45, Math.PI * 28 / 180, 0.4, 2);
 flashlight.visible = false;             // keep OFF by default
 flashlight.castShadow = true;
 scene.add(flashlight, flashlight.target);
@@ -205,6 +205,9 @@ function setEnvIntensity(root, intensity) {
 // =============== GUI SETUP (Step 3: Developer Panel)
 const gui = new GUI();
 
+// TODO: Consider adding individual value reset on double-click
+// lil-gui supports this natively with .listen() and double-click behavior
+
 // State object to track all adjustable values
 const state = {
   // Rendering
@@ -222,12 +225,12 @@ const state = {
   hemiIntensity: hemi.intensity,
   ambientIntensity: amb.intensity,
   
-  // Fog
+  // Fog (near = where fog starts, far = where fog reaches full density)
   fogNear: scene.fog.near,
   fogFar: scene.fog.far,
   fogColor: '#0b1133',
   
-  // Flashlight
+  // Flashlight (updated defaults from testing)
   flashlightIntensity: flashlight.intensity,
   flashlightAngle: flashlight.angle * 180 / Math.PI,  // Convert to degrees for GUI
   flashlightPenumbra: flashlight.penumbra,
@@ -288,18 +291,38 @@ lightsFolder.add(state, 'ambientIntensity', 0, 0.3, 0.001)
 // Fog folder
 const fogFolder = gui.addFolder('Fog');
 fogFolder.add(state, 'fogNear', 0, 100, 1)
-  .name('Near')
-  .onChange(v => scene.fog.near = v);
+  .name('Near (Start)')
+  .onChange(v => {
+    // Prevent near from being greater than or equal to far
+    if (v >= state.fogFar) {
+      v = state.fogFar - 1;
+      state.fogNear = v;
+      gui.controllersRecursive().forEach(controller => {
+        if (controller.property === 'fogNear') controller.updateDisplay();
+      });
+    }
+    scene.fog.near = v;
+  });
 fogFolder.add(state, 'fogFar', 50, 200, 1)
-  .name('Far')
-  .onChange(v => scene.fog.far = v);
+  .name('Far (Full)')
+  .onChange(v => {
+    // Prevent far from being less than or equal to near
+    if (v <= state.fogNear) {
+      v = state.fogNear + 1;
+      state.fogFar = v;
+      gui.controllersRecursive().forEach(controller => {
+        if (controller.property === 'fogFar') controller.updateDisplay();
+      });
+    }
+    scene.fog.far = v;
+  });
 fogFolder.addColor(state, 'fogColor')
   .name('Color')
   .onChange(v => scene.fog.color.set(v));
 
 // Flashlight folder
 const flashFolder = gui.addFolder('Flashlight');
-flashFolder.add(state, 'flashlightIntensity', 0, 50, 0.5)
+flashFolder.add(state, 'flashlightIntensity', 0, 100, 0.5)  // Increased max to 100
   .name('Intensity')
   .onChange(v => flashlight.intensity = v);
 flashFolder.add(state, 'flashlightAngle', 5, 45, 1)
@@ -328,7 +351,7 @@ const presetsObj = {
   resetToDefaults: () => {
     // Reset all values to their starting defaults
     state.exposure = 1.0;
-    state.envIntensity = 0.15;
+    state.envIntensity = 0.25;  // Updated default
     state.hdri = 'moonless_golf';
     state.moonIntensity = 0.8;
     state.moonX = 12;
@@ -338,10 +361,10 @@ const presetsObj = {
     state.ambientIntensity = 0.05;
     state.fogNear = 35;
     state.fogFar = 90;
-    state.flashlightIntensity = 20;
-    state.flashlightAngle = 18;  // degrees
-    state.flashlightPenumbra = 0.5;
-    state.flashlightDistance = 35;
+    state.flashlightIntensity = 50;      // Updated default
+    state.flashlightAngle = 28;          // Updated default (degrees)
+    state.flashlightPenumbra = 0.4;      // Updated default
+    state.flashlightDistance = 45;       // Updated default
     state.shadowBias = -0.001;
     state.shadowNormalBias = 0.02;
     
