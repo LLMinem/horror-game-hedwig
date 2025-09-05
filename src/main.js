@@ -79,12 +79,12 @@ scene.add(amb);
 // =============== GROUND WITH TEXTURES
 const textureLoader = new THREE.TextureLoader();
 
-// Load grass textures
-const grassColorTex = textureLoader.load('/assets/textures/grass_color.jpg');
-const grassNormalTex = textureLoader.load('/assets/textures/grass_normal.jpg');
+// Load grass textures (using 2K for better quality)
+const grassColorTex = textureLoader.load('/assets/textures/ground/grass_color_2k.jpg');
+const grassNormalTex = textureLoader.load('/assets/textures/ground/grass_normal_2k.jpg');
 
 // Configure textures for tiling
-const groundTiling = 32; // Start with 32x32 tiling for sharp detail (~1.5cm per pixel)
+const groundTiling = 64; // 64x tiling with 2K textures = sharp detail (~0.4cm per pixel)
 grassColorTex.wrapS = grassColorTex.wrapT = THREE.RepeatWrapping;
 grassNormalTex.wrapS = grassNormalTex.wrapT = THREE.RepeatWrapping;
 grassColorTex.repeat.set(groundTiling, groundTiling);
@@ -275,7 +275,7 @@ const defaults = {
   shadowBias: -0.001,
   shadowNormalBias: 0.02,
   // New ground texture controls
-  groundTiling: 32,
+  groundTiling: 64,
   normalStrength: 1.0,
 };
 
@@ -317,7 +317,7 @@ envFolder.open();
 // Ground texture folder
 const groundFolder = gui.addFolder("Ground Texture");
 groundFolder
-  .add(state, "groundTiling", 8, 64, 1)
+  .add(state, "groundTiling", 16, 128, 1)
   .name("Tiling Amount")
   .onChange((v) => {
     grassColorTex.repeat.set(v, v);
@@ -463,7 +463,7 @@ const presetsObj = {
     state.flashlightDistance = 45; // Updated default
     state.shadowBias = -0.001;
     state.shadowNormalBias = 0.02;
-    state.groundTiling = 32;
+    state.groundTiling = 64;
     state.normalStrength = 1.0;
 
     // Apply all changes
@@ -614,6 +614,6 @@ console.log("🎮 Night Scene with Ground Textures");
 console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
 console.log("✓ Grass texture loaded with normal mapping");
 console.log("GUI: Adjust 'Ground Texture' folder:");
-console.log("  • Tiling: 8-64x (default 32x)");
+console.log("  • Tiling: 16-128x (default 64x, using 2K textures)");
 console.log("  • Bump Strength: 0-2 (default 1.0)");
 console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
