@@ -1,4 +1,4 @@
-// main.js (with lil-gui developer panel)
+// main.js (with ground textures)
 // --------------------------------------------------
 import GUI from "lil-gui";
 import * as THREE from "three";
@@ -76,14 +76,32 @@ scene.add(hemi);
 const amb = new THREE.AmbientLight(0x1b1e34, 0.05);
 scene.add(amb);
 
-// =============== GROUND
+// =============== GROUND WITH TEXTURES
+const textureLoader = new THREE.TextureLoader();
+
+// Load grass textures
+const grassColorTex = textureLoader.load('/assets/textures/grass_color.jpg');
+const grassNormalTex = textureLoader.load('/assets/textures/grass_normal.jpg');
+
+// Configure textures for tiling
+const groundTiling = 32; // Start with 32x32 tiling for sharp detail (~1.5cm per pixel)
+grassColorTex.wrapS = grassColorTex.wrapT = THREE.RepeatWrapping;
+grassNormalTex.wrapS = grassNormalTex.wrapT = THREE.RepeatWrapping;
+grassColorTex.repeat.set(groundTiling, groundTiling);
+grassNormalTex.repeat.set(groundTiling, groundTiling);
+
+// IMPORTANT: Mark color texture as sRGB for correct color management
+grassColorTex.colorSpace = THREE.SRGBColorSpace;
+
+// Ground material with textures
 const groundGeo = new THREE.PlaneGeometry(500, 500);
 const groundMat = new THREE.MeshStandardMaterial({
-  color: 0x3b4d3b,
-  roughness: 0.85,
+  map: grassColorTex,           // Color texture
+  normalMap: grassNormalTex,     // Normal map for surface detail
+  normalScale: new THREE.Vector2(1, 1), // Strength of normal effect
+  roughness: 0.8,                // Slightly less rough since texture has detail
   metalness: 0.0,
-  emissive: 0x0c0d10,
-  emissiveIntensity: 0.08, // reduced emissive glow
+  envMapIntensity: 0.25,         // Will be overridden by setEnvIntensity
 });
 const ground = new THREE.Mesh(groundGeo, groundMat);
 ground.rotation.x = -Math.PI / 2;
@@ -256,6 +274,9 @@ const defaults = {
   flashlightDistance: 45,
   shadowBias: -0.001,
   shadowNormalBias: 0.02,
+  // New ground texture controls
+  groundTiling: 32,
+  normalStrength: 1.0,
 };
 
 // State object initialized from defaults (enables double-click reset)
@@ -292,6 +313,26 @@ envFolder
   })
   .listen(); // Enable double-click reset
 envFolder.open();
+
+// Ground texture folder
+const groundFolder = gui.addFolder("Ground Texture");
+groundFolder
+  .add(state, "groundTiling", 8, 64, 1)
+  .name("Tiling Amount")
+  .onChange((v) => {
+    grassColorTex.repeat.set(v, v);
+    grassNormalTex.repeat.set(v, v);
+    console.log(`Ground tiling: ${v}x${v} (${(500/v).toFixed(1)}m per tile, ${(1024/(500/v)*0.01).toFixed(1)}cm per pixel)`);
+  })
+  .listen();
+groundFolder
+  .add(state, "normalStrength", 0, 2, 0.01)
+  .name("Bump Strength")
+  .onChange((v) => {
+    groundMat.normalScale.set(v, v);
+  })
+  .listen();
+groundFolder.open();
 
 // Lights folder
 const lightsFolder = gui.addFolder("Lights");
@@ -422,6 +463,8 @@ const presetsObj = {
     state.flashlightDistance = 45; // Updated default
     state.shadowBias = -0.001;
     state.shadowNormalBias = 0.02;
+    state.groundTiling = 32;
+    state.normalStrength = 1.0;
 
     // Apply all changes
     renderer.toneMappingExposure = state.exposure;
@@ -439,6 +482,9 @@ const presetsObj = {
     flashlight.distance = state.flashlightDistance;
     moon.shadow.bias = state.shadowBias;
     moon.shadow.normalBias = state.shadowNormalBias;
+    grassColorTex.repeat.set(state.groundTiling, state.groundTiling);
+    grassNormalTex.repeat.set(state.groundTiling, state.groundTiling);
+    groundMat.normalScale.set(state.normalStrength, state.normalStrength);
 
     // Update GUI to reflect changes
     gui
@@ -564,12 +610,10 @@ function animate() {
 animate();
 
 // Start message
-console.log("🎮 Night Scene with GUI Controls");
+console.log("🎮 Night Scene with Ground Textures");
 console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
-console.log("GUI panel in top-right corner");
-console.log("💡 DOUBLE-CLICK any slider to reset to default!");
-console.log("Keyboard shortcuts still work:");
-console.log("  F - Toggle flashlight");
-console.log("  ü/ä - Adjust exposure");
-console.log("  +/- - Adjust environment intensity");
+console.log("✓ Grass texture loaded with normal mapping");
+console.log("GUI: Adjust 'Ground Texture' folder:");
+console.log("  • Tiling: 8-64x (default 32x)");
+console.log("  • Bump Strength: 0-2 (default 1.0)");
 console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
