@@ -254,7 +254,7 @@ function setEnvIntensity(root, intensity) {
 // =============== GUI SETUP (Step 3: Developer Panel)
 const gui = new GUI();
 
-// Default values for double-click reset functionality
+// Default values for double-click reset functionality (MUST be defined first!)
 const defaults = {
   exposure: 1.0,
   envIntensity: 0.25,
@@ -279,25 +279,77 @@ const defaults = {
   normalStrength: 1.0,
 };
 
-// State object initialized from defaults (enables double-click reset)
+// State object initialized from defaults
 const state = { ...defaults };
+
+// Helper function to add double-click reset to any controller
+function addDblClickReset(controller, defaultValue) {
+  // lil-gui uses .name for the label element
+  const labelEl = controller.domElement.querySelector('.name');
+  if (!labelEl) {
+    console.warn('Could not find label element for', controller.property);
+    return;
+  }
+  
+  // Make it discoverable
+  labelEl.style.cursor = 'pointer';
+  labelEl.title = 'Double-click to reset to default';
+  
+  // Add the double-click handler
+  labelEl.addEventListener('dblclick', (e) => {
+    e.preventDefault(); // Prevent text selection
+    controller.setValue(defaultValue);
+    console.log(`Reset ${controller.property} to ${defaultValue}`);
+  });
+}
+
+// Wrapper to automatically add double-click reset to all controllers
+function enhanceGuiWithReset(guiOrFolder) {
+  const originalAdd = guiOrFolder.add.bind(guiOrFolder);
+  
+  guiOrFolder.add = function(object, property, ...args) {
+    const controller = originalAdd(object, property, ...args);
+    
+    // Check if we have a default value for this property
+    if (defaults.hasOwnProperty(property)) {
+      addDblClickReset(controller, defaults[property]);
+    }
+    
+    return controller;
+  };
+  
+  // Also wrap addColor method
+  if (guiOrFolder.addColor) {
+    const originalAddColor = guiOrFolder.addColor.bind(guiOrFolder);
+    guiOrFolder.addColor = function(object, property) {
+      const controller = originalAddColor(object, property);
+      if (defaults.hasOwnProperty(property)) {
+        addDblClickReset(controller, defaults[property]);
+      }
+      return controller;
+    };
+  }
+}
+
+// Apply the enhancement to the main GUI and all folders
+enhanceGuiWithReset(gui);
 
 // Rendering folder
 const renderFolder = gui.addFolder("Rendering");
+enhanceGuiWithReset(renderFolder); // Enable double-click reset for this folder
 renderFolder
   .add(state, "exposure", 0.3, 3.0, 0.01)
   .name("Exposure")
-  .onChange((v) => (renderer.toneMappingExposure = v))
-  .listen(); // Enable double-click reset
+  .onChange((v) => (renderer.toneMappingExposure = v));
 renderFolder.open();
 
 // Environment folder
 const envFolder = gui.addFolder("Environment");
+enhanceGuiWithReset(envFolder); // Enable double-click reset for this folder
 envFolder
   .add(state, "envIntensity", 0, 1, 0.01)
   .name("Env Intensity")
-  .onChange((v) => setEnvIntensity(scene, v))
-  .listen(); // Enable double-click reset
+  .onChange((v) => setEnvIntensity(scene, v));
 envFolder
   .add(state, "hdri", {
     "Darkest (moonless_golf)": "moonless_golf",
@@ -310,12 +362,12 @@ envFolder
   .onChange((v) => {
     HDRI_CHOICE = v;
     loadHDRI(v);
-  })
-  .listen(); // Enable double-click reset
+  });
 envFolder.open();
 
 // Ground texture folder
 const groundFolder = gui.addFolder("Ground Texture");
+enhanceGuiWithReset(groundFolder); // Enable double-click reset for this folder
 groundFolder
   .add(state, "groundTiling", 16, 128, 1)
   .name("Tiling Amount")
@@ -324,51 +376,53 @@ groundFolder
     grassNormalTex.repeat.set(v, v);
     console.log(`Ground tiling: ${v}x${v} (${(500/v).toFixed(1)}m per tile, ${(1024/(500/v)*0.01).toFixed(1)}cm per pixel)`);
   })
-  .listen();
+;
 groundFolder
   .add(state, "normalStrength", 0, 2, 0.01)
   .name("Bump Strength")
   .onChange((v) => {
     groundMat.normalScale.set(v, v);
   })
-  .listen();
+;
 groundFolder.open();
 
 // Lights folder
 const lightsFolder = gui.addFolder("Lights");
+enhanceGuiWithReset(lightsFolder); // Enable double-click reset for this folder
 lightsFolder
   .add(state, "moonIntensity", 0, 2, 0.01)
   .name("Moon Intensity")
   .onChange((v) => (moon.intensity = v))
-  .listen(); // Enable double-click reset
+  ; // Enable double-click reset
 lightsFolder
   .add(state, "moonX", -50, 50, 0.5)
   .name("Moon X")
   .onChange((v) => (moon.position.x = v))
-  .listen(); // Enable double-click reset
+  ; // Enable double-click reset
 lightsFolder
   .add(state, "moonY", 10, 50, 0.5)
   .name("Moon Y")
   .onChange((v) => (moon.position.y = v))
-  .listen(); // Enable double-click reset
+  ; // Enable double-click reset
 lightsFolder
   .add(state, "moonZ", -50, 50, 0.5)
   .name("Moon Z")
   .onChange((v) => (moon.position.z = v))
-  .listen(); // Enable double-click reset
+  ; // Enable double-click reset
 lightsFolder
   .add(state, "hemiIntensity", 0, 1, 0.01)
   .name("Hemisphere")
   .onChange((v) => (hemi.intensity = v))
-  .listen(); // Enable double-click reset
+  ; // Enable double-click reset
 lightsFolder
   .add(state, "ambientIntensity", 0, 0.3, 0.001)
   .name("Ambient")
   .onChange((v) => (amb.intensity = v))
-  .listen(); // Enable double-click reset
+  ; // Enable double-click reset
 
 // Fog folder
 const fogFolder = gui.addFolder("Fog");
+enhanceGuiWithReset(fogFolder); // Enable double-click reset for this folder
 fogFolder
   .add(state, "fogNear", 0, 100, 1)
   .name("Near (Start)")
@@ -382,8 +436,7 @@ fogFolder
       });
     }
     scene.fog.near = v;
-  })
-  .listen(); // Enable double-click reset
+  });
 fogFolder
   .add(state, "fogFar", 50, 200, 1)
   .name("Far (Full)")
@@ -397,50 +450,51 @@ fogFolder
       });
     }
     scene.fog.far = v;
-  })
-  .listen(); // Enable double-click reset
+  });
 fogFolder
   .addColor(state, "fogColor")
   .name("Color")
   .onChange((v) => scene.fog.color.set(v))
-  .listen(); // Enable double-click reset
+  ; // Enable double-click reset
 
 // Flashlight folder
 const flashFolder = gui.addFolder("Flashlight");
+enhanceGuiWithReset(flashFolder); // Enable double-click reset for this folder
 flashFolder
   .add(state, "flashlightIntensity", 0, 100, 0.5) // Increased max to 100
   .name("Intensity")
   .onChange((v) => (flashlight.intensity = v))
-  .listen(); // Enable double-click reset
+  ; // Enable double-click reset
 flashFolder
   .add(state, "flashlightAngle", 5, 45, 1)
   .name("Angle (degrees)")
   .onChange((v) => (flashlight.angle = (v * Math.PI) / 180))
-  .listen(); // Enable double-click reset
+  ; // Enable double-click reset
 flashFolder
   .add(state, "flashlightPenumbra", 0, 1, 0.01)
   .name("Penumbra")
   .onChange((v) => (flashlight.penumbra = v))
-  .listen(); // Enable double-click reset
+  ; // Enable double-click reset
 flashFolder
   .add(state, "flashlightDistance", 10, 100, 1)
   .name("Distance")
   .onChange((v) => (flashlight.distance = v))
-  .listen(); // Enable double-click reset
+  ; // Enable double-click reset
 flashFolder.add(flashlight, "visible").name("Enabled");
 
 // Shadows folder
 const shadowFolder = gui.addFolder("Shadows");
+enhanceGuiWithReset(shadowFolder); // Enable double-click reset for this folder
 shadowFolder
   .add(state, "shadowBias", -0.005, 0.005, 0.0001)
   .name("Bias")
   .onChange((v) => (moon.shadow.bias = v))
-  .listen(); // Enable double-click reset
+  ; // Enable double-click reset
 shadowFolder
   .add(state, "shadowNormalBias", 0, 0.1, 0.001)
   .name("Normal Bias")
   .onChange((v) => (moon.shadow.normalBias = v))
-  .listen(); // Enable double-click reset
+  ; // Enable double-click reset
 
 // Presets button
 const presetsObj = {
