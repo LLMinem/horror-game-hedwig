@@ -48,8 +48,10 @@ g.fillStyle = grad;
 g.fillRect(0, 0, 4, 2048);
 scene.background = new THREE.CanvasTexture(skyCanvas);
 
-// =============== FOG (subtle; visibility to ~80m)
-scene.fog = new THREE.Fog(0x0b1133, 35, 90); // slightly adjusted to match new lighting
+// =============== FOG (exponential for atmospheric depth)
+// Using FogExp2 for more realistic, horror-game appropriate fog
+// Density value: lower = less fog, higher = denser fog
+scene.fog = new THREE.FogExp2(0x000000, 0.035); // Black fog to match horizon
 
 // =============== LIGHTS
 // 1) Moon (directional) - main light source, cool blue-white
@@ -146,6 +148,7 @@ for (let i = 0; i < 8; i++) {
   post.castShadow = post.receiveShadow = true;
   scene.add(post);
 }
+console.log("Metal posts are at 25-60m distance (along -15 Z axis)");
 
 const sphere = new THREE.Mesh(
   new THREE.SphereGeometry(1, 32, 32),
@@ -159,6 +162,7 @@ const sphere = new THREE.Mesh(
 sphere.position.set(5, 1, 5);
 sphere.castShadow = sphere.receiveShadow = true;
 scene.add(sphere);
+console.log("Sphere is at ~7m distance (5,1,5 from camera at 0,1.7,15)");
 
 // =============== OPTIONAL: FLASHLIGHT (toggle with 'F')
 // Updated defaults based on testing: intensity 50, angle 28°, penumbra 0.4, distance 45
@@ -265,9 +269,9 @@ const defaults = {
   moonZ: 16,
   hemiIntensity: 0.25,
   ambientIntensity: 0.05,
-  fogNear: 35,
-  fogFar: 90,
-  fogColor: "#0b1133",
+  fogDensity: 0.035, // Exponential fog density (much denser for visibility)
+  fogType: "exp2", // Track fog type for GUI
+  fogColor: "#000000", // Black matches horizon better
   flashlightIntensity: 50,
   flashlightAngle: 28,
   flashlightPenumbra: 0.4,
@@ -423,39 +427,38 @@ lightsFolder
 // Fog folder
 const fogFolder = gui.addFolder("Fog");
 enhanceGuiWithReset(fogFolder); // Enable double-click reset for this folder
+// Add fog type selector
 fogFolder
-  .add(state, "fogNear", 0, 100, 1)
-  .name("Near (Start)")
+  .add(state, "fogType", ["linear", "exp2"])
+  .name("Fog Type")
   .onChange((v) => {
-    // Prevent near from being greater than or equal to far
-    if (v >= state.fogFar) {
-      v = state.fogFar - 1;
-      state.fogNear = v;
-      gui.controllersRecursive().forEach((controller) => {
-        if (controller.property === "fogNear") controller.updateDisplay();
-      });
+    if (v === "exp2") {
+      scene.fog = new THREE.FogExp2(state.fogColor, state.fogDensity);
+      console.log("Switched to exponential fog");
+    } else {
+      scene.fog = new THREE.Fog(state.fogColor, 35, 90);
+      console.log("Switched to linear fog");
     }
-    scene.fog.near = v;
   });
+
+// Exponential fog density control
 fogFolder
-  .add(state, "fogFar", 50, 200, 1)
-  .name("Far (Full)")
+  .add(state, "fogDensity", 0.01, 0.08, 0.002)
+  .name("Density")
   .onChange((v) => {
-    // Prevent far from being less than or equal to near
-    if (v <= state.fogNear) {
-      v = state.fogNear + 1;
-      state.fogFar = v;
-      gui.controllersRecursive().forEach((controller) => {
-        if (controller.property === "fogFar") controller.updateDisplay();
-      });
+    if (scene.fog instanceof THREE.FogExp2) {
+      scene.fog.density = v;
+      state.fogDensity = v; // Update state
+      // Log visibility distance for reference
+      const visibilityMeters = Math.round(2 / v); // Rough approximation
+      console.log(`Fog density: ${v.toFixed(3)} (~${visibilityMeters}m visibility)`);
     }
-    scene.fog.far = v;
   });
+
 fogFolder
   .addColor(state, "fogColor")
   .name("Color")
-  .onChange((v) => scene.fog.color.set(v))
-  ; // Enable double-click reset
+  .onChange((v) => scene.fog.color.set(v));
 
 // Flashlight folder
 const flashFolder = gui.addFolder("Flashlight");
@@ -509,8 +512,8 @@ const presetsObj = {
     state.moonZ = 16;
     state.hemiIntensity = 0.25;
     state.ambientIntensity = 0.05;
-    state.fogNear = 35;
-    state.fogFar = 90;
+    state.fogDensity = 0.035;
+    state.fogType = "exp2";
     state.flashlightIntensity = 50; // Updated default
     state.flashlightAngle = 28; // Updated default (degrees)
     state.flashlightPenumbra = 0.4; // Updated default
@@ -528,8 +531,11 @@ const presetsObj = {
     moon.position.set(state.moonX, state.moonY, state.moonZ);
     hemi.intensity = state.hemiIntensity;
     amb.intensity = state.ambientIntensity;
-    scene.fog.near = state.fogNear;
-    scene.fog.far = state.fogFar;
+    if (state.fogType === "exp2") {
+      scene.fog = new THREE.FogExp2(state.fogColor, state.fogDensity);
+    } else {
+      scene.fog = new THREE.Fog(state.fogColor, 35, 90);
+    }
     flashlight.intensity = state.flashlightIntensity;
     flashlight.angle = (state.flashlightAngle * Math.PI) / 180;
     flashlight.penumbra = state.flashlightPenumbra;
@@ -567,13 +573,14 @@ const presetsObj = {
     state.exposure = 0.8;
     state.envIntensity = 0.08;
     state.moonIntensity = 0.5;
-    state.fogNear = 25;
-    state.fogFar = 70;
+    state.fogDensity = 0.05; // Very dense fog for horror
+    state.fogType = "exp2";
     renderer.toneMappingExposure = state.exposure;
     setEnvIntensity(scene, state.envIntensity);
     moon.intensity = state.moonIntensity;
-    scene.fog.near = state.fogNear;
-    scene.fog.far = state.fogFar;
+    if (scene.fog instanceof THREE.FogExp2) {
+      scene.fog.density = state.fogDensity;
+    }
     gui
       .controllersRecursive()
       .forEach((controller) => controller.updateDisplay());
@@ -664,10 +671,13 @@ function animate() {
 animate();
 
 // Start message
-console.log("🎮 Night Scene with Ground Textures");
+console.log("🎮 Night Scene with Exponential Fog");
 console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
-console.log("✓ Grass texture loaded with normal mapping");
-console.log("GUI: Adjust 'Ground Texture' folder:");
-console.log("  • Tiling: 16-128x (default 64x, using 2K textures)");
-console.log("  • Bump Strength: 0-2 (default 1.0)");
+console.log("✓ Exponential fog enabled (density 0.035)");
+console.log("✓ Fog bug fixed - slider now updates live");
+console.log("📏 Object distances for testing:");
+console.log("  • Sphere: ~7m away");
+console.log("  • Metal posts: 25-60m away");
+console.log("  • Tombstones: random within 10m");
+console.log("🎛️ Try fog density 0.02-0.06 for best effect");
 console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
