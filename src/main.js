@@ -1,16 +1,17 @@
-// main.js (with ground textures)
+// main.js (with fog-aware skydome)
 // --------------------------------------------------
 import GUI from "lil-gui";
 import * as THREE from "three";
 import { RGBELoader } from "three/examples/jsm/loaders/RGBELoader.js";
 
 // =============== HDRI SELECTION (easy to switch!)
-// Options: 'moonless_golf', 'satara_night_no_lamps', 'satara_night', 'dikhololo_night', 'kloppenheim_02'
-let HDRI_CHOICE = "moonless_golf"; // Very dark, perfect for horror atmosphere
+// Options: 'moonless_golf', 'dikhololo_night', 'satara_night'
+let HDRI_CHOICE = "dikhololo_night"; // Beautiful stars, good for testing
 let CURRENT_ENV_INTENSITY = 0.25; // Increased for better object visibility with moonless_golf
 
 // =============== SCENE & RENDERER
 const scene = new THREE.Scene();
+// Skydome handles all sky visuals now
 
 const renderer = new THREE.WebGLRenderer({
   antialias: true,
@@ -30,28 +31,73 @@ const camera = new THREE.PerspectiveCamera(
   75,
   window.innerWidth / window.innerHeight,
   0.1,
-  120,
+  5000, // Increased far plane for skydome
 );
 camera.position.set(0, 1.7, 15);
 camera.lookAt(0, 1.5, 0);
 
-// =============== SKY (background only; does NOT light)
-const skyCanvas = document.createElement("canvas");
-skyCanvas.width = 4;
-skyCanvas.height = 2048; // Higher res to reduce banding
-const g = skyCanvas.getContext("2d");
-const grad = g.createLinearGradient(0, 0, 0, 2048);
-grad.addColorStop(0.0, "#0a0a2e"); // deep blue at top
-grad.addColorStop(0.5, "#0a0e2a"); // slightly lighter blue
-grad.addColorStop(1.0, "#000000"); // black at horizon
-g.fillStyle = grad;
-g.fillRect(0, 0, 4, 2048);
-scene.background = new THREE.CanvasTexture(skyCanvas);
+// =============== SKYDOME (replaces the 2D gradient background)
+// Vertex shader - passes position to fragment shader
+const skyVertexShader = `
+  varying vec3 vWorldPosition;
+  void main() {
+    vec4 worldPosition = modelMatrix * vec4(position, 1.0);
+    vWorldPosition = worldPosition.xyz;
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+  }
+`;
 
-// =============== FOG (exponential for atmospheric depth)
-// Using FogExp2 for more realistic, horror-game appropriate fog
-// Density value: lower = less fog, higher = denser fog
-scene.fog = new THREE.FogExp2(0x000000, 0.035); // Black fog to match horizon
+// Fragment shader - creates the gradient
+const skyFragmentShader = `
+  uniform vec3 topColor;
+  uniform vec3 horizonColor;
+  uniform float curve; // Controls gradient falloff
+  
+  varying vec3 vWorldPosition;
+  
+  void main() {
+    // Normalize to get direction from center
+    vec3 direction = normalize(vWorldPosition);
+    
+    // Get the y component (up/down), remap from [-1,1] to [0,1]
+    float h = direction.y * 0.5 + 0.5;
+    
+    // Apply curve to control gradient shape
+    // curve = 1.0 is linear, < 1.0 biases toward horizon, > 1.0 biases toward top
+    h = pow(h, curve);
+    
+    // Lerp between horizon and top color
+    vec3 color = mix(horizonColor, topColor, h);
+    
+    gl_FragColor = vec4(color, 1.0);
+  }
+`;
+
+// Create skydome geometry and material
+// FIXED: Reduced radius and disabled depth test completely
+const skyGeometry = new THREE.SphereGeometry(1000, 32, 32);
+const skyMaterial = new THREE.ShaderMaterial({
+  uniforms: {
+    topColor: { value: new THREE.Color(0x0a0a2e) }, // Deep blue at top
+    horizonColor: { value: new THREE.Color(0x000000) }, // Near-black at horizon
+    curve: { value: 1.0 }, // Linear gradient by default
+  },
+  vertexShader: skyVertexShader,
+  fragmentShader: skyFragmentShader,
+  side: THREE.BackSide, // Render inside of sphere
+  depthWrite: false, // Don't write to depth buffer
+  depthTest: false, // CRITICAL: Don't test depth at all
+  fog: false, // DISABLE fog on sky itself (we'll handle blending differently)
+});
+
+const skydome = new THREE.Mesh(skyGeometry, skyMaterial);
+skydome.renderOrder = -999; // CRITICAL: Render before everything else
+skydome.frustumCulled = false; // Never cull the sky
+scene.add(skydome);
+
+// =============== FOG (adjusted for skydome interaction)
+// Using FogExp2 for atmospheric depth - slightly reduced density for skydome
+scene.fog = new THREE.FogExp2(0x0a0e2a, 0.030); // Blue-tinted fog matching sky
 
 // =============== LIGHTS
 // 1) Moon (directional) - main light source, cool blue-white
@@ -195,11 +241,13 @@ function loadHDRI(hdriName) {
       const envMap = pmrem.fromEquirectangular(hdrTexture).texture;
       scene.environment = envMap; // For diffuse IBL
       hdrTexture.dispose(); // Clean up original
+      
+      // NOTE: We no longer set scene.background - skydome handles visuals!
 
       // FIX for r179: Must also set envMap on each material!
       applyEnvMapToMaterials(scene, envMap, CURRENT_ENV_INTENSITY);
 
-      console.log(`✓ Loaded HDRI: ${hdriName}`);
+      console.log(`✓ Loaded HDRI for lighting: ${hdriName}`);
     },
     (progress) => {
       const percent = ((progress.loaded / progress.total) * 100).toFixed(0);
@@ -262,25 +310,29 @@ const gui = new GUI();
 const defaults = {
   exposure: 1.0,
   envIntensity: 0.25,
-  hdri: "moonless_golf",
+  hdri: "dikhololo_night",
   moonIntensity: 0.8,
   moonX: 12,
   moonY: 30,
   moonZ: 16,
   hemiIntensity: 0.25,
   ambientIntensity: 0.05,
-  fogDensity: 0.035, // Exponential fog density (much denser for visibility)
-  fogType: "exp2", // Track fog type for GUI
-  fogColor: "#000000", // Black matches horizon better
+  fogDensity: 0.030, // Reduced for skydome
+  fogType: "exp2",
+  fogColor: "#0a0e2a", // Blue-tinted to match sky
   flashlightIntensity: 50,
   flashlightAngle: 28,
   flashlightPenumbra: 0.4,
   flashlightDistance: 45,
   shadowBias: -0.001,
   shadowNormalBias: 0.02,
-  // New ground texture controls
+  // Ground texture controls
   groundTiling: 64,
   normalStrength: 1.0,
+  // NEW: Sky controls
+  skyTopColor: "#0a0a2e",
+  skyHorizonColor: "#000000",
+  skyCurve: 1.0,
 };
 
 // State object initialized from defaults
@@ -338,6 +390,23 @@ function enhanceGuiWithReset(guiOrFolder) {
 // Apply the enhancement to the main GUI and all folders
 enhanceGuiWithReset(gui);
 
+// NEW: Sky folder for skydome controls
+const skyFolder = gui.addFolder("Sky");
+enhanceGuiWithReset(skyFolder);
+skyFolder
+  .addColor(state, "skyTopColor")
+  .name("Top Color")
+  .onChange((v) => skyMaterial.uniforms.topColor.value.set(v));
+skyFolder
+  .addColor(state, "skyHorizonColor")
+  .name("Horizon Color")
+  .onChange((v) => skyMaterial.uniforms.horizonColor.value.set(v));
+skyFolder
+  .add(state, "skyCurve", 0.2, 3.0, 0.01)
+  .name("Gradient Curve")
+  .onChange((v) => (skyMaterial.uniforms.curve.value = v));
+skyFolder.open();
+
 // Rendering folder
 const renderFolder = gui.addFolder("Rendering");
 enhanceGuiWithReset(renderFolder); // Enable double-click reset for this folder
@@ -356,13 +425,11 @@ envFolder
   .onChange((v) => setEnvIntensity(scene, v));
 envFolder
   .add(state, "hdri", {
-    "Darkest (moonless_golf)": "moonless_golf",
-    "Dark with stars": "satara_night_no_lamps",
-    "Dark with lamp": "satara_night",
-    "Brighter test": "dikhololo_night",
-    Brightest: "kloppenheim_02",
+    "Dikhololo Night": "dikhololo_night",
+    "Moonless Golf": "moonless_golf",
+    "Satara Night": "satara_night",
   })
-  .name("HDRI")
+  .name("HDRI (Lighting)")
   .onChange((v) => {
     HDRI_CHOICE = v;
     loadHDRI(v);
@@ -388,7 +455,6 @@ groundFolder
     groundMat.normalScale.set(v, v);
   })
 ;
-groundFolder.open();
 
 // Lights folder
 const lightsFolder = gui.addFolder("Lights");
@@ -396,33 +462,27 @@ enhanceGuiWithReset(lightsFolder); // Enable double-click reset for this folder
 lightsFolder
   .add(state, "moonIntensity", 0, 2, 0.01)
   .name("Moon Intensity")
-  .onChange((v) => (moon.intensity = v))
-  ; // Enable double-click reset
+  .onChange((v) => (moon.intensity = v));
 lightsFolder
   .add(state, "moonX", -50, 50, 0.5)
   .name("Moon X")
-  .onChange((v) => (moon.position.x = v))
-  ; // Enable double-click reset
+  .onChange((v) => (moon.position.x = v));
 lightsFolder
   .add(state, "moonY", 10, 50, 0.5)
   .name("Moon Y")
-  .onChange((v) => (moon.position.y = v))
-  ; // Enable double-click reset
+  .onChange((v) => (moon.position.y = v));
 lightsFolder
   .add(state, "moonZ", -50, 50, 0.5)
   .name("Moon Z")
-  .onChange((v) => (moon.position.z = v))
-  ; // Enable double-click reset
+  .onChange((v) => (moon.position.z = v));
 lightsFolder
   .add(state, "hemiIntensity", 0, 1, 0.01)
   .name("Hemisphere")
-  .onChange((v) => (hemi.intensity = v))
-  ; // Enable double-click reset
+  .onChange((v) => (hemi.intensity = v));
 lightsFolder
   .add(state, "ambientIntensity", 0, 0.3, 0.001)
   .name("Ambient")
-  .onChange((v) => (amb.intensity = v))
-  ; // Enable double-click reset
+  .onChange((v) => (amb.intensity = v));
 
 // Fog folder
 const fogFolder = gui.addFolder("Fog");
@@ -443,7 +503,7 @@ fogFolder
 
 // Exponential fog density control
 fogFolder
-  .add(state, "fogDensity", 0.01, 0.08, 0.002)
+  .add(state, "fogDensity", 0.010, 0.050, 0.002)
   .name("Density")
   .onChange((v) => {
     if (scene.fog instanceof THREE.FogExp2) {
@@ -466,23 +526,19 @@ enhanceGuiWithReset(flashFolder); // Enable double-click reset for this folder
 flashFolder
   .add(state, "flashlightIntensity", 0, 100, 0.5) // Increased max to 100
   .name("Intensity")
-  .onChange((v) => (flashlight.intensity = v))
-  ; // Enable double-click reset
+  .onChange((v) => (flashlight.intensity = v));
 flashFolder
   .add(state, "flashlightAngle", 5, 45, 1)
   .name("Angle (degrees)")
-  .onChange((v) => (flashlight.angle = (v * Math.PI) / 180))
-  ; // Enable double-click reset
+  .onChange((v) => (flashlight.angle = (v * Math.PI) / 180));
 flashFolder
   .add(state, "flashlightPenumbra", 0, 1, 0.01)
   .name("Penumbra")
-  .onChange((v) => (flashlight.penumbra = v))
-  ; // Enable double-click reset
+  .onChange((v) => (flashlight.penumbra = v));
 flashFolder
   .add(state, "flashlightDistance", 10, 100, 1)
   .name("Distance")
-  .onChange((v) => (flashlight.distance = v))
-  ; // Enable double-click reset
+  .onChange((v) => (flashlight.distance = v));
 flashFolder.add(flashlight, "visible").name("Enabled");
 
 // Shadows folder
@@ -491,37 +547,39 @@ enhanceGuiWithReset(shadowFolder); // Enable double-click reset for this folder
 shadowFolder
   .add(state, "shadowBias", -0.005, 0.005, 0.0001)
   .name("Bias")
-  .onChange((v) => (moon.shadow.bias = v))
-  ; // Enable double-click reset
+  .onChange((v) => (moon.shadow.bias = v));
 shadowFolder
   .add(state, "shadowNormalBias", 0, 0.1, 0.001)
   .name("Normal Bias")
-  .onChange((v) => (moon.shadow.normalBias = v))
-  ; // Enable double-click reset
+  .onChange((v) => (moon.shadow.normalBias = v));
 
 // Presets button
 const presetsObj = {
   resetToDefaults: () => {
     // Reset all values to their starting defaults
     state.exposure = 1.0;
-    state.envIntensity = 0.25; // Updated default
-    state.hdri = "moonless_golf";
+    state.envIntensity = 0.25;
+    state.hdri = "dikhololo_night";
     state.moonIntensity = 0.8;
     state.moonX = 12;
     state.moonY = 30;
     state.moonZ = 16;
     state.hemiIntensity = 0.25;
     state.ambientIntensity = 0.05;
-    state.fogDensity = 0.035;
+    state.fogDensity = 0.030;
     state.fogType = "exp2";
-    state.flashlightIntensity = 50; // Updated default
-    state.flashlightAngle = 28; // Updated default (degrees)
-    state.flashlightPenumbra = 0.4; // Updated default
-    state.flashlightDistance = 45; // Updated default
+    state.fogColor = "#0a0e2a";
+    state.flashlightIntensity = 50;
+    state.flashlightAngle = 28;
+    state.flashlightPenumbra = 0.4;
+    state.flashlightDistance = 45;
     state.shadowBias = -0.001;
     state.shadowNormalBias = 0.02;
     state.groundTiling = 64;
     state.normalStrength = 1.0;
+    state.skyTopColor = "#0a0a2e";
+    state.skyHorizonColor = "#000000";
+    state.skyCurve = 1.0;
 
     // Apply all changes
     renderer.toneMappingExposure = state.exposure;
@@ -545,6 +603,9 @@ const presetsObj = {
     grassColorTex.repeat.set(state.groundTiling, state.groundTiling);
     grassNormalTex.repeat.set(state.groundTiling, state.groundTiling);
     groundMat.normalScale.set(state.normalStrength, state.normalStrength);
+    skyMaterial.uniforms.topColor.value.set(state.skyTopColor);
+    skyMaterial.uniforms.horizonColor.value.set(state.skyHorizonColor);
+    skyMaterial.uniforms.curve.value = state.skyCurve;
 
     // Update GUI to reflect changes
     gui
@@ -573,14 +634,18 @@ const presetsObj = {
     state.exposure = 0.8;
     state.envIntensity = 0.08;
     state.moonIntensity = 0.5;
-    state.fogDensity = 0.05; // Very dense fog for horror
+    state.fogDensity = 0.040; // Denser fog for horror
     state.fogType = "exp2";
+    state.skyHorizonColor = "#000000";
+    state.skyCurve = 0.7; // Bias toward horizon for darker feel
     renderer.toneMappingExposure = state.exposure;
     setEnvIntensity(scene, state.envIntensity);
     moon.intensity = state.moonIntensity;
     if (scene.fog instanceof THREE.FogExp2) {
       scene.fog.density = state.fogDensity;
     }
+    skyMaterial.uniforms.horizonColor.value.set(state.skyHorizonColor);
+    skyMaterial.uniforms.curve.value = state.skyCurve;
     gui
       .controllersRecursive()
       .forEach((controller) => controller.updateDisplay());
@@ -657,6 +722,9 @@ const tmpDir = new THREE.Vector3();
 function animate() {
   requestAnimationFrame(animate);
 
+  // IMPORTANT: Skydome follows camera to prevent parallax
+  skydome.position.copy(camera.position);
+
   // Attach flashlight to camera
   if (flashlight.visible) {
     flashlight.position.copy(camera.position);
@@ -671,13 +739,11 @@ function animate() {
 animate();
 
 // Start message
-console.log("🎮 Night Scene with Exponential Fog");
+console.log("🌌 Night Scene with Fog-Aware Skydome");
 console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
-console.log("✓ Exponential fog enabled (density 0.035)");
-console.log("✓ Fog bug fixed - slider now updates live");
-console.log("📏 Object distances for testing:");
-console.log("  • Sphere: ~7m away");
-console.log("  • Metal posts: 25-60m away");
-console.log("  • Tombstones: random within 10m");
-console.log("🎛️ Try fog density 0.02-0.06 for best effect");
+console.log("✓ Skydome implemented with gradient shader");
+console.log("✓ Fog now blends seamlessly with horizon");
+console.log("✓ HDRI used for lighting only (not visible)");
+console.log("🎨 Adjust sky colors and curve in GUI");
+console.log("🌫️ Fog density reduced to 0.030 for skydome");
 console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
