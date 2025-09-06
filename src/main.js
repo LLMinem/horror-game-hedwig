@@ -37,39 +37,58 @@ camera.position.set(0, 1.7, 15);
 camera.lookAt(0, 1.5, 0);
 
 // =============== SKYDOME (replaces the 2D gradient background)
-// Vertex shader - passes position to fragment shader
+// Vertex shader - calculates eye-ray direction for proper horizon alignment
 const skyVertexShader = `
-  varying vec3 vWorldPosition;
+  varying vec3 vDir;  // Direction from camera to vertex
+  
   void main() {
-    vec4 worldPosition = modelMatrix * vec4(position, 1.0);
-    vWorldPosition = worldPosition.xyz;
+    vec3 worldPos = (modelMatrix * vec4(position, 1.0)).xyz;
+    vDir = worldPos - cameraPosition;  // THREE.js provides cameraPosition automatically!
+    
     gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
   }
 `;
 
-// Fragment shader - creates the gradient
+// Fragment shader - creates 4-stop gradient aligned with visual horizon
 const skyFragmentShader = `
-  uniform vec3 topColor;
-  uniform vec3 horizonColor;
-  uniform float curve; // Controls gradient falloff
+  precision highp float;
   
-  varying vec3 vWorldPosition;
+  // Four color stops for complex gradient
+  uniform vec3 horizonColor;    // Bottom color (light pollution)
+  uniform vec3 midLowColor;     // Lower-mid transition
+  uniform vec3 midHighColor;    // Upper-mid transition  
+  uniform vec3 zenithColor;     // Top color (darkest sky)
+  
+  // Control where transitions happen (0-1 range)
+  uniform float midLowStop;     // Where horizon transitions to mid-low
+  uniform float midHighStop;    // Where mid-low transitions to mid-high
+  
+  varying vec3 vDir;  // Direction from camera to this fragment
   
   void main() {
-    // Normalize to get direction from center
-    vec3 direction = normalize(vWorldPosition);
+    // Normalize the eye-ray direction
+    vec3 dir = normalize(vDir);
     
-    // Get the y component (up/down), remap from [-1,1] to [0,1]
-    float h = direction.y * 0.5 + 0.5;
+    // Use Y component directly: 0 = horizon, 1 = straight up
+    // Clamp to [0,1] so anything below horizon stays at horizon color
+    float altitude = clamp(dir.y, 0.0, 1.0);
     
-    // Apply curve to control gradient shape
-    // curve = 1.0 is linear, < 1.0 biases toward horizon, > 1.0 biases toward top
-    h = pow(h, curve);
+    // SMOOTHSTEP: Creates smooth S-curve transitions
+    // Now altitude=0 is TRUE VISUAL HORIZON, altitude=1 is zenith
     
-    // Lerp between horizon and top color
-    vec3 color = mix(horizonColor, topColor, h);
+    // Transition 1: Horizon to Mid-Low
+    float t1 = smoothstep(0.0, midLowStop, altitude);
+    vec3 col = mix(horizonColor, midLowColor, t1);
     
-    gl_FragColor = vec4(color, 1.0);
+    // Transition 2: Mid-Low to Mid-High  
+    float t2 = smoothstep(midLowStop, midHighStop, altitude);
+    col = mix(col, midHighColor, t2);
+    
+    // Transition 3: Mid-High to Zenith
+    float t3 = smoothstep(midHighStop, 1.0, altitude);
+    col = mix(col, zenithColor, t3);
+    
+    gl_FragColor = vec4(col, 1.0);
   }
 `;
 
@@ -78,9 +97,15 @@ const skyFragmentShader = `
 const skyGeometry = new THREE.SphereGeometry(1000, 32, 32);
 const skyMaterial = new THREE.ShaderMaterial({
   uniforms: {
-    topColor: { value: new THREE.Color(0x0a0a2e) }, // Deep blue at top
-    horizonColor: { value: new THREE.Color(0x000000) }, // Near-black at horizon
-    curve: { value: 1.0 }, // Linear gradient by default
+    // Four color stops for realistic night gradient
+    horizonColor: { value: new THREE.Color(0x2B1E1B) },  // Warm grey-brown (light pollution)
+    midLowColor: { value: new THREE.Color(0x15131C) },   // Dark plum (transition)
+    midHighColor: { value: new THREE.Color(0x0D1019) },  // Deep grey-blue
+    zenithColor: { value: new THREE.Color(0x060B14) },   // Very dark indigo (never pure black!)
+    
+    // Control where color transitions happen
+    midLowStop: { value: 0.25 },   // 25% up from horizon
+    midHighStop: { value: 0.60 },  // 60% up from horizon
   },
   vertexShader: skyVertexShader,
   fragmentShader: skyFragmentShader,
@@ -329,10 +354,13 @@ const defaults = {
   // Ground texture controls
   groundTiling: 64,
   normalStrength: 1.0,
-  // NEW: Sky controls - Realistic 10-11pm night colors
-  skyTopColor: "#060B14",      // Deep indigo-grey (zenith)
-  skyHorizonColor: "#15131C",  // Dark plum-grey (subtle light pollution)
-  skyCurve: 1.2,               // Slight bias toward zenith for natural look
+  // NEW: Sky controls - 4-stop gradient for realistic night
+  skyHorizonColor: "#2B1E1B",  // Warm grey-brown (light pollution)
+  skyMidLowColor: "#15131C",   // Dark plum (transition zone)
+  skyMidHighColor: "#0D1019",  // Deep grey-blue (main sky)
+  skyZenithColor: "#060B14",   // Very dark indigo (never pure black!)
+  skyMidLowStop: 0.25,         // Where first transition happens
+  skyMidHighStop: 0.60,        // Where second transition happens
 };
 
 // State object initialized from defaults
@@ -390,21 +418,38 @@ function enhanceGuiWithReset(guiOrFolder) {
 // Apply the enhancement to the main GUI and all folders
 enhanceGuiWithReset(gui);
 
-// NEW: Sky folder for skydome controls
-const skyFolder = gui.addFolder("Sky");
+// NEW: Sky folder for 4-stop gradient controls
+const skyFolder = gui.addFolder("Sky Gradient (4 Colors)");
 enhanceGuiWithReset(skyFolder);
-skyFolder
-  .addColor(state, "skyTopColor")
-  .name("Top Color")
-  .onChange((v) => skyMaterial.uniforms.topColor.value.set(v));
+
+// Color controls - from bottom to top
 skyFolder
   .addColor(state, "skyHorizonColor")
-  .name("Horizon Color")
+  .name("1. Horizon (Light Pollution)")
   .onChange((v) => skyMaterial.uniforms.horizonColor.value.set(v));
 skyFolder
-  .add(state, "skyCurve", 0.2, 3.0, 0.01)
-  .name("Gradient Curve")
-  .onChange((v) => (skyMaterial.uniforms.curve.value = v));
+  .addColor(state, "skyMidLowColor")
+  .name("2. Mid-Low (Transition)")
+  .onChange((v) => skyMaterial.uniforms.midLowColor.value.set(v));
+skyFolder
+  .addColor(state, "skyMidHighColor")
+  .name("3. Mid-High (Main Sky)")
+  .onChange((v) => skyMaterial.uniforms.midHighColor.value.set(v));
+skyFolder
+  .addColor(state, "skyZenithColor")
+  .name("4. Zenith (Darkest)")
+  .onChange((v) => skyMaterial.uniforms.zenithColor.value.set(v));
+
+// Transition position controls
+skyFolder
+  .add(state, "skyMidLowStop", 0.0, 0.5, 0.01)
+  .name("Low→Mid Transition")
+  .onChange((v) => (skyMaterial.uniforms.midLowStop.value = v));
+skyFolder
+  .add(state, "skyMidHighStop", 0.5, 1.0, 0.01)
+  .name("Mid→High Transition")
+  .onChange((v) => (skyMaterial.uniforms.midHighStop.value = v));
+
 skyFolder.open();
 
 // Rendering folder
@@ -577,9 +622,12 @@ const presetsObj = {
     state.shadowNormalBias = 0.02;
     state.groundTiling = 64;
     state.normalStrength = 1.0;
-    state.skyTopColor = "#060B14";      // Deep indigo-grey
-    state.skyHorizonColor = "#15131C";  // Dark plum-grey
-    state.skyCurve = 1.2;
+    state.skyHorizonColor = "#2B1E1B";  // Warm grey-brown
+    state.skyMidLowColor = "#15131C";   // Dark plum
+    state.skyMidHighColor = "#0D1019";  // Deep grey-blue
+    state.skyZenithColor = "#060B14";   // Very dark indigo
+    state.skyMidLowStop = 0.25;
+    state.skyMidHighStop = 0.60;
 
     // Apply all changes
     renderer.toneMappingExposure = state.exposure;
@@ -603,9 +651,12 @@ const presetsObj = {
     grassColorTex.repeat.set(state.groundTiling, state.groundTiling);
     grassNormalTex.repeat.set(state.groundTiling, state.groundTiling);
     groundMat.normalScale.set(state.normalStrength, state.normalStrength);
-    skyMaterial.uniforms.topColor.value.set(state.skyTopColor);
     skyMaterial.uniforms.horizonColor.value.set(state.skyHorizonColor);
-    skyMaterial.uniforms.curve.value = state.skyCurve;
+    skyMaterial.uniforms.midLowColor.value.set(state.skyMidLowColor);
+    skyMaterial.uniforms.midHighColor.value.set(state.skyMidHighColor);
+    skyMaterial.uniforms.zenithColor.value.set(state.skyZenithColor);
+    skyMaterial.uniforms.midLowStop.value = state.skyMidLowStop;
+    skyMaterial.uniforms.midHighStop.value = state.skyMidHighStop;
 
     // Update GUI to reflect changes
     gui
@@ -636,8 +687,11 @@ const presetsObj = {
     state.moonIntensity = 0.5;
     state.fogDensity = 0.040; // Denser fog for horror
     state.fogType = "exp2";
-    state.skyHorizonColor = "#000000";
-    state.skyCurve = 0.7; // Bias toward horizon for darker feel
+    // Darker, more oppressive sky colors
+    state.skyHorizonColor = "#0A0807";  // Almost black with hint of brown
+    state.skyMidLowColor = "#080709";   // Very dark grey
+    state.skyMidHighColor = "#050608";  // Darker grey-blue
+    state.skyZenithColor = "#020304";   // Nearly black
     renderer.toneMappingExposure = state.exposure;
     setEnvIntensity(scene, state.envIntensity);
     moon.intensity = state.moonIntensity;
@@ -645,7 +699,9 @@ const presetsObj = {
       scene.fog.density = state.fogDensity;
     }
     skyMaterial.uniforms.horizonColor.value.set(state.skyHorizonColor);
-    skyMaterial.uniforms.curve.value = state.skyCurve;
+    skyMaterial.uniforms.midLowColor.value.set(state.skyMidLowColor);
+    skyMaterial.uniforms.midHighColor.value.set(state.skyMidHighColor);
+    skyMaterial.uniforms.zenithColor.value.set(state.skyZenithColor);
     gui
       .controllersRecursive()
       .forEach((controller) => controller.updateDisplay());
@@ -654,15 +710,21 @@ const presetsObj = {
 
   realisticNight: () => {
     // Preset for realistic 10-11pm night sky
-    state.skyTopColor = "#060B14";      // Deep indigo-grey
-    state.skyHorizonColor = "#15131C";  // Dark plum with light pollution
-    state.skyCurve = 1.2;               // Natural transition
+    state.skyHorizonColor = "#2B1E1B";  // Warm grey-brown (light pollution)
+    state.skyMidLowColor = "#15131C";   // Dark plum (transition)
+    state.skyMidHighColor = "#0D1019";  // Deep grey-blue
+    state.skyZenithColor = "#060B14";   // Very dark indigo
+    state.skyMidLowStop = 0.25;         // Natural transition points
+    state.skyMidHighStop = 0.60;
     state.fogDensity = 0.030;           // Moderate fog
     state.exposure = 1.0;
     state.envIntensity = 0.15;
-    skyMaterial.uniforms.topColor.value.set(state.skyTopColor);
     skyMaterial.uniforms.horizonColor.value.set(state.skyHorizonColor);
-    skyMaterial.uniforms.curve.value = state.skyCurve;
+    skyMaterial.uniforms.midLowColor.value.set(state.skyMidLowColor);
+    skyMaterial.uniforms.midHighColor.value.set(state.skyMidHighColor);
+    skyMaterial.uniforms.zenithColor.value.set(state.skyZenithColor);
+    skyMaterial.uniforms.midLowStop.value = state.skyMidLowStop;
+    skyMaterial.uniforms.midHighStop.value = state.skyMidHighStop;
     if (scene.fog instanceof THREE.FogExp2) {
       scene.fog.density = state.fogDensity;
     }
@@ -745,7 +807,8 @@ const tmpDir = new THREE.Vector3();
 function animate() {
   requestAnimationFrame(animate);
 
-  // IMPORTANT: Skydome follows camera to prevent parallax
+  // IMPORTANT: Skydome follows camera completely now that shader is fixed!
+  // The eye-ray calculation in the shader handles horizon alignment properly
   skydome.position.copy(camera.position);
 
   // Attach flashlight to camera
