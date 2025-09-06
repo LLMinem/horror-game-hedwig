@@ -109,5 +109,8 @@ temp/
 *.backup
 *.old
 
+# Repo Prompt
+.repo_ignore
+
 # Sensitive files
 .mcp.json
