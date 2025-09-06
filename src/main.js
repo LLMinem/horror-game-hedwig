@@ -329,10 +329,10 @@ const defaults = {
   // Ground texture controls
   groundTiling: 64,
   normalStrength: 1.0,
-  // NEW: Sky controls
-  skyTopColor: "#0a0a2e",
-  skyHorizonColor: "#000000",
-  skyCurve: 1.0,
+  // NEW: Sky controls - Realistic 10-11pm night colors
+  skyTopColor: "#060B14",      // Deep indigo-grey (zenith)
+  skyHorizonColor: "#15131C",  // Dark plum-grey (subtle light pollution)
+  skyCurve: 1.2,               // Slight bias toward zenith for natural look
 };
 
 // State object initialized from defaults
@@ -577,9 +577,9 @@ const presetsObj = {
     state.shadowNormalBias = 0.02;
     state.groundTiling = 64;
     state.normalStrength = 1.0;
-    state.skyTopColor = "#0a0a2e";
-    state.skyHorizonColor = "#000000";
-    state.skyCurve = 1.0;
+    state.skyTopColor = "#060B14";      // Deep indigo-grey
+    state.skyHorizonColor = "#15131C";  // Dark plum-grey
+    state.skyCurve = 1.2;
 
     // Apply all changes
     renderer.toneMappingExposure = state.exposure;
@@ -651,12 +651,35 @@ const presetsObj = {
       .forEach((controller) => controller.updateDisplay());
     console.log("✓ Applied horror dark preset");
   },
+
+  realisticNight: () => {
+    // Preset for realistic 10-11pm night sky
+    state.skyTopColor = "#060B14";      // Deep indigo-grey
+    state.skyHorizonColor = "#15131C";  // Dark plum with light pollution
+    state.skyCurve = 1.2;               // Natural transition
+    state.fogDensity = 0.030;           // Moderate fog
+    state.exposure = 1.0;
+    state.envIntensity = 0.15;
+    skyMaterial.uniforms.topColor.value.set(state.skyTopColor);
+    skyMaterial.uniforms.horizonColor.value.set(state.skyHorizonColor);
+    skyMaterial.uniforms.curve.value = state.skyCurve;
+    if (scene.fog instanceof THREE.FogExp2) {
+      scene.fog.density = state.fogDensity;
+    }
+    renderer.toneMappingExposure = state.exposure;
+    setEnvIntensity(scene, state.envIntensity);
+    gui
+      .controllersRecursive()
+      .forEach((controller) => controller.updateDisplay());
+    console.log("✓ Applied realistic night preset");
+  },
 };
 
 const presetsFolder = gui.addFolder("Presets");
 presetsFolder.add(presetsObj, "resetToDefaults").name("Reset to Defaults");
 presetsFolder.add(presetsObj, "brightTest").name("Bright (Testing)");
 presetsFolder.add(presetsObj, "horrorDark").name("Horror Dark");
+presetsFolder.add(presetsObj, "realisticNight").name("Realistic Night");
 presetsFolder.open();
 
 // =============== KEYBOARD CONTROLS (keeping for backwards compatibility)
