@@ -3,8 +3,9 @@
 ## 🎯 Current Progress
 
 **Base Commit:** `15ca4ab` - ChatGPT's baseline night scene  
-**Current Status:** Steps 0-2 complete, implementing lil-gui next  
-**Latest Working:** `d957860` - Key bindings fixed
+**Current Status:** Steps 0-3 complete, atmospheric sky implementation active  
+**Latest Working:** `505d23f` - Four-stop gradient sky with proper horizon alignment  
+**Current Focus:** Atmospheric sky enhancement Step 2 - Light pollution radial glow
 
 ### ✅ Completed Steps
 
@@ -12,13 +13,23 @@
 - **Step 1:** Remove RoomEnvironment → `5131463` (proper night lighting)
 - **Step 2:** Night HDRI with intensity → `e2bfd91` (fixed r179 bug with envMap)
   - Additional fixes: `eef2c15` (precision), `d957860` (key swap)
+- **Step 3:** lil-gui Dev Panel → `716e148` (full controls with double-click reset)
+- **Atmospheric Sky Step 1:** Four-stop gradient → `505d23f` (proper horizon alignment) [COMPLETE 2025-09-07]
 
 ### 🚧 Currently Implementing
 
-- **Step 3:** lil-gui Dev Panel (moved up from original Step 6)
+- **Atmospheric Sky Step 2:** Light pollution radial glow (following atmospheric-sky-implementation-plan.md)
 
 ### 📋 Remaining Steps
 
+**Atmospheric Sky Pipeline (Priority):**
+- Atmospheric Sky Step 2: Light pollution radial glow [NEXT UP]
+- Atmospheric Sky Step 3: Dithering (anti-banding) [PENDING]
+- Atmospheric Sky Step 4: Procedural star field [PENDING]
+- Atmospheric Sky Step 5: Atmospheric noise [PENDING]
+- Atmospheric Sky Step 6: Horror atmosphere tuning [PENDING]
+
+**Original Night Scene Steps:**
 - Step 4: Ground texture micro-detail (was Step 3)
 - Step 5: Fog tuning (was Step 4)
 - Step 6: Shadow quality (was Step 5)
@@ -310,4 +321,9 @@ Downloaded 5 HDRIs for different moods:
 
 This is a lighting class disguised as a game. We're not "adding hacks"; we're **teaching the renderer what kind of night it is**: faint, cool sky; a single distant moon; tiny ambient bounce; materials with just enough micro-detail to catch that light. With the dev panel and dev room, you'll be able to audition any future asset in minutes.
 
-Current focus: Implementing lil-gui for live control, then continuing with ground textures.
+Current focus: **Atmospheric sky enhancement** following the detailed plan in `atmospheric-sky-implementation-plan.md`
+
+### Atmospheric Sky Implementation Status
+**Step 1 COMPLETE (2025-09-07):** Four-stop gradient with proper horizon alignment  
+**Next:** Light pollution radial glow effects  
+**Reference:** See `docs/atmospheric-sky-implementation-plan.md` for detailed progress tracking
