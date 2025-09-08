@@ -93,13 +93,14 @@ function updateCameraRotation() {
 }
 
 // =============== SKYDOME (replaces the 2D gradient background)
-// Vertex shader - calculates eye-ray direction for proper horizon alignment
+// Vertex shader - calculates world-space direction for stable star positions
 const skyVertexShader = `
-  varying vec3 vDir;  // Direction from camera to vertex
+  varying vec3 vDir;  // World-space direction (ignores camera translation)
   
   void main() {
-    vec3 worldPos = (modelMatrix * vec4(position, 1.0)).xyz;
-    vDir = worldPos - cameraPosition;  // THREE.js provides cameraPosition automatically!
+    // CRITICAL FIX: Use w=0 to get direction without camera translation
+    // This makes stars stay in fixed positions in world space
+    vDir = (modelMatrix * vec4(position, 0.0)).xyz;
     
     gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
   }
@@ -151,12 +152,87 @@ const skyFragmentShader = `
     return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453);
   }
   
+  // Advanced hash for 3D positions (used for stars)
+  float hash3(vec3 p) {
+    // Different magic numbers for 3D
+    return fract(sin(dot(p, vec3(127.1, 311.7, 74.7))) * 43758.5453);
+  }
+  
+  // Convert spherical direction to 2D grid coordinates for star cells
+  vec2 dirToSphereMap(vec3 dir) {
+    // Convert 3D direction to spherical coordinates (theta, phi)
+    float theta = atan(dir.z, dir.x); // Horizontal angle (-PI to PI)
+    float phi = asin(dir.y);          // Vertical angle (-PI/2 to PI/2)
+    
+    // Map to 0-1 range for grid
+    float u = (theta + 3.14159265359) / (2.0 * 3.14159265359);
+    float v = (phi + 1.5707963268) / 3.14159265359;
+    
+    return vec2(u, v);
+  }
+  
+  // Generate stars in a cell
+  float generateStars(vec3 dir) {
+    if (!starsEnabled) return 0.0;
+    
+    // Convert direction to 2D sphere map
+    vec2 sphereCoord = dirToSphereMap(dir);
+    
+    // Scale by density to create grid cells
+    vec2 cellCoord = sphereCoord * starDensity * 150.0; // Increased multiplier for more stars
+    vec2 cellId = floor(cellCoord);    // Integer cell ID
+    vec2 cellUV = fract(cellCoord);    // Position within cell (0-1)
+    
+    float starLight = 0.0;
+    
+    // Check 3x3 grid of cells (for stars that might overlap cell boundaries)
+    for (int dx = -1; dx <= 1; dx++) {
+      for (int dy = -1; dy <= 1; dy++) {
+        vec2 neighborId = cellId + vec2(float(dx), float(dy));
+        
+        // Use cell ID as hash seed
+        vec3 hashSeed = vec3(neighborId, 0.0);
+        
+        // Determine if this cell has a star (probability based on density)
+        float hasStarProb = hash3(hashSeed);
+        if (hasStarProb > 0.15) continue; // 85% of cells have stars (was 60%)
+        
+        // Random position within cell
+        float starX = hash3(hashSeed + vec3(0.1, 0.0, 0.0));
+        float starY = hash3(hashSeed + vec3(0.0, 0.1, 0.0));
+        vec2 starPos = vec2(starX, starY);
+        
+        // Position relative to current fragment
+        vec2 offset = starPos + vec2(float(dx), float(dy)) - cellUV;
+        float dist = length(offset);
+        
+        // Random star size (between min and max)
+        float sizeSeed = hash3(hashSeed + vec3(0.0, 0.0, 0.1));
+        float starSize = mix(starSizeMin, starSizeMax, sizeSeed * sizeSeed); // Square for more dim stars
+        
+        // Star brightness falls off from center
+        if (dist < starSize) {
+          // Gaussian-like falloff for natural look
+          float brightness = exp(-dist * dist / (starSize * starSize * 0.2));
+          
+          // Random brightness variation
+          float brightnessMult = hash3(hashSeed + vec3(0.2, 0.2, 0.2));
+          brightnessMult = 0.3 + 0.7 * brightnessMult; // 30% to 100% brightness
+          
+          starLight += brightness * brightnessMult * starBrightness;
+        }
+      }
+    }
+    
+    return starLight;
+  }
+  
   void main() {
-    // Normalize the eye-ray direction
+    // Normalize the world-space direction
     vec3 dir = normalize(vDir);
     
-    // Use Y component directly: 0 = horizon, 1 = straight up
-    // Clamp to [0,1] so anything below horizon stays at horizon color
+    // Use Y component for altitude: 0 = horizon, 1 = straight up
+    // Since we're using world-space direction, this is stable
     float altitude = clamp(dir.y, 0.0, 1.0);
     
     // SMOOTHSTEP: Creates smooth S-curve transitions
@@ -206,6 +282,17 @@ const skyFragmentShader = `
     vec3 pollutionColor = vec3(0.24, 0.18, 0.16); // Warm brown-orange
     col += pollutionColor * (village1Glow + village2Glow);
     
+    // ============ PROCEDURAL STARS ============
+    // Generate stars based on view direction
+    float stars = generateStars(dir);
+    
+    // Apply atmospheric extinction (fade near horizon)
+    float starFade = smoothstep(0.0, starHorizonFade, altitude);
+    stars *= starFade;
+    
+    // Add stars to the sky (additive blending)
+    col += vec3(stars);
+    
     // Apply dithering to prevent color banding
     // Uses screen-space position for stable noise pattern
     float dither = hash(gl_FragCoord.xy);
@@ -248,10 +335,10 @@ const skyMaterial = new THREE.ShaderMaterial({
     
     // STAR FIELD PARAMETERS
     starsEnabled: { value: true },        // Stars on by default
-    starDensity: { value: 0.5 },         // Moderate density (0.5 cells/steradian)
-    starBrightness: { value: 1.0 },      // Full brightness
-    starSizeMin: { value: 0.0003 },      // Tiny stars (dim)
-    starSizeMax: { value: 0.002 },       // Larger stars (bright)
+    starDensity: { value: 1.0 },         // Higher density for more visible stars
+    starBrightness: { value: 1.5 },      // Brighter for better visibility
+    starSizeMin: { value: 0.0004 },      // Slightly larger minimum (was 0.0003)
+    starSizeMax: { value: 0.007 },       // Much larger maximum (was 0.002)
     starHorizonFade: { value: 0.3 },     // Start fading at 30% altitude
   },
   vertexShader: skyVertexShader,
@@ -522,10 +609,10 @@ const defaults = {
   skyDitherAmount: 0.008,      // Dithering to prevent gradient banding
   // Star field parameters
   starsEnabled: true,           // Enable stars by default
-  starDensity: 0.5,            // Stars per steradian
-  starBrightness: 1.0,         // Overall brightness
-  starSizeMin: 0.0003,         // Minimum star size
-  starSizeMax: 0.002,          // Maximum star size  
+  starDensity: 1.0,            // More stars visible (was 0.5)
+  starBrightness: 1.5,         // Brighter stars (was 1.0)
+  starSizeMin: 0.0004,         // Larger minimum (was 0.0003)
+  starSizeMax: 0.007,          // Much larger maximum (was 0.002)
   starHorizonFade: 0.3,        // Fade starts at 30% altitude
 };
 
@@ -636,24 +723,24 @@ starsFolder
 
 // Star density control
 starsFolder
-  .add(state, "starDensity", 0.1, 2.0, 0.05)
+  .add(state, "starDensity", 0.1, 3.0, 0.05)
   .name("Density (stars/steradian)")
   .onChange((v) => (skyMaterial.uniforms.starDensity.value = v));
 
 // Overall brightness
 starsFolder
-  .add(state, "starBrightness", 0.0, 2.0, 0.01)
+  .add(state, "starBrightness", 0.0, 3.0, 0.01)
   .name("Brightness")
   .onChange((v) => (skyMaterial.uniforms.starBrightness.value = v));
 
-// Size range controls
+// Size range controls - adjusted ranges for better visibility
 starsFolder
-  .add(state, "starSizeMin", 0.0001, 0.001, 0.0001)
+  .add(state, "starSizeMin", 0.0001, 0.002, 0.0001)
   .name("Min Size (dim stars)")
   .onChange((v) => (skyMaterial.uniforms.starSizeMin.value = v));
 
 starsFolder
-  .add(state, "starSizeMax", 0.001, 0.005, 0.0001)
+  .add(state, "starSizeMax", 0.001, 0.01, 0.0001)
   .name("Max Size (bright stars)")
   .onChange((v) => (skyMaterial.uniforms.starSizeMax.value = v));
 
@@ -913,10 +1000,10 @@ const presetsObj = {
     state.village2Height = 0.25;
     state.skyDitherAmount = 0.008;
     state.starsEnabled = true;
-    state.starDensity = 0.5;
-    state.starBrightness = 1.0;
-    state.starSizeMin = 0.0003;
-    state.starSizeMax = 0.002;
+    state.starDensity = 1.0;
+    state.starBrightness = 1.5;
+    state.starSizeMin = 0.0004;
+    state.starSizeMax = 0.007;
     state.starHorizonFade = 0.3;
 
     // Apply all changes
