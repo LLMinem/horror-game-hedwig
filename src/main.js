@@ -135,6 +135,14 @@ const skyFragmentShader = `
   // DITHERING
   uniform float ditherAmount;      // How strong the dither effect is (0.0-0.01)
   
+  // STAR FIELD PARAMETERS
+  uniform bool starsEnabled;       // Toggle stars on/off
+  uniform float starDensity;       // Number of stars (cells per steradian)
+  uniform float starBrightness;    // Overall star brightness multiplier
+  uniform float starSizeMin;       // Minimum star size (smaller = dimmer)
+  uniform float starSizeMax;       // Maximum star size (larger = brighter)
+  uniform float starHorizonFade;   // Height where stars start fading (0-1)
+  
   varying vec3 vDir;  // Direction from camera to this fragment
   
   // Simple hash function for dithering noise
@@ -237,6 +245,14 @@ const skyMaterial = new THREE.ShaderMaterial({
     
     // DITHERING - Prevents gradient banding
     ditherAmount: { value: 0.008 },      // Noise to break up gradients
+    
+    // STAR FIELD PARAMETERS
+    starsEnabled: { value: true },        // Stars on by default
+    starDensity: { value: 0.5 },         // Moderate density (0.5 cells/steradian)
+    starBrightness: { value: 1.0 },      // Full brightness
+    starSizeMin: { value: 0.0003 },      // Tiny stars (dim)
+    starSizeMax: { value: 0.002 },       // Larger stars (bright)
+    starHorizonFade: { value: 0.3 },     // Start fading at 30% altitude
   },
   vertexShader: skyVertexShader,
   fragmentShader: skyFragmentShader,
@@ -504,6 +520,13 @@ const defaults = {
   pollutionColor: "#3D2F28",   // Warm sodium lamp color
   // Dithering
   skyDitherAmount: 0.008,      // Dithering to prevent gradient banding
+  // Star field parameters
+  starsEnabled: true,           // Enable stars by default
+  starDensity: 0.5,            // Stars per steradian
+  starBrightness: 1.0,         // Overall brightness
+  starSizeMin: 0.0003,         // Minimum star size
+  starSizeMax: 0.002,          // Maximum star size  
+  starHorizonFade: 0.3,        // Fade starts at 30% altitude
 };
 
 // State object initialized from defaults
@@ -600,6 +623,47 @@ skyFolder
   .onChange((v) => (skyMaterial.uniforms.ditherAmount.value = v));
 
 skyFolder.open();
+
+// Star Field folder for procedural stars
+const starsFolder = gui.addFolder("Star Field (Procedural)");
+enhanceGuiWithReset(starsFolder);
+
+// Enable/disable stars
+starsFolder
+  .add(state, "starsEnabled")
+  .name("Enable Stars")
+  .onChange((v) => (skyMaterial.uniforms.starsEnabled.value = v));
+
+// Star density control
+starsFolder
+  .add(state, "starDensity", 0.1, 2.0, 0.05)
+  .name("Density (stars/steradian)")
+  .onChange((v) => (skyMaterial.uniforms.starDensity.value = v));
+
+// Overall brightness
+starsFolder
+  .add(state, "starBrightness", 0.0, 2.0, 0.01)
+  .name("Brightness")
+  .onChange((v) => (skyMaterial.uniforms.starBrightness.value = v));
+
+// Size range controls
+starsFolder
+  .add(state, "starSizeMin", 0.0001, 0.001, 0.0001)
+  .name("Min Size (dim stars)")
+  .onChange((v) => (skyMaterial.uniforms.starSizeMin.value = v));
+
+starsFolder
+  .add(state, "starSizeMax", 0.001, 0.005, 0.0001)
+  .name("Max Size (bright stars)")
+  .onChange((v) => (skyMaterial.uniforms.starSizeMax.value = v));
+
+// Horizon fade control
+starsFolder
+  .add(state, "starHorizonFade", 0.0, 0.5, 0.01)
+  .name("Horizon Fade Height")
+  .onChange((v) => (skyMaterial.uniforms.starHorizonFade.value = v));
+
+starsFolder.open();
 
 // Light Pollution folder for dual village sources
 const pollutionFolder = gui.addFolder("Light Pollution (2 Villages)");
@@ -848,6 +912,12 @@ const presetsObj = {
     state.village2Spread = 50;
     state.village2Height = 0.25;
     state.skyDitherAmount = 0.008;
+    state.starsEnabled = true;
+    state.starDensity = 0.5;
+    state.starBrightness = 1.0;
+    state.starSizeMin = 0.0003;
+    state.starSizeMax = 0.002;
+    state.starHorizonFade = 0.3;
 
     // Apply all changes
     renderer.toneMappingExposure = state.exposure;
@@ -889,6 +959,12 @@ const presetsObj = {
     skyMaterial.uniforms.village2Spread.value = (state.village2Spread * Math.PI) / 180;
     skyMaterial.uniforms.village2Height.value = state.village2Height;
     skyMaterial.uniforms.ditherAmount.value = state.skyDitherAmount;
+    skyMaterial.uniforms.starsEnabled.value = state.starsEnabled;
+    skyMaterial.uniforms.starDensity.value = state.starDensity;
+    skyMaterial.uniforms.starBrightness.value = state.starBrightness;
+    skyMaterial.uniforms.starSizeMin.value = state.starSizeMin;
+    skyMaterial.uniforms.starSizeMax.value = state.starSizeMax;
+    skyMaterial.uniforms.starHorizonFade.value = state.starHorizonFade;
 
     // Update GUI to reflect changes
     gui
