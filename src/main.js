@@ -132,7 +132,16 @@ const skyFragmentShader = `
   uniform float village2Spread;    // Broader spread
   uniform float village2Height;    // Lower height limit
   
+  // DITHERING
+  uniform float ditherAmount;      // How strong the dither effect is (0.0-0.01)
+  
   varying vec3 vDir;  // Direction from camera to this fragment
+  
+  // Simple hash function for dithering noise
+  float hash(vec2 p) {
+    // This creates a pseudo-random value based on screen position
+    return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453);
+  }
   
   void main() {
     // Normalize the eye-ray direction
@@ -189,6 +198,12 @@ const skyFragmentShader = `
     vec3 pollutionColor = vec3(0.24, 0.18, 0.16); // Warm brown-orange
     col += pollutionColor * (village1Glow + village2Glow);
     
+    // Apply dithering to prevent color banding
+    // Uses screen-space position for stable noise pattern
+    float dither = hash(gl_FragCoord.xy);
+    dither = (dither - 0.5) * ditherAmount; // Center around 0, scale by amount
+    col += vec3(dither); // Add noise to break up gradients
+    
     gl_FragColor = vec4(col, 1.0);
   }
 `;
@@ -219,6 +234,9 @@ const skyMaterial = new THREE.ShaderMaterial({
     village2Intensity: { value: 0.1 },   // Weak but more visible (increased from 0.05)
     village2Spread: { value: (50 * Math.PI) / 180 }, // 50° spread (increased from 34°)
     village2Height: { value: 0.25 },     // Up to 25% altitude (increased from 10%)
+    
+    // DITHERING - Prevents gradient banding
+    ditherAmount: { value: 0.008 },      // Noise to break up gradients
   },
   vertexShader: skyVertexShader,
   fragmentShader: skyFragmentShader,
@@ -484,6 +502,8 @@ const defaults = {
   village2Spread: 50,          // Broader spread (increased from 34)
   village2Height: 0.25,        // Lower on horizon (increased from 0.1)
   pollutionColor: "#3D2F28",   // Warm sodium lamp color
+  // Dithering
+  skyDitherAmount: 0.008,      // Dithering to prevent gradient banding
 };
 
 // State object initialized from defaults
@@ -572,6 +592,12 @@ skyFolder
   .add(state, "skyMidHighStop", 0.5, 1.0, 0.01)
   .name("Mid→High Transition")
   .onChange((v) => (skyMaterial.uniforms.midHighStop.value = v));
+
+// Dithering control to prevent banding
+skyFolder
+  .add(state, "skyDitherAmount", 0, 0.01, 0.0001)
+  .name("Dithering (Anti-banding)")
+  .onChange((v) => (skyMaterial.uniforms.ditherAmount.value = v));
 
 skyFolder.open();
 
@@ -821,6 +847,7 @@ const presetsObj = {
     state.village2Intensity = 0.1;
     state.village2Spread = 50;
     state.village2Height = 0.25;
+    state.skyDitherAmount = 0.008;
 
     // Apply all changes
     renderer.toneMappingExposure = state.exposure;
@@ -861,6 +888,7 @@ const presetsObj = {
     skyMaterial.uniforms.village2Intensity.value = state.village2Intensity;
     skyMaterial.uniforms.village2Spread.value = (state.village2Spread * Math.PI) / 180;
     skyMaterial.uniforms.village2Height.value = state.village2Height;
+    skyMaterial.uniforms.ditherAmount.value = state.skyDitherAmount;
 
     // Update GUI to reflect changes
     gui
