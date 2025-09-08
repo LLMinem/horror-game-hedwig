@@ -210,15 +210,15 @@ const skyMaterial = new THREE.ShaderMaterial({
     
     // NEAR VILLAGE (NW-N, ~250m) - Noticeable glow
     village1Dir: { value: new THREE.Vector3(-0.7, 0, -0.7).normalize() }, // Northwest
-    village1Intensity: { value: 0.25 },  // Moderate glow (0-1)
-    village1Spread: { value: 0.4 },      // ~23° spread
-    village1Height: { value: 0.2 },      // Visible up to 20% altitude
+    village1Intensity: { value: 0.20 },  // Moderate glow (reduced from 0.25)
+    village1Spread: { value: (90 * Math.PI) / 180 }, // 90° spread (increased from 23°)
+    village1Height: { value: 0.4 },      // Visible up to 40% altitude (increased from 20%)
     
     // DISTANT VILLAGE (SE, ~2km) - Very subtle
     village2Dir: { value: new THREE.Vector3(0.7, 0, 0.7).normalize() }, // Southeast  
-    village2Intensity: { value: 0.05 },  // Very weak (8x dimmer)
-    village2Spread: { value: 0.6 },      // Broader spread ~34°
-    village2Height: { value: 0.1 },      // Only near horizon
+    village2Intensity: { value: 0.1 },   // Weak but more visible (increased from 0.05)
+    village2Spread: { value: (50 * Math.PI) / 180 }, // 50° spread (increased from 34°)
+    village2Height: { value: 0.25 },     // Up to 25% altitude (increased from 10%)
   },
   vertexShader: skyVertexShader,
   fragmentShader: skyFragmentShader,
@@ -476,13 +476,13 @@ const defaults = {
   skyMidHighStop: 0.60,        // Where second transition happens
   // Light pollution controls
   village1Azimuth: -45,        // Northwest direction (degrees)
-  village1Intensity: 0.25,     // Near village glow strength
-  village1Spread: 23,          // Angular spread in degrees
-  village1Height: 0.2,         // Max altitude (0-1)
+  village1Intensity: 0.20,     // Near village glow strength (reduced from 0.25)
+  village1Spread: 90,          // Angular spread in degrees (increased from 23)
+  village1Height: 0.4,         // Max altitude (0-1) (increased from 0.2)
   village2Azimuth: 135,        // Southeast direction (degrees)
-  village2Intensity: 0.05,     // Distant village (much weaker)
-  village2Spread: 34,          // Broader spread
-  village2Height: 0.1,         // Lower on horizon
+  village2Intensity: 0.1,      // Distant village (increased from 0.05)
+  village2Spread: 50,          // Broader spread (increased from 34)
+  village2Height: 0.25,        // Lower on horizon (increased from 0.1)
   pollutionColor: "#3D2F28",   // Warm sodium lamp color
 };
 
@@ -594,7 +594,7 @@ village1Sub
   .name("Intensity")
   .onChange((v) => (skyMaterial.uniforms.village1Intensity.value = v));
 village1Sub
-  .add(state, "village1Spread", 10, 60, 1)
+  .add(state, "village1Spread", 30, 120, 1)
   .name("Spread (°)")
   .onChange((v) => (skyMaterial.uniforms.village1Spread.value = (v * Math.PI) / 180));
 village1Sub
@@ -617,11 +617,11 @@ village2Sub
   .name("Intensity")
   .onChange((v) => (skyMaterial.uniforms.village2Intensity.value = v));
 village2Sub
-  .add(state, "village2Spread", 10, 90, 1)
+  .add(state, "village2Spread", 30, 120, 1)
   .name("Spread (°)")
   .onChange((v) => (skyMaterial.uniforms.village2Spread.value = (v * Math.PI) / 180));
 village2Sub
-  .add(state, "village2Height", 0, 0.3, 0.01)
+  .add(state, "village2Height", 0, 0.5, 0.01)
   .name("Max Height")
   .onChange((v) => (skyMaterial.uniforms.village2Height.value = v));
 
@@ -814,13 +814,13 @@ const presetsObj = {
     state.skyMidLowStop = 0.25;
     state.skyMidHighStop = 0.60;
     state.village1Azimuth = -45;
-    state.village1Intensity = 0.25;
-    state.village1Spread = 23;
-    state.village1Height = 0.2;
+    state.village1Intensity = 0.20;
+    state.village1Spread = 90;
+    state.village1Height = 0.4;
     state.village2Azimuth = 135;
-    state.village2Intensity = 0.05;
-    state.village2Spread = 34;
-    state.village2Height = 0.1;
+    state.village2Intensity = 0.1;
+    state.village2Spread = 50;
+    state.village2Height = 0.25;
 
     // Apply all changes
     renderer.toneMappingExposure = state.exposure;
