@@ -3,9 +3,9 @@
 ## 🎯 Current Progress
 
 **Base Commit:** `15ca4ab` - ChatGPT's baseline night scene  
-**Current Status:** Steps 0-3 complete, atmospheric sky Step 2 complete, mouse controls added  
-**Latest Working:** `430fcea` - Fine-tuned light pollution settings for better realism  
-**Current Focus:** Atmospheric sky enhancement Step 3 - Dithering (anti-banding)
+**Current Status:** Steps 0-3 complete, atmospheric sky Step 3 complete, mouse controls added  
+**Latest Working:** `345c9f9` - Added dithering to prevent gradient banding in night sky  
+**Current Focus:** Atmospheric sky enhancement Step 4 - Procedural star field
 
 ### ✅ Completed Steps
 
@@ -18,17 +18,16 @@
 - **Atmospheric Sky Step 1:** Four-stop gradient → `505d23f` (proper horizon alignment) [COMPLETE 2025-09-07]
 - **Atmospheric Sky Step 2:** Dual-source light pollution → `f173843` (realistic village glow system) [COMPLETE 2025-09-08]
   - **Fine-tuning:** → `430fcea` (adjusted defaults for better realism)
+- **Atmospheric Sky Step 3:** Dithering (anti-banding) → `345c9f9` (hash-based screen-space noise) [COMPLETE 2025-09-08]
 
 ### 🚧 Currently Implementing
 
-- **Atmospheric Sky Step 3:** Dithering (anti-banding) for smooth gradients
+- **Atmospheric Sky Step 4:** Procedural star field for depth and reference points
 
 ### 📋 Remaining Steps
 
 **Atmospheric Sky Pipeline (Priority):**
-- Atmospheric Sky Step 3: Dithering (anti-banding) [NEXT UP]
-- Atmospheric Sky Step 4: Procedural star field [PENDING]
-- Atmospheric Sky Step 4: Procedural star field [PENDING]
+- Atmospheric Sky Step 4: Procedural star field [NEXT UP]
 - Atmospheric Sky Step 5: Atmospheric noise [PENDING]
 - Atmospheric Sky Step 6: Horror atmosphere tuning [PENDING]
 
@@ -330,7 +329,10 @@ Current focus: **Atmospheric sky enhancement** following the detailed plan in `a
 **Step 1 COMPLETE (2025-09-07):** Four-stop gradient with proper horizon alignment  
 **Step 2 COMPLETE (2025-09-08):** Dual-source light pollution system with physics-based falloff
 - **Fine-tuned (2025-09-08):** Adjusted default values for more realistic appearance  
-**Next:** Dithering (anti-banding) for smooth gradients  
+**Step 3 COMPLETE (2025-09-08):** Dithering (anti-banding) with hash-based screen-space noise
+- **Eliminates color banding:** Smooth gradients across all display types
+- **Minimal performance impact:** Single hash calculation per pixel
+**Next:** Procedural star field for depth and reference points  
 **Reference:** See `docs/atmospheric-sky-implementation-plan.md` for detailed progress tracking
 
 ### Additional Features
