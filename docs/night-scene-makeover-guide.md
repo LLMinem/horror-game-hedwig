@@ -4,7 +4,7 @@
 
 **Base Commit:** `15ca4ab` - ChatGPT's baseline night scene  
 **Current Status:** Steps 0-3 complete, atmospheric sky Step 2 complete, mouse controls added  
-**Latest Working:** `f173843` - Dual-source light pollution system for realistic night sky  
+**Latest Working:** `430fcea` - Fine-tuned light pollution settings for better realism  
 **Current Focus:** Atmospheric sky enhancement Step 3 - Dithering (anti-banding)
 
 ### ✅ Completed Steps
@@ -17,6 +17,7 @@
 - **Mouse Look Controls:** First-person camera → `8335bac` (pointer lock API with smooth rotation) [COMPLETE 2025-09-08]
 - **Atmospheric Sky Step 1:** Four-stop gradient → `505d23f` (proper horizon alignment) [COMPLETE 2025-09-07]
 - **Atmospheric Sky Step 2:** Dual-source light pollution → `f173843` (realistic village glow system) [COMPLETE 2025-09-08]
+  - **Fine-tuning:** → `430fcea` (adjusted defaults for better realism)
 
 ### 🚧 Currently Implementing
 
@@ -327,7 +328,8 @@ Current focus: **Atmospheric sky enhancement** following the detailed plan in `a
 
 ### Atmospheric Sky Implementation Status
 **Step 1 COMPLETE (2025-09-07):** Four-stop gradient with proper horizon alignment  
-**Step 2 COMPLETE (2025-09-08):** Dual-source light pollution system with physics-based falloff  
+**Step 2 COMPLETE (2025-09-08):** Dual-source light pollution system with physics-based falloff
+- **Fine-tuned (2025-09-08):** Adjusted default values for more realistic appearance  
 **Next:** Dithering (anti-banding) for smooth gradients  
 **Reference:** See `docs/atmospheric-sky-implementation-plan.md` for detailed progress tracking
 

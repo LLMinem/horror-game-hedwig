@@ -77,12 +77,20 @@ Zenith:      #060B14  // Very dark indigo (darkest but NOT black)
 - **Directional glow**: Stronger in direction of light source
 - **Dual-source system**: Multiple light sources create more realistic sky variation
 
+**Fine-tuning Update** [2025-09-08]:  
+Based on real-world testing, adjusted default values for more realistic appearance:
+- **Near village**: Wider spread (90° vs 70°), higher reach (40% vs 30% altitude)
+- **Distant village**: More visible but subtle (0.1 vs 0.08 intensity, 50° vs 40° spread)  
+- **Extended GUI ranges**: Spread now adjustable from 30-120° for better control
+- Result: More natural light pollution that better matches rural cemetery lighting
+
 **Testing Results**:  
 ✅ Near village creates noticeable but not overpowering glow  
 ✅ Distant village provides subtle atmospheric enhancement  
 ✅ Both sources have independent controls  
 ✅ Physics-based falloff feels natural  
 ✅ No performance impact on 60 FPS target
+✅ Fine-tuned values provide more realistic appearance
 
 ---
 
