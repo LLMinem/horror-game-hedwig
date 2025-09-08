@@ -3,9 +3,9 @@
 ## 🎯 Current Progress
 
 **Base Commit:** `15ca4ab` - ChatGPT's baseline night scene  
-**Current Status:** Steps 0-3 complete, atmospheric sky Step 3 complete, mouse controls added  
-**Latest Working:** `345c9f9` - Added dithering to prevent gradient banding in night sky  
-**Current Focus:** Atmospheric sky enhancement Step 4 - Procedural star field
+**Current Status:** Steps 0-3 complete, atmospheric sky Step 4 complete (WIP), mouse controls added  
+**Latest Working:** `549400b` - Implemented procedural star field system (WIP due to issues)  
+**Current Focus:** Fix star field issues (GitHub issue #4)
 
 ### ✅ Completed Steps
 
@@ -19,15 +19,16 @@
 - **Atmospheric Sky Step 2:** Dual-source light pollution → `f173843` (realistic village glow system) [COMPLETE 2025-09-08]
   - **Fine-tuning:** → `430fcea` (adjusted defaults for better realism)
 - **Atmospheric Sky Step 3:** Dithering (anti-banding) → `345c9f9` (hash-based screen-space noise) [COMPLETE 2025-09-08]
+- **Atmospheric Sky Step 4:** Procedural star field → `549400b` (COMPLETE but WIP due to critical bugs - issue #4) [2025-09-08]
 
-### 🚧 Currently Implementing
+### ⚠️ Current Issues (Priority)
 
-- **Atmospheric Sky Step 4:** Procedural star field for depth and reference points
+- **GitHub Issue #4:** Star field bugs - stars reposition when camera moves, poor defaults, unnatural distribution
 
 ### 📋 Remaining Steps
 
 **Atmospheric Sky Pipeline (Priority):**
-- Atmospheric Sky Step 4: Procedural star field [NEXT UP]
+- Atmospheric Sky Step 4: Fix star field issues (GitHub issue #4) [URGENT]
 - Atmospheric Sky Step 5: Atmospheric noise [PENDING]
 - Atmospheric Sky Step 6: Horror atmosphere tuning [PENDING]
 
@@ -332,7 +333,10 @@ Current focus: **Atmospheric sky enhancement** following the detailed plan in `a
 **Step 3 COMPLETE (2025-09-08):** Dithering (anti-banding) with hash-based screen-space noise
 - **Eliminates color banding:** Smooth gradients across all display types
 - **Minimal performance impact:** Single hash calculation per pixel
-**Next:** Procedural star field for depth and reference points  
+**Step 4 COMPLETE (WIP) (2025-09-08):** Procedural star field implemented but has critical bugs
+- **Issues:** Stars reposition with camera movement, poor default visibility, unnatural distribution
+- **Reference:** See GitHub issue #4 for detailed bug reports
+**Next:** Fix star field bugs before proceeding to atmospheric noise  
 **Reference:** See `docs/atmospheric-sky-implementation-plan.md` for detailed progress tracking
 
 ### Additional Features

@@ -123,22 +123,46 @@ Based on real-world testing, adjusted default values for more realistic appearan
 
 ---
 
-### Step 4: Procedural Star Field 📋
-**Status**: PENDING
+### Step 4: Procedural Star Field ✅ (WIP - has issues) [2025-09-08]
+**Status**: COMPLETE (WIP) - Implemented but has significant bugs (see GitHub issue #4)
 **What**: Generate stars directly in shader
 **Why**: Stars provide depth and reference points
 **How**: Hash function creates random points with varying brightness
+
+**Implementation Notes**:
+- Full procedural star generation in GLSL shader
+- Hash-based pseudo-random star placement
+- Configurable density, brightness, and color temperature
+- Altitude-based atmospheric extinction
+- Complete GUI controls for all star parameters
 
 **Concepts for Beginners**:
 - **Procedural generation**: Creating content with math instead of textures
 - **Hash function**: Converts position to random-looking number
 - **Altitude fade**: Stars disappear near horizon (atmospheric extinction)
+- **Pseudo-random**: Mathematical patterns that look random but are deterministic
+- **Atmospheric extinction**: Real-world effect where atmosphere dims stars near horizon
 
-**Testing**:
-- 3000-6000 visible stars
-- Varying brightness and slight color
-- Fade out near horizon
-- Optional subtle twinkle
+**CRITICAL ISSUES (GitHub Issue #4)**:
+⚠️ **Stars reposition when camera moves** - Major bug affecting immersion
+⚠️ **Default values produce barely visible stars** - Poor out-of-box experience
+⚠️ **Distribution looks unnatural** - Too evenly spaced, lacks realistic clustering
+⚠️ **Performance concerns** - High density settings may impact frame rate
+
+**Testing Results**:
+✅ Star generation working with configurable parameters
+✅ GUI controls functional for all star settings
+✅ Altitude-based fading implemented
+❌ Stars move relative to camera (critical bug)
+❌ Default visibility too low
+❌ Unnatural distribution pattern
+⚠️ Needs performance optimization at high densities
+
+**Next Steps**:
+- Fix camera-relative positioning bug
+- Adjust default values for better visibility
+- Improve distribution algorithm for more realistic clustering
+- Performance testing and optimization
 
 ---
 
@@ -238,7 +262,7 @@ Sky Settings/
 - [x] **Proper Positioning**: Fixed horizon alignment bug ✅
 - [x] **Step 2 Complete**: Dual-source light pollution system ✅
 - [x] **Step 3 Complete**: Dithering eliminates color banding ✅
-- [ ] **Step 4**: Procedural star field for depth
+- [x] **Step 4 Complete (WIP)**: Procedural star field implemented but has bugs (issue #4) ⚠️
 - [ ] **Step 5**: Atmospheric noise variations
 - [ ] **Step 6**: Horror atmosphere tuning
 
@@ -278,5 +302,5 @@ Sky Settings/
 ---
 
 *Last Updated: September 8, 2025*  
-*Step 3 Complete: Dithering (anti-banding) with hash-based screen-space noise*  
+*Step 4 Complete (WIP): Procedural star field implemented but has critical bugs (issue #4)*  
 *For: Horror Game Project - Night Scene Implementation*
