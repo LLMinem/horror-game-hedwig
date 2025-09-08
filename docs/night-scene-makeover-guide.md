@@ -3,9 +3,9 @@
 ## 🎯 Current Progress
 
 **Base Commit:** `15ca4ab` - ChatGPT's baseline night scene  
-**Current Status:** Steps 0-3 complete, atmospheric sky implementation active  
-**Latest Working:** `505d23f` - Four-stop gradient sky with proper horizon alignment  
-**Current Focus:** Atmospheric sky enhancement Step 2 - Light pollution radial glow
+**Current Status:** Steps 0-3 complete, atmospheric sky Step 2 complete, mouse controls added  
+**Latest Working:** `f173843` - Dual-source light pollution system for realistic night sky  
+**Current Focus:** Atmospheric sky enhancement Step 3 - Dithering (anti-banding)
 
 ### ✅ Completed Steps
 
@@ -14,17 +14,19 @@
 - **Step 2:** Night HDRI with intensity → `e2bfd91` (fixed r179 bug with envMap)
   - Additional fixes: `eef2c15` (precision), `d957860` (key swap)
 - **Step 3:** lil-gui Dev Panel → `716e148` (full controls with double-click reset)
+- **Mouse Look Controls:** First-person camera → `8335bac` (pointer lock API with smooth rotation) [COMPLETE 2025-09-08]
 - **Atmospheric Sky Step 1:** Four-stop gradient → `505d23f` (proper horizon alignment) [COMPLETE 2025-09-07]
+- **Atmospheric Sky Step 2:** Dual-source light pollution → `f173843` (realistic village glow system) [COMPLETE 2025-09-08]
 
 ### 🚧 Currently Implementing
 
-- **Atmospheric Sky Step 2:** Light pollution radial glow (following atmospheric-sky-implementation-plan.md)
+- **Atmospheric Sky Step 3:** Dithering (anti-banding) for smooth gradients
 
 ### 📋 Remaining Steps
 
 **Atmospheric Sky Pipeline (Priority):**
-- Atmospheric Sky Step 2: Light pollution radial glow [NEXT UP]
-- Atmospheric Sky Step 3: Dithering (anti-banding) [PENDING]
+- Atmospheric Sky Step 3: Dithering (anti-banding) [NEXT UP]
+- Atmospheric Sky Step 4: Procedural star field [PENDING]
 - Atmospheric Sky Step 4: Procedural star field [PENDING]
 - Atmospheric Sky Step 5: Atmospheric noise [PENDING]
 - Atmospheric Sky Step 6: Horror atmosphere tuning [PENDING]
@@ -325,5 +327,12 @@ Current focus: **Atmospheric sky enhancement** following the detailed plan in `a
 
 ### Atmospheric Sky Implementation Status
 **Step 1 COMPLETE (2025-09-07):** Four-stop gradient with proper horizon alignment  
-**Next:** Light pollution radial glow effects  
+**Step 2 COMPLETE (2025-09-08):** Dual-source light pollution system with physics-based falloff  
+**Next:** Dithering (anti-banding) for smooth gradients  
 **Reference:** See `docs/atmospheric-sky-implementation-plan.md` for detailed progress tracking
+
+### Additional Features
+**Mouse Look Controls COMPLETE (2025-09-08):** First-person camera control with pointer lock API  
+- Smooth horizontal/vertical rotation with clamped angles  
+- Fixed horizontal inversion issue for natural feel  
+- Integrated with existing WASD movement system

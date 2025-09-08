@@ -58,21 +58,31 @@ Zenith:      #060B14  // Very dark indigo (darkest but NOT black)
 
 ---
 
-### Step 2: Light Pollution Radial Glow 📋
-**Status**: PENDING
-**What**: Add directional glow simulating village lights
-**Why**: Rural areas have subtle light domes from nearby settlements
-**How**: Calculate angle to village, apply radial falloff with noise
+### Step 2: Light Pollution Radial Glow ✅ [2025-09-08]
+**Status**: COMPLETE - Implemented dual-source light pollution system  
+**What**: Add directional glow simulating village lights  
+**Why**: Rural areas have subtle light domes from nearby settlements  
+**How**: Calculate angle to village, apply radial falloff with noise  
+
+**Implementation Notes**:  
+- Upgraded from single-source to **dual-source system** for enhanced realism  
+- **Near village** (NW, 250m): Noticeable orange glow with physics-based falloff  
+- **Distant village** (SE, 2km): Subtle background glow with altitude fade  
+- Full GUI controls for both light pollution sources  
+- Physics-based intensity calculation with atmospheric scattering simulation  
 
 **Concepts for Beginners**:
-- **Radial falloff**: Light gets weaker with distance
-- **Noise texture**: Adds random variation for realism
+- **Radial falloff**: Light gets weaker with distance (inverse square law)
+- **Altitude fade**: Light pollution fades as you look higher in the sky
 - **Directional glow**: Stronger in direction of light source
+- **Dual-source system**: Multiple light sources create more realistic sky variation
 
-**Testing**:
-- Subtle glow in one direction
-- Patchy/cloudy variation, not uniform
-- Adjustable intensity and direction
+**Testing Results**:  
+✅ Near village creates noticeable but not overpowering glow  
+✅ Distant village provides subtle atmospheric enhancement  
+✅ Both sources have independent controls  
+✅ Physics-based falloff feels natural  
+✅ No performance impact on 60 FPS target
 
 ---
 
@@ -207,7 +217,7 @@ Sky Settings/
 - [x] **Performance**: 60 FPS maintained ✅
 - [x] **GUI Integration**: All Step 1 controls working ✅
 - [x] **Proper Positioning**: Fixed horizon alignment bug ✅
-- [ ] **Step 2**: Light pollution radial glow
+- [x] **Step 2 Complete**: Dual-source light pollution system ✅
 - [ ] **Step 3**: No visible color banding (dithering needed)
 - [ ] **Step 4**: Procedural star field for depth
 - [ ] **Step 5**: Atmospheric noise variations
@@ -248,6 +258,6 @@ Sky Settings/
 
 ---
 
-*Last Updated: September 7, 2025*  
-*Step 1 Complete: Four-stop gradient with proper horizon alignment*
+*Last Updated: September 8, 2025*  
+*Step 2 Complete: Dual-source light pollution system with physics-based falloff*  
 *For: Horror Game Project - Night Scene Implementation*
