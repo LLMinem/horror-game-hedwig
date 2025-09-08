@@ -34,7 +34,63 @@ const camera = new THREE.PerspectiveCamera(
   5000, // Increased far plane for skydome
 );
 camera.position.set(0, 1.7, 15);
-camera.lookAt(0, 1.5, 0);
+
+// =============== MOUSE LOOK CONTROLS
+let yaw = 0; // Horizontal rotation (radians)
+let pitch = 0; // Vertical rotation (radians)
+let mouseSensitivity = 0.002; // How fast the camera rotates
+let isPointerLocked = false;
+
+// Request pointer lock when clicking on the canvas
+renderer.domElement.addEventListener('click', () => {
+  if (!isPointerLocked) {
+    renderer.domElement.requestPointerLock();
+  }
+});
+
+// Handle pointer lock change
+document.addEventListener('pointerlockchange', () => {
+  isPointerLocked = document.pointerLockElement === renderer.domElement;
+  if (isPointerLocked) {
+    console.log('✓ Mouse captured - move to look around, ESC to release');
+  } else {
+    console.log('✓ Mouse released - click to capture again');
+  }
+});
+
+// Handle mouse movement when pointer is locked
+document.addEventListener('mousemove', (event) => {
+  if (!isPointerLocked) return;
+  
+  // Get mouse movement delta
+  const movementX = event.movementX || 0;
+  const movementY = event.movementY || 0;
+  
+  // Update rotation angles
+  yaw += movementX * mouseSensitivity;  // Fixed: was inverted
+  pitch -= movementY * mouseSensitivity;
+  
+  // Clamp pitch to prevent over-rotation (looking too far up/down)
+  const maxPitch = Math.PI / 2 - 0.1; // Almost straight up/down
+  pitch = Math.max(-maxPitch, Math.min(maxPitch, pitch));
+});
+
+// Function to update camera rotation based on yaw/pitch
+function updateCameraRotation() {
+  // Calculate direction vector from yaw and pitch
+  const direction = new THREE.Vector3(
+    Math.sin(yaw) * Math.cos(pitch),
+    Math.sin(pitch),
+    -Math.cos(yaw) * Math.cos(pitch)
+  );
+  
+  // Point camera in that direction
+  camera.lookAt(
+    camera.position.x + direction.x,
+    camera.position.y + direction.y,
+    camera.position.z + direction.z
+  );
+}
 
 // =============== SKYDOME (replaces the 2D gradient background)
 // Vertex shader - calculates eye-ray direction for proper horizon alignment
@@ -807,6 +863,9 @@ const tmpDir = new THREE.Vector3();
 function animate() {
   requestAnimationFrame(animate);
 
+  // Update camera rotation from mouse look
+  updateCameraRotation();
+
   // IMPORTANT: Skydome follows camera completely now that shader is fixed!
   // The eye-ray calculation in the shader handles horizon alignment properly
   skydome.position.copy(camera.position);
@@ -825,11 +884,12 @@ function animate() {
 animate();
 
 // Start message
-console.log("🌌 Night Scene with Fog-Aware Skydome");
+console.log("🌌 Night Scene with Mouse Look Controls");
 console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
-console.log("✓ Skydome implemented with gradient shader");
-console.log("✓ Fog now blends seamlessly with horizon");
-console.log("✓ HDRI used for lighting only (not visible)");
-console.log("🎨 Adjust sky colors and curve in GUI");
-console.log("🌫️ Fog density reduced to 0.030 for skydome");
+console.log("🖱️ CLICK to capture mouse for looking around");
+console.log("⎋ Press ESC to release mouse");
+console.log("✓ Skydome with 4-stop gradient shader");
+console.log("✓ Mouse sensitivity: 0.002 (adjustable soon)");
+console.log("✓ Vertical rotation clamped to prevent flipping");
+console.log("🎨 Adjust sky colors and all settings in GUI");
 console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
