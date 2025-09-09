@@ -22,15 +22,15 @@ Analyze the compression summary above. You've been auto-compacted, which means y
 
 ## 📊 Current Git State
 
-!`git status`
+Run `git status` to show the current repository state and any uncommitted changes.
 
 ## 📝 Uncommitted Changes (if any)
 
-!`git diff --stat`
+Run `git diff --stat` to show a summary of uncommitted changes.
 
 ## 🔍 Recent Work Context
 
-!`git log -5`
+Run `git log -5` to show detailed information about recent commits and work context.
 
 ## 🎯 Strategic Context Recovery
 
@@ -38,13 +38,15 @@ Based on the summary and git state, now selectively read ONLY the files that wil
 
 ### Core Context Files
 
-@CLAUDE.md
-@docs/night-scene-makeover-guide.md
+Read `docs/atmospheric-sky-implementation-plan.md` - **HIGHEST PRIORITY** - Current active implementation guide
+Read `CLAUDE.md` - Project context and collaboration instructions
+Read `docs/night-scene-makeover-guide.md` - Previous implementation guide (still relevant context)
 
 ### Implementation State Discovery
 
-!`find src -name "*.js" -exec grep -l "TODO\|FIXME\|XXX" {} \;`
-!`ls -la src/`
+Run `find src -name "*.js" -exec grep -l "TODO\|FIXME\|XXX" {} \;` to find files with incomplete work markers.
+
+Run `ls -la src/` to see the current source directory structure.
 
 ## 🔄 Work Continuation Strategy
 
