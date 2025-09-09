@@ -346,6 +346,10 @@ const starFragmentShader = `
     // Gaussian falloff for natural star appearance
     float alpha = exp(-dist * dist * 8.0) * vBrightness;
     
+    // FIX 2: Apply size ratio compensation
+    // When a star is forced from 0.5px to 1px, reduce brightness by 50%
+    alpha *= vSizeRatio;
+    
     // TODO: Add horizon fade based on star altitude
     // (will implement after basic stars work)
     
