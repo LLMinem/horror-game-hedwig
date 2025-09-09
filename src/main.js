@@ -138,6 +138,11 @@ const skyFragmentShader = `
   // DITHERING
   uniform float ditherAmount;      // How strong the dither effect is (0.0-0.01)
   
+  // FOG INTEGRATION
+  uniform vec3 fogColor;           // Scene fog color for blending
+  uniform float fogDensity;        // Scene fog density for matching
+  uniform float fogMax;            // Maximum fog opacity at horizon
+  
   // Note: Star field now handled by separate THREE.Points geometry (see ADR-003)
   
   varying vec3 vDir;  // World-space direction (same as used for light pollution)
@@ -213,6 +218,16 @@ const skyFragmentShader = `
     dither = (dither - 0.5) * ditherAmount; // Center around 0, scale by amount
     col += vec3(dither); // Add noise to break up gradients
     
+    // CUSTOM FOG BLENDING - blend fog color based on altitude
+    // Lower altitude = more fog (horizon gets fogged, zenith stays clear)
+    float fogFactor = 1.0 - altitude; // Inverted: 1.0 at horizon, 0.0 at zenith
+    fogFactor = pow(fogFactor, 2.0); // Strengthen the effect near horizon
+    // Scale with fog density - denser fog = more sky obscured
+    fogFactor *= clamp(fogDensity * 35.0, 0.0, fogMax); // 35 is empirical scale factor
+    
+    // Blend sky color with fog color
+    col = mix(col, fogColor, fogFactor);
+    
     gl_FragColor = vec4(col, 1.0);
   }
 `;
@@ -223,10 +238,10 @@ const skyGeometry = new THREE.SphereGeometry(1000, 32, 32);
 const skyMaterial = new THREE.ShaderMaterial({
   uniforms: {
     // Four color stops for realistic night gradient
-    horizonColor: { value: new THREE.Color(0x2B1E1B) },  // Warm grey-brown (light pollution)
-    midLowColor: { value: new THREE.Color(0x15131C) },   // Dark plum (transition)
-    midHighColor: { value: new THREE.Color(0x0D1019) },  // Deep grey-blue
-    zenithColor: { value: new THREE.Color(0x060B14) },   // Very dark indigo (never pure black!)
+    horizonColor: { value: new THREE.Color(0x2b2822) },  // USER TUNED: Warmer horizon
+    midLowColor: { value: new THREE.Color(0x0f0e14) },   // USER TUNED: Dark plum
+    midHighColor: { value: new THREE.Color(0x080a10) },  // USER TUNED: Deeper blue
+    zenithColor: { value: new THREE.Color(0x040608) },   // USER TUNED: Almost black
     
     // Control where color transitions happen
     midLowStop: { value: 0.25 },   // 25% up from horizon
@@ -234,25 +249,30 @@ const skyMaterial = new THREE.ShaderMaterial({
     
     // NEAR VILLAGE (NW-N, ~250m) - Noticeable glow
     village1Dir: { value: new THREE.Vector3(-0.7, 0, -0.7).normalize() }, // Northwest
-    village1Intensity: { value: 0.20 },  // Moderate glow (reduced from 0.25)
-    village1Spread: { value: (90 * Math.PI) / 180 }, // 90° spread (increased from 23°)
-    village1Height: { value: 0.4 },      // Visible up to 40% altitude (increased from 20%)
+    village1Intensity: { value: 0.15 },  // USER TUNED: Focused glow
+    village1Spread: { value: (70 * Math.PI) / 180 }, // USER TUNED: 70° spread
+    village1Height: { value: 0.35 },      // USER TUNED: Up to 35% altitude
     
     // DISTANT VILLAGE (SE, ~2km) - Very subtle
     village2Dir: { value: new THREE.Vector3(0.7, 0, 0.7).normalize() }, // Southeast  
-    village2Intensity: { value: 0.1 },   // Weak but more visible (increased from 0.05)
-    village2Spread: { value: (50 * Math.PI) / 180 }, // 50° spread (increased from 34°)
-    village2Height: { value: 0.25 },     // Up to 25% altitude (increased from 10%)
+    village2Intensity: { value: 0.06 },   // USER TUNED: Very subtle
+    village2Spread: { value: (60 * Math.PI) / 180 }, // USER TUNED: 60° spread
+    village2Height: { value: 0.15 },     // USER TUNED: Low on horizon
     
     // DITHERING - Prevents gradient banding
     ditherAmount: { value: 0.008 },      // Noise to break up gradients
+    
+    // FOG INTEGRATION - Custom fog blending
+    fogColor: { value: new THREE.Color(0x141618) },  // Matches scene fog
+    fogDensity: { value: 0.028 },                    // Matches scene fog density
+    fogMax: { value: 0.95 },                         // Maximum fog opacity at horizon
   },
   vertexShader: skyVertexShader,
   fragmentShader: skyFragmentShader,
   side: THREE.BackSide, // Render inside of sphere
   depthWrite: false, // Don't write to depth buffer
   depthTest: false, // CRITICAL: Don't test depth at all
-  fog: false, // DISABLE fog on sky itself (we'll handle blending differently)
+  fog: false, // MUST be false - fog on skydome with no depth causes black screen!
 });
 
 const skydome = new THREE.Mesh(skyGeometry, skyMaterial);
@@ -262,7 +282,7 @@ scene.add(skydome);
 
 // =============== THREE.Points STAR SYSTEM (replaces fragment shader stars)
 // Generate star positions on the celestial sphere
-function generateStarGeometry(starCount = 5000) {
+function generateStarGeometry(starCount = 1500) {
   const positions = new Float32Array(starCount * 3);
   const sizes = new Float32Array(starCount);
   const brightnesses = new Float32Array(starCount);
@@ -338,6 +358,7 @@ const starVertexShader = `
 const starFragmentShader = `
   uniform float u_horizonFade;
   uniform bool u_useAntiAlias;
+  uniform float u_fogDensity;    // Fog density for star fading
   
   varying float vBrightness;
   varying vec3 vWorldPosition;   // Receive world position
@@ -369,6 +390,9 @@ const starFragmentShader = `
     float horizonFadeAlpha = smoothstep(0.0, u_horizonFade, altitude);
     alpha *= horizonFadeAlpha;
     
+    // Fog-based fading - stars disappear in dense fog
+    alpha *= exp(-u_fogDensity * 60.0 * (1.0 - altitude)); // 60 is empirical scale
+    
     gl_FragColor = vec4(1.0, 1.0, 1.0, alpha);
   }
 `;
@@ -376,13 +400,14 @@ const starFragmentShader = `
 // Create star material
 const starMaterial = new THREE.ShaderMaterial({
   uniforms: {
-    u_sizeMin: { value: 1.0 },
+    u_sizeMin: { value: 0.8 },
     u_sizeMax: { value: 5.0 },
-    u_brightness: { value: 1.5 },
+    u_brightness: { value: 0.8 },
     u_horizonFade: { value: 0.3 },
     u_pixelRatio: { value: renderer.getPixelRatio() }, // FIXED: Added missing uniform
     u_useAntiAlias: { value: true }, // Anti-aliasing toggle
-    u_cameraPos: { value: camera.position } // For potential future use
+    u_cameraPos: { value: camera.position }, // For potential future use
+    u_fogDensity: { value: 0.028 } // Fog density for star fading
   },
   vertexShader: starVertexShader,
   fragmentShader: starFragmentShader,
@@ -393,7 +418,7 @@ const starMaterial = new THREE.ShaderMaterial({
 });
 
 // Create stars
-const starGeometry = generateStarGeometry(5000);
+const starGeometry = generateStarGeometry(1500);
 const stars = new THREE.Points(starGeometry, starMaterial);
 stars.renderOrder = -1000; // Render before skydome
 stars.frustumCulled = false; // Never cull stars
@@ -402,16 +427,16 @@ scene.add(stars);
 // Star system state for GUI controls
 const starState = {
   enabled: true,
-  count: 5000,
-  brightness: 1.5,
-  sizeMin: 1.0,
+  count: 1500,
+  brightness: 0.8,
+  sizeMin: 0.8,
   sizeMax: 5.0,
   horizonFade: 0.3
 };
 
 // =============== FOG (adjusted for skydome interaction)
-// Using FogExp2 for atmospheric depth - slightly reduced density for skydome
-scene.fog = new THREE.FogExp2(0x0a0e2a, 0.030); // Blue-tinted fog matching sky
+// Using FogExp2 for atmospheric depth with improved color
+scene.fog = new THREE.FogExp2(0x141618, 0.028); // Bluish charcoal - matches night atmosphere better
 
 // =============== LIGHTS
 // 1) Moon (directional) - main light source, cool blue-white
@@ -631,9 +656,10 @@ const defaults = {
   moonZ: 16,
   hemiIntensity: 0.25,
   ambientIntensity: 0.05,
-  fogDensity: 0.030, // Reduced for skydome
+  fogDensity: 0.028, // Optimal for 50-60m visibility
   fogType: "exp2",
-  fogColor: "#0a0e2a", // Blue-tinted to match sky
+  fogColor: "#141618", // Bluish charcoal for night atmosphere
+  fogMax: 0.95, // Maximum fog opacity at horizon
   flashlightIntensity: 50,
   flashlightAngle: 28,
   flashlightPenumbra: 0.4,
@@ -644,31 +670,31 @@ const defaults = {
   groundTiling: 64,
   normalStrength: 1.0,
   // NEW: Sky controls - 4-stop gradient for realistic night
-  skyHorizonColor: "#2B1E1B",  // Warm grey-brown (light pollution)
-  skyMidLowColor: "#15131C",   // Dark plum (transition zone)
-  skyMidHighColor: "#0D1019",  // Deep grey-blue (main sky)
-  skyZenithColor: "#060B14",   // Very dark indigo (never pure black!)
+  skyHorizonColor: "#2b2822",  // USER TUNED: Warmer horizon
+  skyMidLowColor: "#0f0e14",   // USER TUNED: Dark plum
+  skyMidHighColor: "#080a10",  // USER TUNED: Deeper blue
+  skyZenithColor: "#040608",   // USER TUNED: Almost black
   skyMidLowStop: 0.25,         // Where first transition happens
   skyMidHighStop: 0.60,        // Where second transition happens
   // Light pollution controls
   village1Azimuth: -45,        // Northwest direction (degrees)
-  village1Intensity: 0.20,     // Near village glow strength (reduced from 0.25)
-  village1Spread: 90,          // Angular spread in degrees (increased from 23)
-  village1Height: 0.4,         // Max altitude (0-1) (increased from 0.2)
+  village1Intensity: 0.15,     // USER TUNED: Near village glow
+  village1Spread: 70,          // USER TUNED: Focused spread
+  village1Height: 0.35,        // USER TUNED: Max altitude
   village2Azimuth: 135,        // Southeast direction (degrees)
-  village2Intensity: 0.1,      // Distant village (increased from 0.05)
-  village2Spread: 50,          // Broader spread (increased from 34)
-  village2Height: 0.25,        // Lower on horizon (increased from 0.1)
+  village2Intensity: 0.06,     // USER TUNED: Distant village
+  village2Spread: 60,          // USER TUNED: Broader spread
+  village2Height: 0.15,        // USER TUNED: Lower on horizon
   pollutionColor: "#3D2F28",   // Warm sodium lamp color
   // Dithering
   skyDitherAmount: 0.008,      // Dithering to prevent gradient banding
   // THREE.Points star system
   starEnabled: true,
-  starCount: 5000,
-  starBrightness: 1.5,
-  starSizeMin: 1.0,
-  starSizeMax: 5.0,
-  starHorizonFade: 0.3,
+  starCount: 1500,             // USER TUNED: Sparse stars
+  starBrightness: 0.8,         // USER TUNED: Dimmer stars
+  starSizeMin: 0.8,            // USER TUNED: Min size
+  starSizeMax: 5.0,            // USER TUNED: Max size
+  starHorizonFade: 0.3,        // USER TUNED: Horizon fade
   starAntiAlias: true
 };
 
@@ -995,6 +1021,8 @@ fogFolder
     if (scene.fog instanceof THREE.FogExp2) {
       scene.fog.density = v;
       state.fogDensity = v; // Update state
+      skyMaterial.uniforms.fogDensity.value = v; // Update skydome fog density
+      starMaterial.uniforms.u_fogDensity.value = v; // Update star fog density
       // Log visibility distance for reference
       const visibilityMeters = Math.round(2 / v); // Rough approximation
       console.log(`Fog density: ${v.toFixed(3)} (~${visibilityMeters}m visibility)`);
@@ -1004,7 +1032,17 @@ fogFolder
 fogFolder
   .addColor(state, "fogColor")
   .name("Color")
-  .onChange((v) => scene.fog.color.set(v));
+  .onChange((v) => {
+    scene.fog.color.set(v);
+    skyMaterial.uniforms.fogColor.value.set(v); // Update skydome fog color too
+  });
+
+fogFolder
+  .add(state, "fogMax", 0.5, 1.0, 0.01)
+  .name("Sky Fog Max")
+  .onChange((v) => {
+    skyMaterial.uniforms.fogMax.value = v; // Control maximum fog opacity at horizon
+  });
 
 // Flashlight folder
 const flashFolder = gui.addFolder("Flashlight");
@@ -1052,9 +1090,10 @@ const presetsObj = {
     state.moonZ = 16;
     state.hemiIntensity = 0.25;
     state.ambientIntensity = 0.05;
-    state.fogDensity = 0.030;
+    state.fogDensity = 0.028;
     state.fogType = "exp2";
-    state.fogColor = "#0a0e2a";
+    state.fogColor = "#141618";
+    state.fogMax = 0.95;
     state.flashlightIntensity = 50;
     state.flashlightAngle = 28;
     state.flashlightPenumbra = 0.4;
@@ -1063,25 +1102,25 @@ const presetsObj = {
     state.shadowNormalBias = 0.02;
     state.groundTiling = 64;
     state.normalStrength = 1.0;
-    state.skyHorizonColor = "#2B1E1B";  // Warm grey-brown
-    state.skyMidLowColor = "#15131C";   // Dark plum
-    state.skyMidHighColor = "#0D1019";  // Deep grey-blue
-    state.skyZenithColor = "#060B14";   // Very dark indigo
+    state.skyHorizonColor = "#2b2822";  // USER TUNED: Warmer horizon
+    state.skyMidLowColor = "#0f0e14";   // USER TUNED: Dark plum
+    state.skyMidHighColor = "#080a10";  // USER TUNED: Deeper blue
+    state.skyZenithColor = "#040608";   // USER TUNED: Almost black
     state.skyMidLowStop = 0.25;
     state.skyMidHighStop = 0.60;
     state.village1Azimuth = -45;
-    state.village1Intensity = 0.20;
-    state.village1Spread = 90;
-    state.village1Height = 0.4;
+    state.village1Intensity = 0.15;     // USER TUNED
+    state.village1Spread = 70;          // USER TUNED
+    state.village1Height = 0.35;        // USER TUNED
     state.village2Azimuth = 135;
-    state.village2Intensity = 0.1;
-    state.village2Spread = 50;
-    state.village2Height = 0.25;
+    state.village2Intensity = 0.06;     // USER TUNED
+    state.village2Spread = 60;          // USER TUNED
+    state.village2Height = 0.15;        // USER TUNED
     state.skyDitherAmount = 0.008;
     state.starEnabled = true;
-    state.starCount = 5000;
-    state.starBrightness = 1.5;
-    state.starSizeMin = 1.0;
+    state.starCount = 1500;             // USER TUNED
+    state.starBrightness = 0.8;         // USER TUNED
+    state.starSizeMin = 0.8;            // USER TUNED
     state.starSizeMax = 5.0;
     state.starHorizonFade = 0.3;
     state.starAntiAlias = true;
@@ -1099,6 +1138,10 @@ const presetsObj = {
     } else {
       scene.fog = new THREE.Fog(state.fogColor, 35, 90);
     }
+    skyMaterial.uniforms.fogDensity.value = state.fogDensity;
+    skyMaterial.uniforms.fogColor.value.set(state.fogColor);
+    skyMaterial.uniforms.fogMax.value = state.fogMax;
+    starMaterial.uniforms.u_fogDensity.value = state.fogDensity;
     flashlight.intensity = state.flashlightIntensity;
     flashlight.angle = (state.flashlightAngle * Math.PI) / 180;
     flashlight.penumbra = state.flashlightPenumbra;
