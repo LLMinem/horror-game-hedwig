@@ -19,16 +19,17 @@
 - **Atmospheric Sky Step 2:** Dual-source light pollution → `f173843` (realistic village glow system) [COMPLETE 2025-09-08]
   - **Fine-tuning:** → `430fcea` (adjusted defaults for better realism)
 - **Atmospheric Sky Step 3:** Dithering (anti-banding) → `345c9f9` (hash-based screen-space noise) [COMPLETE 2025-09-08]
-- **Atmospheric Sky Step 4:** Procedural star field → `549400b` (COMPLETE but WIP due to critical bugs - issue #4) [2025-09-08]
+- **Atmospheric Sky Step 4:** Procedural star field → `549400b` (DEPRECATED - See ADR-003) [2025-09-08]
 
 ### ⚠️ Current Issues (Priority)
 
-- **GitHub Issue #4:** Star field bugs - stars reposition when camera moves, poor defaults, unnatural distribution
+- **GitHub Issue #4:** Star field bugs - stars reposition when camera moves, poor defaults, unnatural distribution [RESOLVED via ADR-003 - architectural change]
 
 ### 📋 Remaining Steps
 
 **Atmospheric Sky Pipeline (Priority):**
-- Atmospheric Sky Step 4: Fix star field issues (GitHub issue #4) [URGENT]
+- Atmospheric Sky Step 4a: Fragment shader stars [DEPRECATED - See ADR-003]
+- Atmospheric Sky Step 4b: THREE.Points geometry-based stars [NEW APPROACH - PENDING]
 - Atmospheric Sky Step 5: Atmospheric noise [PENDING]
 - Atmospheric Sky Step 6: Horror atmosphere tuning [PENDING]
 
@@ -333,10 +334,11 @@ Current focus: **Atmospheric sky enhancement** following the detailed plan in `a
 **Step 3 COMPLETE (2025-09-08):** Dithering (anti-banding) with hash-based screen-space noise
 - **Eliminates color banding:** Smooth gradients across all display types
 - **Minimal performance impact:** Single hash calculation per pixel
-**Step 4 COMPLETE (WIP) (2025-09-08):** Procedural star field implemented but has critical bugs
-- **Issues:** Stars reposition with camera movement, poor default visibility, unnatural distribution
-- **Reference:** See GitHub issue #4 for detailed bug reports
-**Next:** Fix star field bugs before proceeding to atmospheric noise  
+**Step 4a DEPRECATED (2025-09-09):** Fragment shader stars abandoned due to architectural flaws
+- **Issues:** View-dependent recalculation, unstable brightness, unfixable camera movement bugs
+- **Resolution:** ADR-003 documents switch to THREE.Points geometry-based approach
+**Step 4b PENDING:** THREE.Points geometry-based stars (new implementation plan)
+**Next:** Implement geometry-based star field before proceeding to atmospheric noise  
 **Reference:** See `docs/atmospheric-sky-implementation-plan.md` for detailed progress tracking
 
 ### Additional Features

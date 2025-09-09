@@ -161,8 +161,44 @@ Based on real-world testing, adjusted default values for more realistic appearan
 **Next Steps**:
 - Fix camera-relative positioning bug
 - Adjust default values for better visibility
-- Improve distribution algorithm for more realistic clustering
-- Performance testing and optimization
+**Resolution**: Issues were deemed unfixable within the fragment shader architecture
+**ADR-003**: Documents the technical analysis and decision to switch approaches
+**New Direction**: THREE.Points geometry-based star rendering
+
+---
+
+### Step 4b: THREE.Points Geometry-Based Stars 📋 [NEW APPROACH - PENDING]
+**Status**: PENDING - Replacement for deprecated fragment shader approach
+**What**: Generate stars as THREE.Points geometry with custom shaders
+**Why**: Stable world-space positioning, industry standard approach
+**How**: Generate fixed star positions in 3D space, render with instanced geometry
+
+**Implementation Plan**:
+- Generate deterministic star positions during initialization
+- Use THREE.Points with custom vertex/fragment shaders
+- Apply realistic magnitude distribution and color variation
+- Integrate atmospheric perspective and optional twinkling effects
+- Proper depth testing and fog interaction
+
+**Concepts for Beginners**:
+- **THREE.Points**: Geometry type that renders vertices as individual points/sprites
+- **Instanced rendering**: Efficient way to render many similar objects
+- **Vertex shaders**: Process individual star positions and properties
+- **World-space coordinates**: Fixed positions that don't change with camera
+- **Deterministic generation**: Same random seed produces same star field
+
+**Advantages over Fragment Shader Approach**:
+✅ **Stable positioning**: Stars stay fixed in world space
+✅ **Performance**: Fixed vertex count, no per-pixel recalculation
+✅ **Industry standard**: Proven approach used in commercial games
+✅ **Debugging**: Individual stars can be inspected and modified
+✅ **Scalability**: Easy to adjust star count and properties
+
+**Testing Goals**:
+- Stable star positions regardless of camera movement
+- Realistic magnitude distribution and clustering
+- Proper atmospheric integration
+- Maintain 60 FPS performance target
 
 ---
 
@@ -262,7 +298,8 @@ Sky Settings/
 - [x] **Proper Positioning**: Fixed horizon alignment bug ✅
 - [x] **Step 2 Complete**: Dual-source light pollution system ✅
 - [x] **Step 3 Complete**: Dithering eliminates color banding ✅
-- [x] **Step 4 Complete (WIP)**: Procedural star field implemented but has bugs (issue #4) ⚠️
+- [x] **Step 4a Deprecated**: Fragment shader stars abandoned due to architectural flaws ❌
+- [ ] **Step 4b Pending**: THREE.Points geometry-based stars (new approach) 📋
 - [ ] **Step 5**: Atmospheric noise variations
 - [ ] **Step 6**: Horror atmosphere tuning
 
@@ -301,6 +338,6 @@ Sky Settings/
 
 ---
 
-*Last Updated: September 8, 2025*  
-*Step 4 Complete (WIP): Procedural star field implemented but has critical bugs (issue #4)*  
+*Last Updated: September 9, 2025*  
+*Step 4a Deprecated: Fragment shader stars abandoned, Step 4b planned with THREE.Points approach*  
 *For: Horror Game Project - Night Scene Implementation*

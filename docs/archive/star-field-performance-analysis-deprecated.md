@@ -1,5 +1,19 @@
 # 🌟 Star Field Performance Analysis: Will Your MacBook Catch Fire?
 
+## ⚠️ DEPRECATED DOCUMENT - ARCHIVED 2025-09-09
+
+**This analysis is for the DEPRECATED fragment shader star approach that was abandoned.**
+
+**Reason**: Fragment shader stars were fundamentally flawed (view-dependent, unstable positioning)  
+**Resolution**: ADR-003 documents the switch to THREE.Points geometry-based stars  
+**Status**: This document is preserved for historical reference only
+
+**For current star field implementation**: See Step 4b in `atmospheric-sky-implementation-plan.md`
+
+---
+
+# Original Analysis (For Deprecated Approach)
+
 ## TL;DR - Quick Answer
 **No, your MacBook won't catch fire.** The entire star system adds approximately 0.5-1.0 milliseconds to each frame, which is negligible. At 60 FPS, you have 16.67ms per frame - we're using only 6% of that budget for thousands of stars.
 
