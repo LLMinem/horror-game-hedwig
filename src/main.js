@@ -308,6 +308,7 @@ const starVertexShader = `
   uniform float u_brightness;
   
   varying float vBrightness;
+  varying float vSizeRatio;  // For alpha compensation when clamping size
   
   void main() {
     vBrightness = brightness * u_brightness;
@@ -319,7 +320,13 @@ const starVertexShader = `
     float starSize = mix(u_sizeMin, u_sizeMax, size);
     
     // Size attenuation: make distant stars smaller (perspective)
-    gl_PointSize = starSize * (300.0 / -mvPosition.z);
+    float calculatedSize = starSize * (300.0 / -mvPosition.z);
+    
+    // FIX 1: Enforce minimum pixel size to prevent sub-pixel flickering
+    gl_PointSize = max(1.0, calculatedSize);  // Never go below 1 pixel
+    
+    // Pass ratio for brightness compensation (will be < 1 for sub-pixel stars)
+    vSizeRatio = calculatedSize / gl_PointSize;
   }
 `;
 
@@ -328,6 +335,7 @@ const starFragmentShader = `
   uniform vec3 u_cameraPos;
   
   varying float vBrightness;
+  varying float vSizeRatio;  // Receive size ratio from vertex shader
   
   void main() {
     // Make stars circular (discard pixels outside circle)
