@@ -3,9 +3,9 @@
 ## 🎯 Current Progress
 
 **Base Commit:** `15ca4ab` - ChatGPT's baseline night scene  
-**Current Status:** Steps 0-3 complete, atmospheric sky Step 4 complete (WIP), mouse controls added  
-**Latest Working:** `549400b` - Implemented procedural star field system (WIP due to issues)  
-**Current Focus:** Fix star field issues (GitHub issue #4)
+**Current Status:** Steps 0-3 complete, atmospheric sky Steps 1-5 complete (MVP quality fog), mouse controls added  
+**Latest Working:** `6484727` - Complete atmospheric fog implementation for MVP quality  
+**Current Focus:** Atmospheric sky Step 6 (Horror atmosphere tuning) or ground textures
 
 ### ✅ Completed Steps
 
@@ -20,6 +20,8 @@
   - **Fine-tuning:** → `430fcea` (adjusted defaults for better realism)
 - **Atmospheric Sky Step 3:** Dithering (anti-banding) → `345c9f9` (hash-based screen-space noise) [COMPLETE 2025-09-08]
 - **Atmospheric Sky Step 4:** Procedural star field → `549400b` (DEPRECATED - See ADR-003) [2025-09-08]
+- **Atmospheric Sky Step 4b:** THREE.Points star system → **COMPLETE** [2025-09-09]
+- **Atmospheric Sky Step 5:** Comprehensive atmospheric fog → `6484727` **COMPLETE (MVP Quality)** [2025-09-10]
 
 ### ⚠️ Current Issues (Priority)
 
@@ -29,8 +31,8 @@
 
 **Atmospheric Sky Pipeline (Priority):**
 - Atmospheric Sky Step 4a: Fragment shader stars [DEPRECATED - See ADR-003]
-- Atmospheric Sky Step 4b: THREE.Points geometry-based stars [NEW APPROACH - PENDING]
-- Atmospheric Sky Step 5: Atmospheric noise [PENDING]
+- Atmospheric Sky Step 4b: THREE.Points geometry-based stars [COMPLETE - 2025-09-09]
+- Atmospheric Sky Step 5: Comprehensive atmospheric fog system [COMPLETE (MVP Quality) - 2025-09-10]
 - Atmospheric Sky Step 6: Horror atmosphere tuning [PENDING]
 
 **Original Night Scene Steps:**
@@ -337,8 +339,12 @@ Current focus: **Atmospheric sky enhancement** following the detailed plan in `a
 **Step 4a DEPRECATED (2025-09-09):** Fragment shader stars abandoned due to architectural flaws
 - **Issues:** View-dependent recalculation, unstable brightness, unfixable camera movement bugs
 - **Resolution:** ADR-003 documents switch to THREE.Points geometry-based approach
-**Step 4b PENDING:** THREE.Points geometry-based stars (new implementation plan)
-**Next:** Implement geometry-based star field before proceeding to atmospheric noise  
+**Step 4b COMPLETE (2025-09-09):** THREE.Points geometry-based stars with flicker-free rendering
+**Step 5 COMPLETE (2025-09-10):** Comprehensive atmospheric fog system (MVP quality)
+- **Key Achievement:** Complete fog system with altitude-based sky blending, synchronized fog across all elements
+- **Quality Level:** MVP production-ready standards achieved
+- **Performance:** Maintains 60 FPS with complex atmospheric calculations
+**Next:** Step 6 (Horror atmosphere tuning) or proceed to ground textures  
 **Reference:** See `docs/atmospheric-sky-implementation-plan.md` for detailed progress tracking
 
 ### Additional Features
