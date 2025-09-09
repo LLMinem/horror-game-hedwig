@@ -98,9 +98,11 @@ const skyVertexShader = `
   varying vec3 vDir;  // World-space direction (ignores camera translation)
   
   void main() {
-    // CRITICAL FIX: Use w=0 to get direction without camera translation
-    // This makes stars stay in fixed positions in world space
-    vDir = (modelMatrix * vec4(position, 0.0)).xyz;
+    // CRITICAL: Extract only rotation from modelMatrix, ignore translation.
+    // This provides a stable world-space direction for the celestial sphere.
+    // This is what makes the light pollution stay fixed in the northwest!
+    mat3 rotationOnly = mat3(modelMatrix);
+    vDir = rotationOnly * position;
     
     gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
   }
@@ -144,7 +146,7 @@ const skyFragmentShader = `
   uniform float starSizeMax;       // Maximum star size (larger = brighter)
   uniform float starHorizonFade;   // Height where stars start fading (0-1)
   
-  varying vec3 vDir;  // Direction from camera to this fragment
+  varying vec3 vDir;  // World-space direction (same as used for light pollution)
   
   // Simple hash function for dithering noise
   float hash(vec2 p) {
@@ -172,11 +174,12 @@ const skyFragmentShader = `
   }
   
   // Generate stars in a cell
-  float generateStars(vec3 dir) {
+  float generateStars(vec3 celestialDir) {
     if (!starsEnabled) return 0.0;
     
-    // Convert direction to 2D sphere map
-    vec2 sphereCoord = dirToSphereMap(dir);
+    // Use the same world-space direction that makes light pollution work correctly
+    // This ensures stars stay in fixed celestial positions
+    vec2 sphereCoord = dirToSphereMap(celestialDir);
     
     // Scale by density to create grid cells
     vec2 cellCoord = sphereCoord * starDensity * 150.0; // Increased multiplier for more stars
@@ -283,10 +286,11 @@ const skyFragmentShader = `
     col += pollutionColor * (village1Glow + village2Glow);
     
     // ============ PROCEDURAL STARS ============
-    // Generate stars based on view direction
+    // Generate stars using the same world-space direction as light pollution
+    // This ensures stars stay in fixed celestial positions just like the village glow
     float stars = generateStars(dir);
     
-    // Apply atmospheric extinction (fade near horizon)
+    // Apply atmospheric extinction (fade near horizon based on VIEW direction)
     float starFade = smoothstep(0.0, starHorizonFade, altitude);
     stars *= starFade;
     
