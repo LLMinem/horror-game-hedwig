@@ -1,7 +1,8 @@
 # ADR-003: Switch from Fragment Shader to Geometry-Based Stars
 
 ## Status
-**Accepted** - December 2024
+
+**Accepted** - 2025.09.09
 
 ## Context
 
@@ -21,6 +22,7 @@ However, after extensive implementation and debugging efforts, fundamental archi
 2. **Cell-Based Brightness Problems**: The cellular noise approach created brightness calculations that varied based on viewing angle, making stars appear to flicker or change intensity as the camera moved.
 
 3. **Unfixable Architecture**: Multiple attempted solutions failed:
+
    - Camera position normalization
    - Fixed reference frames
    - Alternative noise functions
@@ -43,6 +45,7 @@ The fundamental issue is that fragment shaders are inherently view-dependent - t
 ## Consequences
 
 ### Positive
+
 - **Stability**: Stars maintain consistent position and brightness regardless of camera movement
 - **Performance**: Geometry-based rendering with fixed vertex count, no per-pixel recalculation
 - **Industry Standard**: Aligns with established practices in game development and Three.js
@@ -51,26 +54,32 @@ The fundamental issue is that fragment shaders are inherently view-dependent - t
 - **Compatibility**: Better integration with Three.js rendering pipeline and post-processing
 
 ### Negative
+
 - **Development Cost**: Requires complete rewrite of star system implementation
 - **Memory Usage**: Fixed geometry requires memory allocation (minimal impact for star count)
 - **Complexity**: Additional shader management and geometry generation code
 
 ### Neutral
+
 - **Feature Parity**: Same visual capabilities achievable with different implementation approach
 - **Maintenance**: Different but comparable ongoing maintenance requirements
 
 ## Alternatives Considered
 
 ### 1. Continue Fragment Shader Approach (Rejected)
+
 **Rationale**: Fundamentally flawed architecture cannot be patched. View-dependency is inherent to fragment shader execution model.
 
 ### 2. Pre-baked Star Texture (Rejected)
+
 **Rationale**: Less flexible, lower quality, and still requires proper integration with atmospheric effects.
 
 ### 3. Icosahedral Grid Mapping (Rejected)
+
 **Rationale**: While mathematically elegant, still suffers from view-dependent aliasing issues and added complexity.
 
 ### 4. Hybrid Approach (Rejected)
+
 **Rationale**: Combining fragment shader and geometry approaches would increase complexity without solving core issues.
 
 ## Implementation Notes
