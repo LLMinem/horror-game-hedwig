@@ -358,8 +358,8 @@ const starMaterial = new THREE.ShaderMaterial({
   fragmentShader: starFragmentShader,
   transparent: true,
   blending: THREE.AdditiveBlending,
-  depthWrite: false,
-  depthTest: false
+  depthWrite: false,  // Don't write to depth buffer (stars are background)
+  depthTest: true     // But DO test depth so objects can occlude stars
 });
 
 // Create stars
