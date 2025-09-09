@@ -632,6 +632,13 @@ const defaults = {
   pollutionColor: "#3D2F28",   // Warm sodium lamp color
   // Dithering
   skyDitherAmount: 0.008,      // Dithering to prevent gradient banding
+  // THREE.Points star system
+  starEnabled: true,
+  starCount: 5000,
+  starBrightness: 1.5,
+  starSizeMin: 1.0,
+  starSizeMax: 5.0,
+  starHorizonFade: 0.3
 };
 
 // State object initialized from defaults
@@ -731,16 +738,18 @@ skyFolder.open();
 
 // THREE.Points Star System controls
 const starsFolder = gui.addFolder("Stars (THREE.Points)");
+enhanceGuiWithReset(starsFolder);
 
 starsFolder
-  .add(starState, "enabled")
+  .add(state, "starEnabled")
   .name("Enable Stars")
   .onChange((v) => {
     stars.visible = v;
+    starState.enabled = v;
   });
 
 starsFolder
-  .add(starState, "count", 1000, 10000, 100)
+  .add(state, "starCount", 1000, 10000, 100)
   .name("Star Count")
   .onChange((v) => {
     // Regenerate star geometry with new count
@@ -751,31 +760,35 @@ starsFolder
   });
 
 starsFolder
-  .add(starState, "brightness", 0, 3, 0.01)
+  .add(state, "starBrightness", 0, 3, 0.01)
   .name("Brightness")
   .onChange((v) => {
     starMaterial.uniforms.u_brightness.value = v;
+    starState.brightness = v;
   });
 
 starsFolder
-  .add(starState, "sizeMin", 0.5, 5, 0.1)
+  .add(state, "starSizeMin", 0.5, 5, 0.1)
   .name("Min Size")
   .onChange((v) => {
     starMaterial.uniforms.u_sizeMin.value = v;
+    starState.sizeMin = v;
   });
 
 starsFolder
-  .add(starState, "sizeMax", 2, 15, 0.1)
+  .add(state, "starSizeMax", 2, 15, 0.1)
   .name("Max Size")
   .onChange((v) => {
     starMaterial.uniforms.u_sizeMax.value = v;
+    starState.sizeMax = v;
   });
 
 starsFolder
-  .add(starState, "horizonFade", 0, 0.5, 0.01)
+  .add(state, "starHorizonFade", 0, 0.5, 0.01)
   .name("Horizon Fade")
   .onChange((v) => {
     starMaterial.uniforms.u_horizonFade.value = v;
+    starState.horizonFade = v;
   });
 
 starsFolder.open();
@@ -1027,6 +1040,12 @@ const presetsObj = {
     state.village2Spread = 50;
     state.village2Height = 0.25;
     state.skyDitherAmount = 0.008;
+    state.starEnabled = true;
+    state.starCount = 5000;
+    state.starBrightness = 1.5;
+    state.starSizeMin = 1.0;
+    state.starSizeMax = 5.0;
+    state.starHorizonFade = 0.3;
 
     // Apply all changes
     renderer.toneMappingExposure = state.exposure;
@@ -1068,6 +1087,23 @@ const presetsObj = {
     skyMaterial.uniforms.village2Spread.value = (state.village2Spread * Math.PI) / 180;
     skyMaterial.uniforms.village2Height.value = state.village2Height;
     skyMaterial.uniforms.ditherAmount.value = state.skyDitherAmount;
+    // Apply star changes
+    stars.visible = state.starEnabled;
+    starState.enabled = state.starEnabled;
+    if (state.starCount !== starState.count) {
+      starGeometry.dispose();
+      const newGeometry = generateStarGeometry(state.starCount);
+      stars.geometry = newGeometry;
+      starState.count = state.starCount;
+    }
+    starMaterial.uniforms.u_brightness.value = state.starBrightness;
+    starMaterial.uniforms.u_sizeMin.value = state.starSizeMin;
+    starMaterial.uniforms.u_sizeMax.value = state.starSizeMax;
+    starMaterial.uniforms.u_horizonFade.value = state.starHorizonFade;
+    starState.brightness = state.starBrightness;
+    starState.sizeMin = state.starSizeMin;
+    starState.sizeMax = state.starSizeMax;
+    starState.horizonFade = state.starHorizonFade;
 
     // Update GUI to reflect changes
     gui
