@@ -182,7 +182,10 @@ const skyFragmentShader = `
     vec2 sphereCoord = dirToSphereMap(celestialDir);
     
     // Scale by density to create grid cells
-    vec2 cellCoord = sphereCoord * starDensity * 150.0; // Increased multiplier for more stars
+    // Cell size calculation: avg area per cell = 1/starDensity steradians
+    // This ensures cells are large enough to not cause re-rolling with pixel movement
+    float cellsPerAxis = sqrt(starDensity * 4.0 * 3.14159265359);
+    vec2 cellCoord = sphereCoord * cellsPerAxis;
     vec2 cellId = floor(cellCoord);    // Integer cell ID
     vec2 cellUV = fract(cellCoord);    // Position within cell (0-1)
     
@@ -339,7 +342,7 @@ const skyMaterial = new THREE.ShaderMaterial({
     
     // STAR FIELD PARAMETERS
     starsEnabled: { value: true },        // Stars on by default
-    starDensity: { value: 1.0 },         // Higher density for more visible stars
+    starDensity: { value: 400.0 },       // ~5000 stars across full sky (400 * 4π ≈ 5000)
     starBrightness: { value: 1.5 },      // Brighter for better visibility
     starSizeMin: { value: 0.0004 },      // Slightly larger minimum (was 0.0003)
     starSizeMax: { value: 0.007 },       // Much larger maximum (was 0.002)
@@ -613,7 +616,7 @@ const defaults = {
   skyDitherAmount: 0.008,      // Dithering to prevent gradient banding
   // Star field parameters
   starsEnabled: true,           // Enable stars by default
-  starDensity: 1.0,            // More stars visible (was 0.5)
+  starDensity: 400.0,          // ~5000 stars across full sky
   starBrightness: 1.5,         // Brighter stars (was 1.0)
   starSizeMin: 0.0004,         // Larger minimum (was 0.0003)
   starSizeMax: 0.007,          // Much larger maximum (was 0.002)
@@ -725,10 +728,10 @@ starsFolder
   .name("Enable Stars")
   .onChange((v) => (skyMaterial.uniforms.starsEnabled.value = v));
 
-// Star density control
+// Star density control - adjusted range for new scaling formula
 starsFolder
-  .add(state, "starDensity", 0.1, 3.0, 0.05)
-  .name("Density (stars/steradian)")
+  .add(state, "starDensity", 100, 1000, 10)
+  .name("Density (total stars)")
   .onChange((v) => (skyMaterial.uniforms.starDensity.value = v));
 
 // Overall brightness
@@ -1004,7 +1007,7 @@ const presetsObj = {
     state.village2Height = 0.25;
     state.skyDitherAmount = 0.008;
     state.starsEnabled = true;
-    state.starDensity = 1.0;
+    state.starDensity = 400.0;
     state.starBrightness = 1.5;
     state.starSizeMin = 0.0004;
     state.starSizeMax = 0.007;
