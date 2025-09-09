@@ -138,13 +138,7 @@ const skyFragmentShader = `
   // DITHERING
   uniform float ditherAmount;      // How strong the dither effect is (0.0-0.01)
   
-  // STAR FIELD PARAMETERS
-  uniform bool starsEnabled;       // Toggle stars on/off
-  uniform float starDensity;       // Number of stars (cells per steradian)
-  uniform float starBrightness;    // Overall star brightness multiplier
-  uniform float starSizeMin;       // Minimum star size (smaller = dimmer)
-  uniform float starSizeMax;       // Maximum star size (larger = brighter)
-  uniform float starHorizonFade;   // Height where stars start fading (0-1)
+  // Note: Star field now handled by separate THREE.Points geometry (see ADR-003)
   
   varying vec3 vDir;  // World-space direction (same as used for light pollution)
   
@@ -154,84 +148,7 @@ const skyFragmentShader = `
     return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453);
   }
   
-  // Advanced hash for 3D positions (used for stars)
-  float hash3(vec3 p) {
-    // Different magic numbers for 3D
-    return fract(sin(dot(p, vec3(127.1, 311.7, 74.7))) * 43758.5453);
-  }
-  
-  // Convert spherical direction to 2D grid coordinates for star cells
-  vec2 dirToSphereMap(vec3 dir) {
-    // Convert 3D direction to spherical coordinates (theta, phi)
-    float theta = atan(dir.z, dir.x); // Horizontal angle (-PI to PI)
-    float phi = asin(dir.y);          // Vertical angle (-PI/2 to PI/2)
-    
-    // Map to 0-1 range for grid
-    float u = (theta + 3.14159265359) / (2.0 * 3.14159265359);
-    float v = (phi + 1.5707963268) / 3.14159265359;
-    
-    return vec2(u, v);
-  }
-  
-  // Generate stars in a cell
-  float generateStars(vec3 celestialDir) {
-    if (!starsEnabled) return 0.0;
-    
-    // Use the same world-space direction that makes light pollution work correctly
-    // This ensures stars stay in fixed celestial positions
-    vec2 sphereCoord = dirToSphereMap(celestialDir);
-    
-    // Scale by density to create grid cells
-    // Cell size calculation: avg area per cell = 1/starDensity steradians
-    // This ensures cells are large enough to not cause re-rolling with pixel movement
-    float cellsPerAxis = sqrt(starDensity * 4.0 * 3.14159265359);
-    vec2 cellCoord = sphereCoord * cellsPerAxis;
-    vec2 cellId = floor(cellCoord);    // Integer cell ID
-    vec2 cellUV = fract(cellCoord);    // Position within cell (0-1)
-    
-    float starLight = 0.0;
-    
-    // Check 3x3 grid of cells (for stars that might overlap cell boundaries)
-    for (int dx = -1; dx <= 1; dx++) {
-      for (int dy = -1; dy <= 1; dy++) {
-        vec2 neighborId = cellId + vec2(float(dx), float(dy));
-        
-        // Use cell ID as hash seed
-        vec3 hashSeed = vec3(neighborId, 0.0);
-        
-        // Determine if this cell has a star (probability based on density)
-        float hasStarProb = hash3(hashSeed);
-        if (hasStarProb > 0.15) continue; // 85% of cells have stars (was 60%)
-        
-        // Random position within cell
-        float starX = hash3(hashSeed + vec3(0.1, 0.0, 0.0));
-        float starY = hash3(hashSeed + vec3(0.0, 0.1, 0.0));
-        vec2 starPos = vec2(starX, starY);
-        
-        // Position relative to current fragment
-        vec2 offset = starPos + vec2(float(dx), float(dy)) - cellUV;
-        float dist = length(offset);
-        
-        // Random star size (between min and max)
-        float sizeSeed = hash3(hashSeed + vec3(0.0, 0.0, 0.1));
-        float starSize = mix(starSizeMin, starSizeMax, sizeSeed * sizeSeed); // Square for more dim stars
-        
-        // Star brightness falls off from center
-        if (dist < starSize) {
-          // Gaussian-like falloff for natural look
-          float brightness = exp(-dist * dist / (starSize * starSize * 0.2));
-          
-          // Random brightness variation
-          float brightnessMult = hash3(hashSeed + vec3(0.2, 0.2, 0.2));
-          brightnessMult = 0.3 + 0.7 * brightnessMult; // 30% to 100% brightness
-          
-          starLight += brightness * brightnessMult * starBrightness;
-        }
-      }
-    }
-    
-    return starLight;
-  }
+  // Note: Star generation functions removed - stars now rendered via THREE.Points (see ADR-003)
   
   void main() {
     // Normalize the world-space direction
@@ -288,17 +205,7 @@ const skyFragmentShader = `
     vec3 pollutionColor = vec3(0.24, 0.18, 0.16); // Warm brown-orange
     col += pollutionColor * (village1Glow + village2Glow);
     
-    // ============ PROCEDURAL STARS ============
-    // Generate stars using the same world-space direction as light pollution
-    // This ensures stars stay in fixed celestial positions just like the village glow
-    float stars = generateStars(dir);
-    
-    // Apply atmospheric extinction (fade near horizon based on VIEW direction)
-    float starFade = smoothstep(0.0, starHorizonFade, altitude);
-    stars *= starFade;
-    
-    // Add stars to the sky (additive blending)
-    col += vec3(stars);
+    // Note: Stars removed from fragment shader - now rendered via THREE.Points (see ADR-003)
     
     // Apply dithering to prevent color banding
     // Uses screen-space position for stable noise pattern
@@ -339,14 +246,6 @@ const skyMaterial = new THREE.ShaderMaterial({
     
     // DITHERING - Prevents gradient banding
     ditherAmount: { value: 0.008 },      // Noise to break up gradients
-    
-    // STAR FIELD PARAMETERS
-    starsEnabled: { value: true },        // Stars on by default
-    starDensity: { value: 400.0 },       // ~5000 stars across full sky (400 * 4π ≈ 5000)
-    starBrightness: { value: 1.5 },      // Brighter for better visibility
-    starSizeMin: { value: 0.0004 },      // Slightly larger minimum (was 0.0003)
-    starSizeMax: { value: 0.007 },       // Much larger maximum (was 0.002)
-    starHorizonFade: { value: 0.3 },     // Start fading at 30% altitude
   },
   vertexShader: skyVertexShader,
   fragmentShader: skyFragmentShader,
@@ -360,6 +259,125 @@ const skydome = new THREE.Mesh(skyGeometry, skyMaterial);
 skydome.renderOrder = -999; // CRITICAL: Render before everything else
 skydome.frustumCulled = false; // Never cull the sky
 scene.add(skydome);
+
+// =============== THREE.Points STAR SYSTEM (replaces fragment shader stars)
+// Generate star positions on the celestial sphere
+function generateStarGeometry(starCount = 5000) {
+  const positions = new Float32Array(starCount * 3);
+  const sizes = new Float32Array(starCount);
+  const brightnesses = new Float32Array(starCount);
+  
+  for (let i = 0; i < starCount; i++) {
+    // Generate points only in upper hemisphere (no stars below horizon)
+    const theta = Math.random() * Math.PI * 2; // 0 to 2π (full circle)
+    const phi = Math.random() * Math.PI * 0.5; // 0 to π/2 (upper hemisphere only)
+    
+    // Convert spherical to cartesian coordinates
+    // Radius matches skydome (1000 units)
+    const radius = 1000;
+    const x = radius * Math.sin(phi) * Math.cos(theta);
+    const y = radius * Math.cos(phi); // Y is up
+    const z = radius * Math.sin(phi) * Math.sin(theta);
+    
+    positions[i * 3] = x;
+    positions[i * 3 + 1] = y;
+    positions[i * 3 + 2] = z;
+    
+    // Random size for each star (will be multiplied by uniforms)
+    sizes[i] = Math.random();
+    
+    // Random brightness for each star
+    brightnesses[i] = 0.3 + Math.random() * 0.7; // 30% to 100% brightness
+  }
+  
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+  geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+  geometry.setAttribute('brightness', new THREE.BufferAttribute(brightnesses, 1));
+  
+  return geometry;
+}
+
+// Custom shaders for star rendering
+const starVertexShader = `
+  attribute float size;
+  attribute float brightness;
+  
+  uniform float u_sizeMin;
+  uniform float u_sizeMax;
+  uniform float u_brightness;
+  
+  varying float vBrightness;
+  
+  void main() {
+    vBrightness = brightness * u_brightness;
+    
+    vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+    gl_Position = projectionMatrix * mvPosition;
+    
+    // Calculate point size based on attributes and uniforms
+    float starSize = mix(u_sizeMin, u_sizeMax, size);
+    
+    // Size attenuation: make distant stars smaller (perspective)
+    gl_PointSize = starSize * (300.0 / -mvPosition.z);
+  }
+`;
+
+const starFragmentShader = `
+  uniform float u_horizonFade;
+  uniform vec3 u_cameraPos;
+  
+  varying float vBrightness;
+  
+  void main() {
+    // Make stars circular (discard pixels outside circle)
+    vec2 center = gl_PointCoord - vec2(0.5);
+    float dist = length(center);
+    if (dist > 0.5) discard;
+    
+    // Gaussian falloff for natural star appearance
+    float alpha = exp(-dist * dist * 8.0) * vBrightness;
+    
+    // TODO: Add horizon fade based on star altitude
+    // (will implement after basic stars work)
+    
+    gl_FragColor = vec4(1.0, 1.0, 1.0, alpha);
+  }
+`;
+
+// Create star material
+const starMaterial = new THREE.ShaderMaterial({
+  uniforms: {
+    u_sizeMin: { value: 1.0 },
+    u_sizeMax: { value: 5.0 },
+    u_brightness: { value: 1.5 },
+    u_horizonFade: { value: 0.3 },
+    u_cameraPos: { value: camera.position }
+  },
+  vertexShader: starVertexShader,
+  fragmentShader: starFragmentShader,
+  transparent: true,
+  blending: THREE.AdditiveBlending,
+  depthWrite: false,
+  depthTest: false
+});
+
+// Create stars
+const starGeometry = generateStarGeometry(5000);
+const stars = new THREE.Points(starGeometry, starMaterial);
+stars.renderOrder = -1000; // Render before skydome
+stars.frustumCulled = false; // Never cull stars
+scene.add(stars);
+
+// Star system state for GUI controls
+const starState = {
+  enabled: true,
+  count: 5000,
+  brightness: 1.5,
+  sizeMin: 1.0,
+  sizeMax: 5.0,
+  horizonFade: 0.3
+};
 
 // =============== FOG (adjusted for skydome interaction)
 // Using FogExp2 for atmospheric depth - slightly reduced density for skydome
@@ -614,13 +632,6 @@ const defaults = {
   pollutionColor: "#3D2F28",   // Warm sodium lamp color
   // Dithering
   skyDitherAmount: 0.008,      // Dithering to prevent gradient banding
-  // Star field parameters
-  starsEnabled: true,           // Enable stars by default
-  starDensity: 400.0,          // ~5000 stars across full sky
-  starBrightness: 1.5,         // Brighter stars (was 1.0)
-  starSizeMin: 0.0004,         // Larger minimum (was 0.0003)
-  starSizeMax: 0.007,          // Much larger maximum (was 0.002)
-  starHorizonFade: 0.3,        // Fade starts at 30% altitude
 };
 
 // State object initialized from defaults
@@ -718,44 +729,54 @@ skyFolder
 
 skyFolder.open();
 
-// Star Field folder for procedural stars
-const starsFolder = gui.addFolder("Star Field (Procedural)");
-enhanceGuiWithReset(starsFolder);
+// THREE.Points Star System controls
+const starsFolder = gui.addFolder("Stars (THREE.Points)");
 
-// Enable/disable stars
 starsFolder
-  .add(state, "starsEnabled")
+  .add(starState, "enabled")
   .name("Enable Stars")
-  .onChange((v) => (skyMaterial.uniforms.starsEnabled.value = v));
+  .onChange((v) => {
+    stars.visible = v;
+  });
 
-// Star density control - adjusted range for new scaling formula
 starsFolder
-  .add(state, "starDensity", 100, 1000, 10)
-  .name("Density (total stars)")
-  .onChange((v) => (skyMaterial.uniforms.starDensity.value = v));
+  .add(starState, "count", 1000, 10000, 100)
+  .name("Star Count")
+  .onChange((v) => {
+    // Regenerate star geometry with new count
+    starGeometry.dispose();
+    const newGeometry = generateStarGeometry(v);
+    stars.geometry = newGeometry;
+    starState.count = v;
+  });
 
-// Overall brightness
 starsFolder
-  .add(state, "starBrightness", 0.0, 3.0, 0.01)
+  .add(starState, "brightness", 0, 3, 0.01)
   .name("Brightness")
-  .onChange((v) => (skyMaterial.uniforms.starBrightness.value = v));
-
-// Size range controls - adjusted ranges for better visibility
-starsFolder
-  .add(state, "starSizeMin", 0.0001, 0.002, 0.0001)
-  .name("Min Size (dim stars)")
-  .onChange((v) => (skyMaterial.uniforms.starSizeMin.value = v));
+  .onChange((v) => {
+    starMaterial.uniforms.u_brightness.value = v;
+  });
 
 starsFolder
-  .add(state, "starSizeMax", 0.001, 0.01, 0.0001)
-  .name("Max Size (bright stars)")
-  .onChange((v) => (skyMaterial.uniforms.starSizeMax.value = v));
+  .add(starState, "sizeMin", 0.5, 5, 0.1)
+  .name("Min Size")
+  .onChange((v) => {
+    starMaterial.uniforms.u_sizeMin.value = v;
+  });
 
-// Horizon fade control
 starsFolder
-  .add(state, "starHorizonFade", 0.0, 0.5, 0.01)
-  .name("Horizon Fade Height")
-  .onChange((v) => (skyMaterial.uniforms.starHorizonFade.value = v));
+  .add(starState, "sizeMax", 2, 15, 0.1)
+  .name("Max Size")
+  .onChange((v) => {
+    starMaterial.uniforms.u_sizeMax.value = v;
+  });
+
+starsFolder
+  .add(starState, "horizonFade", 0, 0.5, 0.01)
+  .name("Horizon Fade")
+  .onChange((v) => {
+    starMaterial.uniforms.u_horizonFade.value = v;
+  });
 
 starsFolder.open();
 
@@ -1006,12 +1027,6 @@ const presetsObj = {
     state.village2Spread = 50;
     state.village2Height = 0.25;
     state.skyDitherAmount = 0.008;
-    state.starsEnabled = true;
-    state.starDensity = 400.0;
-    state.starBrightness = 1.5;
-    state.starSizeMin = 0.0004;
-    state.starSizeMax = 0.007;
-    state.starHorizonFade = 0.3;
 
     // Apply all changes
     renderer.toneMappingExposure = state.exposure;
@@ -1053,12 +1068,6 @@ const presetsObj = {
     skyMaterial.uniforms.village2Spread.value = (state.village2Spread * Math.PI) / 180;
     skyMaterial.uniforms.village2Height.value = state.village2Height;
     skyMaterial.uniforms.ditherAmount.value = state.skyDitherAmount;
-    skyMaterial.uniforms.starsEnabled.value = state.starsEnabled;
-    skyMaterial.uniforms.starDensity.value = state.starDensity;
-    skyMaterial.uniforms.starBrightness.value = state.starBrightness;
-    skyMaterial.uniforms.starSizeMin.value = state.starSizeMin;
-    skyMaterial.uniforms.starSizeMax.value = state.starSizeMax;
-    skyMaterial.uniforms.starHorizonFade.value = state.starHorizonFade;
 
     // Update GUI to reflect changes
     gui
@@ -1212,9 +1221,10 @@ function animate() {
   // Update camera rotation from mouse look
   updateCameraRotation();
 
-  // IMPORTANT: Skydome follows camera completely now that shader is fixed!
+  // IMPORTANT: Skydome and stars follow camera to appear infinitely distant
   // The eye-ray calculation in the shader handles horizon alignment properly
   skydome.position.copy(camera.position);
+  stars.position.copy(camera.position);
 
   // Attach flashlight to camera
   if (flashlight.visible) {
