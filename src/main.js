@@ -338,13 +338,22 @@ const starFragmentShader = `
   varying float vSizeRatio;  // Receive size ratio from vertex shader
   
   void main() {
-    // Make stars circular (discard pixels outside circle)
+    // Make stars circular
     vec2 center = gl_PointCoord - vec2(0.5);
     float dist = length(center);
-    if (dist > 0.5) discard;
     
-    // Gaussian falloff for natural star appearance
-    float alpha = exp(-dist * dist * 8.0) * vBrightness;
+    // FIX 3: Anti-aliased edges with smoothstep for stability
+    // Create soft transition at edges to reduce pixel-boundary flickering
+    float edge = 0.5;
+    float smoothing = 0.1;  // Width of the transition zone
+    float alpha = smoothstep(edge, edge - smoothing, dist);
+    
+    // Add center brightness boost (brighter in center, dimmer at edges)
+    float centerBoost = 1.0 - (dist * 2.0);  // Linear falloff from center
+    alpha *= mix(0.3, 1.0, centerBoost);  // Blend between 30% and 100% brightness
+    
+    // Apply brightness from star attributes
+    alpha *= vBrightness;
     
     // FIX 2: Apply size ratio compensation
     // When a star is forced from 0.5px to 1px, reduce brightness by 50%
