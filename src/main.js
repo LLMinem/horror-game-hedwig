@@ -306,12 +306,17 @@ const starVertexShader = `
   uniform float u_sizeMin;
   uniform float u_sizeMax;
   uniform float u_brightness;
+  uniform float u_pixelRatio;
   
   varying float vBrightness;
-  varying float vSizeRatio;  // For alpha compensation when clamping size
+  varying vec3 vWorldPosition;   // Pass world position for horizon fade
+  varying float vCalculatedSize; // Pass calculated size for smooth fade
   
   void main() {
     vBrightness = brightness * u_brightness;
+    
+    // Get world position before transformation
+    vWorldPosition = position;
     
     vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
     gl_Position = projectionMatrix * mvPosition;
@@ -321,46 +326,48 @@ const starVertexShader = `
     
     // Size attenuation: make distant stars smaller (perspective)
     float calculatedSize = starSize * (300.0 / -mvPosition.z);
+    vCalculatedSize = calculatedSize; // Pass to fragment shader
     
-    // FIX 1: Enforce minimum pixel size to prevent sub-pixel flickering
-    gl_PointSize = max(1.0, calculatedSize);  // Never go below 1 pixel
-    
-    // Pass ratio for brightness compensation (will be < 1 for sub-pixel stars)
-    vSizeRatio = calculatedSize / gl_PointSize;
+    // FIX: Enforce 2-pixel minimum to prevent sub-pixel flickering
+    // 2 logical pixels accounting for device pixel ratio
+    float minPixels = 2.0 * u_pixelRatio;
+    gl_PointSize = max(calculatedSize, minPixels);
   }
 `;
 
 const starFragmentShader = `
   uniform float u_horizonFade;
-  uniform vec3 u_cameraPos;
+  uniform bool u_useAntiAlias;
   
   varying float vBrightness;
-  varying float vSizeRatio;  // Receive size ratio from vertex shader
+  varying vec3 vWorldPosition;   // Receive world position
+  varying float vCalculatedSize; // Receive calculated size for smooth fade
   
   void main() {
-    // Make stars circular
-    vec2 center = gl_PointCoord - vec2(0.5);
-    float dist = length(center);
+    // Create circular star
+    float dist = length(gl_PointCoord - 0.5);
     
-    // FIX 3: Anti-aliased edges with smoothstep for stability
-    // Create soft transition at edges to reduce pixel-boundary flickering
-    float edge = 0.5;
-    float smoothing = 0.1;  // Width of the transition zone
-    float alpha = smoothstep(edge, edge - smoothing, dist);
+    float alpha;
+    if (u_useAntiAlias) {
+      // Smooth anti-aliased edges
+      alpha = smoothstep(0.5, 0.3, dist);
+    } else {
+      // Hard edges (for testing)
+      alpha = dist < 0.5 ? 1.0 : 0.0;
+    }
     
-    // Add center brightness boost (brighter in center, dimmer at edges)
-    float centerBoost = 1.0 - (dist * 2.0);  // Linear falloff from center
-    alpha *= mix(0.3, 1.0, centerBoost);  // Blend between 30% and 100% brightness
-    
-    // Apply brightness from star attributes
+    // Apply star brightness
     alpha *= vBrightness;
     
-    // FIX 2: Apply size ratio compensation
-    // When a star is forced from 0.5px to 1px, reduce brightness by 50%
-    alpha *= vSizeRatio;
-    
-    // TODO: Add horizon fade based on star altitude
-    // (will implement after basic stars work)
+    // CRITICAL FIX: Smooth fade based on calculated size
+    // Stars that would be < 2 pixels fade out smoothly
+    float sizeFade = smoothstep(0.0, 2.0, vCalculatedSize);
+    alpha *= sizeFade;
+
+    // Horizon fade based on star altitude
+    float altitude = normalize(vWorldPosition).y; // Y is up, gives 0.0 at horizon, 1.0 at zenith
+    float horizonFadeAlpha = smoothstep(0.0, u_horizonFade, altitude);
+    alpha *= horizonFadeAlpha;
     
     gl_FragColor = vec4(1.0, 1.0, 1.0, alpha);
   }
@@ -373,7 +380,9 @@ const starMaterial = new THREE.ShaderMaterial({
     u_sizeMax: { value: 5.0 },
     u_brightness: { value: 1.5 },
     u_horizonFade: { value: 0.3 },
-    u_cameraPos: { value: camera.position }
+    u_pixelRatio: { value: renderer.getPixelRatio() }, // FIXED: Added missing uniform
+    u_useAntiAlias: { value: true }, // Anti-aliasing toggle
+    u_cameraPos: { value: camera.position } // For potential future use
   },
   vertexShader: starVertexShader,
   fragmentShader: starFragmentShader,
@@ -659,7 +668,8 @@ const defaults = {
   starBrightness: 1.5,
   starSizeMin: 1.0,
   starSizeMax: 5.0,
-  starHorizonFade: 0.3
+  starHorizonFade: 0.3,
+  starAntiAlias: true
 };
 
 // State object initialized from defaults
@@ -810,6 +820,13 @@ starsFolder
   .onChange((v) => {
     starMaterial.uniforms.u_horizonFade.value = v;
     starState.horizonFade = v;
+  });
+
+starsFolder
+  .add(state, "starAntiAlias")
+  .name("Anti-Aliasing")
+  .onChange((v) => {
+    starMaterial.uniforms.u_useAntiAlias.value = v;
   });
 
 starsFolder.open();
@@ -1067,6 +1084,7 @@ const presetsObj = {
     state.starSizeMin = 1.0;
     state.starSizeMax = 5.0;
     state.starHorizonFade = 0.3;
+    state.starAntiAlias = true;
 
     // Apply all changes
     renderer.toneMappingExposure = state.exposure;
@@ -1125,6 +1143,7 @@ const presetsObj = {
     starState.sizeMin = state.starSizeMin;
     starState.sizeMax = state.starSizeMax;
     starState.horizonFade = state.starHorizonFade;
+    starMaterial.uniforms.u_useAntiAlias.value = state.starAntiAlias;
 
     // Update GUI to reflect changes
     gui
@@ -1268,6 +1287,9 @@ window.addEventListener("resize", () => {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
+  
+  // Update pixel ratio for star rendering
+  starMaterial.uniforms.u_pixelRatio.value = renderer.getPixelRatio();
 });
 
 // =============== LOOP
