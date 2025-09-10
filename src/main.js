@@ -159,6 +159,9 @@ const skyFragmentShader = `
   // DITHERING
   uniform float ditherAmount;      // How strong the dither effect is (0.0-0.01)
   
+  // POLLUTION COLOR
+  uniform vec3 pollutionColor;     // Color of light pollution glow
+  
   // FOG INTEGRATION
   uniform vec3 fogColor;           // Scene fog color for blending
   uniform float fogDensity;        // Scene fog density for matching
@@ -227,8 +230,6 @@ const skyFragmentShader = `
     village2Glow *= smoothstep(village2Height, 0.0, altitude);
     
     // Add light pollution to base gradient
-    // Using warm color (#3D2F28) for sodium lamp glow
-    vec3 pollutionColor = vec3(0.24, 0.18, 0.16); // Warm brown-orange
     col += pollutionColor * (village1Glow + village2Glow);
     
     // Note: Stars removed from fragment shader - now rendered via THREE.Points (see ADR-003)
@@ -282,6 +283,9 @@ const skyMaterial = new THREE.ShaderMaterial({
     
     // DITHERING - Prevents gradient banding
     ditherAmount: { value: 0.008 },      // Noise to break up gradients
+    
+    // POLLUTION COLOR
+    pollutionColor: { value: new THREE.Color(0x3D2F28) }, // Warm sodium lamp color
     
     // FOG INTEGRATION - Custom fog blending
     fogColor: { value: new THREE.Color(0x141618) },  // Matches scene fog
@@ -927,8 +931,7 @@ pollutionFolder
   .addColor(state, "pollutionColor")
   .name("Glow Color")
   .onChange((v) => {
-    // Need to update the shader - for now this won't work as color is hardcoded
-    // TODO: Pollution color needs shader uniform to be functional
+    skyMaterial.uniforms.pollutionColor.value.set(v);
   });
 
 pollutionFolder.open();
@@ -1182,6 +1185,7 @@ const presetsObj = {
     skyMaterial.uniforms.village2Intensity.value = state.village2Intensity;
     skyMaterial.uniforms.village2Spread.value = state.village2Spread * DEG2RAD;
     skyMaterial.uniforms.village2Height.value = state.village2Height;
+    skyMaterial.uniforms.pollutionColor.value.set(state.pollutionColor);
     skyMaterial.uniforms.ditherAmount.value = state.skyDitherAmount;
     // Apply star changes
     stars.visible = state.starEnabled;
