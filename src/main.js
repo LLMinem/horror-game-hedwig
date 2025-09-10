@@ -22,6 +22,9 @@ const SCENE_CONSTANTS = {
   GROUND_TILING: 64,          // Default texture tiling
 };
 
+// Math helper constants
+const DEG2RAD = Math.PI / 180;  // Degree to radian conversion factor
+
 // =============== HDRI SELECTION (easy to switch!)
 // Options: 'moonless_golf', 'dikhololo_night', 'satara_night'
 let HDRI_CHOICE = "dikhololo_night"; // Beautiful stars, good for testing
@@ -268,13 +271,13 @@ const skyMaterial = new THREE.ShaderMaterial({
     // NEAR VILLAGE (NW-N, ~250m) - Noticeable glow
     village1Dir: { value: new THREE.Vector3(-0.7, 0, -0.7).normalize() }, // Northwest
     village1Intensity: { value: 0.15 },  // USER TUNED: Focused glow
-    village1Spread: { value: (70 * Math.PI) / 180 }, // USER TUNED: 70° spread
+    village1Spread: { value: 70 * DEG2RAD }, // USER TUNED: 70° spread
     village1Height: { value: 0.35 },      // USER TUNED: Up to 35% altitude
     
     // DISTANT VILLAGE (SE, ~2km) - Very subtle
     village2Dir: { value: new THREE.Vector3(0.7, 0, 0.7).normalize() }, // Southeast  
     village2Intensity: { value: 0.06 },   // USER TUNED: Very subtle
-    village2Spread: { value: (60 * Math.PI) / 180 }, // USER TUNED: 60° spread
+    village2Spread: { value: 60 * DEG2RAD }, // USER TUNED: 60° spread
     village2Height: { value: 0.15 },     // USER TUNED: Low on horizon
     
     // DITHERING - Prevents gradient banding
@@ -573,7 +576,7 @@ const flashlight = new THREE.SpotLight(
   0xfff2d0,
   50,
   45,
-  (Math.PI * 28) / 180,
+  28 * DEG2RAD,
   0.4,
   2,
 );
@@ -880,7 +883,7 @@ village1Sub
   .add(state, "village1Azimuth", -180, 180, 1)
   .name("Direction (°)")
   .onChange((v) => {
-    const rad = (v * Math.PI) / 180;
+    const rad = v * DEG2RAD;
     skyMaterial.uniforms.village1Dir.value.set(Math.sin(rad), 0, -Math.cos(rad)).normalize();
   });
 village1Sub
@@ -890,7 +893,7 @@ village1Sub
 village1Sub
   .add(state, "village1Spread", 30, 120, 1)
   .name("Spread (°)")
-  .onChange((v) => (skyMaterial.uniforms.village1Spread.value = (v * Math.PI) / 180));
+  .onChange((v) => (skyMaterial.uniforms.village1Spread.value = v * DEG2RAD));
 village1Sub
   .add(state, "village1Height", 0, 0.5, 0.01)
   .name("Max Height")
@@ -903,7 +906,7 @@ village2Sub
   .add(state, "village2Azimuth", -180, 180, 1)
   .name("Direction (°)")
   .onChange((v) => {
-    const rad = (v * Math.PI) / 180;
+    const rad = v * DEG2RAD;
     skyMaterial.uniforms.village2Dir.value.set(Math.sin(rad), 0, -Math.cos(rad)).normalize();
   });
 village2Sub
@@ -913,7 +916,7 @@ village2Sub
 village2Sub
   .add(state, "village2Spread", 30, 120, 1)
   .name("Spread (°)")
-  .onChange((v) => (skyMaterial.uniforms.village2Spread.value = (v * Math.PI) / 180));
+  .onChange((v) => (skyMaterial.uniforms.village2Spread.value = v * DEG2RAD));
 village2Sub
   .add(state, "village2Height", 0, 0.5, 0.01)
   .name("Max Height")
@@ -1065,7 +1068,7 @@ flashFolder
 flashFolder
   .add(state, "flashlightAngle", 5, 45, 1)
   .name("Angle (degrees)")
-  .onChange((v) => (flashlight.angle = (v * Math.PI) / 180));
+  .onChange((v) => (flashlight.angle = v * DEG2RAD));
 flashFolder
   .add(state, "flashlightPenumbra", 0, 1, 0.01)
   .name("Penumbra")
@@ -1154,7 +1157,7 @@ const presetsObj = {
     skyMaterial.uniforms.fogMax.value = state.fogMax;
     starMaterial.uniforms.u_fogDensity.value = state.fogDensity;
     flashlight.intensity = state.flashlightIntensity;
-    flashlight.angle = (state.flashlightAngle * Math.PI) / 180;
+    flashlight.angle = state.flashlightAngle * DEG2RAD;
     flashlight.penumbra = state.flashlightPenumbra;
     flashlight.distance = state.flashlightDistance;
     moon.shadow.bias = state.shadowBias;
@@ -1169,15 +1172,15 @@ const presetsObj = {
     skyMaterial.uniforms.midLowStop.value = state.skyMidLowStop;
     skyMaterial.uniforms.midHighStop.value = state.skyMidHighStop;
     // Update village light pollution
-    let rad = (state.village1Azimuth * Math.PI) / 180;
+    let rad = state.village1Azimuth * DEG2RAD;
     skyMaterial.uniforms.village1Dir.value.set(Math.sin(rad), 0, -Math.cos(rad)).normalize();
     skyMaterial.uniforms.village1Intensity.value = state.village1Intensity;
-    skyMaterial.uniforms.village1Spread.value = (state.village1Spread * Math.PI) / 180;
+    skyMaterial.uniforms.village1Spread.value = state.village1Spread * DEG2RAD;
     skyMaterial.uniforms.village1Height.value = state.village1Height;
-    rad = (state.village2Azimuth * Math.PI) / 180;
+    rad = state.village2Azimuth * DEG2RAD;
     skyMaterial.uniforms.village2Dir.value.set(Math.sin(rad), 0, -Math.cos(rad)).normalize();
     skyMaterial.uniforms.village2Intensity.value = state.village2Intensity;
-    skyMaterial.uniforms.village2Spread.value = (state.village2Spread * Math.PI) / 180;
+    skyMaterial.uniforms.village2Spread.value = state.village2Spread * DEG2RAD;
     skyMaterial.uniforms.village2Height.value = state.village2Height;
     skyMaterial.uniforms.ditherAmount.value = state.skyDitherAmount;
     // Apply star changes
