@@ -533,7 +533,7 @@ for (let i = 0; i < 8; i++) {
   post.castShadow = post.receiveShadow = true;
   scene.add(post);
 }
-console.log("Metal posts are at 25-60m distance (along -15 Z axis)");
+// Metal posts positioned at 25-60m distance (along -15 Z axis)
 
 const sphere = new THREE.Mesh(
   new THREE.SphereGeometry(1, 32, 32),
@@ -547,7 +547,7 @@ const sphere = new THREE.Mesh(
 sphere.position.set(5, 1, 5);
 sphere.castShadow = sphere.receiveShadow = true;
 scene.add(sphere);
-console.log("Sphere is at ~7m distance (5,1,5 from camera at 0,1.7,15)");
+// Sphere positioned at ~7m distance (5,1,5 from camera at 0,1.7,15)
 
 // =============== OPTIONAL: FLASHLIGHT (toggle with 'F')
 // Updated defaults based on testing: intensity 50, angle 28°, penumbra 0.4, distance 45
@@ -590,7 +590,7 @@ function loadHDRI(hdriName) {
     },
     (progress) => {
       const percent = ((progress.loaded / progress.total) * 100).toFixed(0);
-      console.log(`Loading HDRI: ${percent}%`);
+      // Loading HDRI...
     },
     (error) => {
       console.error("Failed to load HDRI:", error);
@@ -619,9 +619,7 @@ function applyEnvMapToMaterials(root, envMap, intensity) {
     }
   });
 
-  console.log(
-    `✓ Applied envMap to ${count} materials at intensity ${intensity}`,
-  );
+  // Applied envMap to materials
 }
 
 // Helper to just change intensity (after envMap is set)
@@ -637,9 +635,7 @@ function setEnvIntensity(root, intensity) {
     }
   });
 
-  console.log(
-    `Environment intensity changed to ${intensity.toFixed(2)} on ${count} materials`,
-  );
+  // Environment intensity updated
 }
 
 // =============== GUI SETUP (Step 3: Developer Panel)
@@ -718,7 +714,7 @@ function addDblClickReset(controller, defaultValue) {
   labelEl.addEventListener('dblclick', (e) => {
     e.preventDefault(); // Prevent text selection
     controller.setValue(defaultValue);
-    console.log(`Reset ${controller.property} to ${defaultValue}`);
+    // Reset property to default value
   });
 }
 
@@ -913,7 +909,7 @@ pollutionFolder
   .name("Glow Color")
   .onChange((v) => {
     // Need to update the shader - for now this won't work as color is hardcoded
-    console.log("Note: Pollution color needs shader uniform to be functional");
+    // TODO: Pollution color needs shader uniform to be functional
   });
 
 pollutionFolder.open();
@@ -957,7 +953,7 @@ groundFolder
   .onChange((v) => {
     grassColorTex.repeat.set(v, v);
     grassNormalTex.repeat.set(v, v);
-    console.log(`Ground tiling: ${v}x${v} (${(500/v).toFixed(1)}m per tile, ${(1024/(500/v)*0.01).toFixed(1)}cm per pixel)`);
+    // Ground tiling updated
   })
 ;
 groundFolder
@@ -1006,10 +1002,10 @@ fogFolder
   .onChange((v) => {
     if (v === "exp2") {
       scene.fog = new THREE.FogExp2(state.fogColor, state.fogDensity);
-      console.log("Switched to exponential fog");
+      // Switched to exponential fog
     } else {
       scene.fog = new THREE.Fog(state.fogColor, 35, 90);
-      console.log("Switched to linear fog");
+      // Switched to linear fog
     }
   });
 
@@ -1025,7 +1021,7 @@ fogFolder
       starMaterial.uniforms.u_fogDensity.value = v; // Update star fog density
       // Log visibility distance for reference
       const visibilityMeters = Math.round(2 / v); // Rough approximation
-      console.log(`Fog density: ${v.toFixed(3)} (~${visibilityMeters}m visibility)`);
+      // Fog density updated
     }
   });
 
@@ -1193,7 +1189,7 @@ const presetsObj = {
       .controllersRecursive()
       .forEach((controller) => controller.updateDisplay());
 
-    console.log("✓ Reset all values to defaults");
+    // Reset all values to defaults
   },
 
   brightTest: () => {
@@ -1207,7 +1203,7 @@ const presetsObj = {
     gui
       .controllersRecursive()
       .forEach((controller) => controller.updateDisplay());
-    console.log("✓ Applied bright test preset");
+    // Applied bright test preset
   },
 
   horrorDark: () => {
@@ -1235,7 +1231,7 @@ const presetsObj = {
     gui
       .controllersRecursive()
       .forEach((controller) => controller.updateDisplay());
-    console.log("✓ Applied horror dark preset");
+    // Applied horror dark preset
   },
 
   realisticNight: () => {
@@ -1263,7 +1259,7 @@ const presetsObj = {
     gui
       .controllersRecursive()
       .forEach((controller) => controller.updateDisplay());
-    console.log("✓ Applied realistic night preset");
+    // Applied realistic night preset
   },
 };
 
@@ -1313,13 +1309,13 @@ window.addEventListener("keydown", (e) => {
     state.exposure = Math.min(3.0, state.exposure * 1.06);
     renderer.toneMappingExposure = state.exposure;
     updateGuiController("exposure");
-    console.log("Exposure increased to:", state.exposure.toFixed(2));
+    // Exposure increased
   }
   if (e.key === "ä") {
     state.exposure = Math.max(0.3, state.exposure / 1.06);
     renderer.toneMappingExposure = state.exposure;
     updateGuiController("exposure");
-    console.log("Exposure decreased to:", state.exposure.toFixed(2));
+    // Exposure decreased
   }
 
   // Quick HDRI intensity test (+ and - keys) - still work but GUI is better!
