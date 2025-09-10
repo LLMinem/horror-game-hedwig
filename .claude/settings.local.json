@@ -1,0 +1,37 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(gh issue view:*)",
+      "Bash(source ~/.bashrc)",
+      "Bash(dev)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:gist.github.com)",
+      "WebFetch(domain:threejs-journey.com)",
+      "Bash(npx prettier:*)",
+      "Read(//home/meeq/screenshots/**)",
+      "WebSearch",
+      "mcp__zen__chat"
+    ]
+  },
+  "enabledMcpjsonServers": [
+    "context7",
+    "puppeteer",
+    "browser-tools",
+    "zen"
+  ],
+  "enableAllProjectMcpServers": false,
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if echo \"$CLAUDE_TOOL_ARGS\" | grep -q '\\.js\"' || echo \"$CLAUDE_TOOL_ARGS\" | grep -q '\\.js$'; then sleep 0.5 && npx prettier --write --cache \"src/**/*.js\" 2>/dev/null && echo '✨ JavaScript files auto-formatted with Prettier' || echo 'Prettier formatting skipped (syntax error or no changes)'; fi",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}
