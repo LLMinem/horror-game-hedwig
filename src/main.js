@@ -4,6 +4,24 @@ import GUI from "lil-gui";
 import * as THREE from "three";
 import { RGBELoader } from "three/examples/jsm/loaders/RGBELoader.js";
 
+// =============== SCENE CONSTANTS
+const SCENE_CONSTANTS = {
+  // World dimensions
+  SKYDOME_RADIUS: 1000,      // Celestial sphere radius
+  GROUND_SIZE: 500,           // Ground plane dimensions
+  FAR_PLANE: 5000,            // Camera far clipping plane
+  
+  // Camera settings
+  CAMERA_HEIGHT: 1.7,         // Player eye level
+  CAMERA_START_Z: 15,         // Starting position
+  
+  // Stars
+  DEFAULT_STAR_COUNT: 1500,   // Number of stars to generate
+  
+  // Texture quality
+  GROUND_TILING: 64,          // Default texture tiling
+};
+
 // =============== HDRI SELECTION (easy to switch!)
 // Options: 'moonless_golf', 'dikhololo_night', 'satara_night'
 let HDRI_CHOICE = "dikhololo_night"; // Beautiful stars, good for testing
@@ -31,9 +49,9 @@ const camera = new THREE.PerspectiveCamera(
   75,
   window.innerWidth / window.innerHeight,
   0.1,
-  5000, // Increased far plane for skydome
+  SCENE_CONSTANTS.FAR_PLANE, // Far clipping plane
 );
-camera.position.set(0, 1.7, 15);
+camera.position.set(0, SCENE_CONSTANTS.CAMERA_HEIGHT, SCENE_CONSTANTS.CAMERA_START_Z);
 
 // =============== MOUSE LOOK CONTROLS
 let yaw = 0; // Horizontal rotation (radians)
@@ -234,7 +252,7 @@ const skyFragmentShader = `
 
 // Create skydome geometry and material
 // FIXED: Reduced radius and disabled depth test completely
-const skyGeometry = new THREE.SphereGeometry(1000, 32, 32);
+const skyGeometry = new THREE.SphereGeometry(SCENE_CONSTANTS.SKYDOME_RADIUS, 32, 32);
 const skyMaterial = new THREE.ShaderMaterial({
   uniforms: {
     // Four color stops for realistic night gradient
@@ -282,7 +300,7 @@ scene.add(skydome);
 
 // =============== THREE.Points STAR SYSTEM (replaces fragment shader stars)
 // Generate star positions on the celestial sphere
-function generateStarGeometry(starCount = 1500) {
+function generateStarGeometry(starCount = SCENE_CONSTANTS.DEFAULT_STAR_COUNT) {
   const positions = new Float32Array(starCount * 3);
   const sizes = new Float32Array(starCount);
   const brightnesses = new Float32Array(starCount);
@@ -294,7 +312,7 @@ function generateStarGeometry(starCount = 1500) {
     
     // Convert spherical to cartesian coordinates
     // Radius matches skydome (1000 units)
-    const radius = 1000;
+    const radius = SCENE_CONSTANTS.SKYDOME_RADIUS;
     const x = radius * Math.sin(phi) * Math.cos(theta);
     const y = radius * Math.cos(phi); // Y is up
     const z = radius * Math.sin(phi) * Math.sin(theta);
@@ -418,7 +436,7 @@ const starMaterial = new THREE.ShaderMaterial({
 });
 
 // Create stars
-const starGeometry = generateStarGeometry(1500);
+const starGeometry = generateStarGeometry(SCENE_CONSTANTS.DEFAULT_STAR_COUNT);
 const stars = new THREE.Points(starGeometry, starMaterial);
 stars.renderOrder = -1000; // Render before skydome
 stars.frustumCulled = false; // Never cull stars
@@ -427,7 +445,7 @@ scene.add(stars);
 // Star system state for GUI controls
 const starState = {
   enabled: true,
-  count: 1500,
+  count: SCENE_CONSTANTS.DEFAULT_STAR_COUNT,
   brightness: 0.8,
   sizeMin: 0.8,
   sizeMax: 5.0,
@@ -471,7 +489,7 @@ const grassColorTex = textureLoader.load('/assets/textures/ground/grass_color_2k
 const grassNormalTex = textureLoader.load('/assets/textures/ground/grass_normal_2k.jpg');
 
 // Configure textures for tiling
-const groundTiling = 64; // 64x tiling with 2K textures = sharp detail (~0.4cm per pixel)
+const groundTiling = SCENE_CONSTANTS.GROUND_TILING; // Default tiling with 2K textures
 grassColorTex.wrapS = grassColorTex.wrapT = THREE.RepeatWrapping;
 grassNormalTex.wrapS = grassNormalTex.wrapT = THREE.RepeatWrapping;
 grassColorTex.repeat.set(groundTiling, groundTiling);
@@ -481,7 +499,7 @@ grassNormalTex.repeat.set(groundTiling, groundTiling);
 grassColorTex.colorSpace = THREE.SRGBColorSpace;
 
 // Ground material with textures
-const groundGeo = new THREE.PlaneGeometry(500, 500);
+const groundGeo = new THREE.PlaneGeometry(SCENE_CONSTANTS.GROUND_SIZE, SCENE_CONSTANTS.GROUND_SIZE);
 const groundMat = new THREE.MeshStandardMaterial({
   map: grassColorTex,           // Color texture
   normalMap: grassNormalTex,     // Normal map for surface detail
@@ -663,7 +681,7 @@ const defaults = {
   shadowBias: -0.001,
   shadowNormalBias: 0.02,
   // Ground texture controls
-  groundTiling: 64,
+  groundTiling: SCENE_CONSTANTS.GROUND_TILING,
   normalStrength: 1.0,
   // NEW: Sky controls - 4-stop gradient for realistic night
   skyHorizonColor: "#2b2822",  // USER TUNED: Warmer horizon
@@ -686,7 +704,7 @@ const defaults = {
   skyDitherAmount: 0.008,      // Dithering to prevent gradient banding
   // THREE.Points star system
   starEnabled: true,
-  starCount: 1500,             // USER TUNED: Sparse stars
+  starCount: SCENE_CONSTANTS.DEFAULT_STAR_COUNT, // USER TUNED: Sparse stars
   starBrightness: 0.8,         // USER TUNED: Dimmer stars
   starSizeMin: 0.8,            // USER TUNED: Min size
   starSizeMax: 5.0,            // USER TUNED: Max size
@@ -1096,7 +1114,7 @@ const presetsObj = {
     state.flashlightDistance = 45;
     state.shadowBias = -0.001;
     state.shadowNormalBias = 0.02;
-    state.groundTiling = 64;
+    state.groundTiling = SCENE_CONSTANTS.GROUND_TILING;
     state.normalStrength = 1.0;
     state.skyHorizonColor = "#2b2822";  // USER TUNED: Warmer horizon
     state.skyMidLowColor = "#0f0e14";   // USER TUNED: Dark plum
@@ -1114,7 +1132,7 @@ const presetsObj = {
     state.village2Height = 0.15;        // USER TUNED
     state.skyDitherAmount = 0.008;
     state.starEnabled = true;
-    state.starCount = 1500;             // USER TUNED
+    state.starCount = SCENE_CONSTANTS.DEFAULT_STAR_COUNT; // USER TUNED
     state.starBrightness = 0.8;         // USER TUNED
     state.starSizeMin = 0.8;            // USER TUNED
     state.starSizeMax = 5.0;
