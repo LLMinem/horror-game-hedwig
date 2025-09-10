@@ -609,6 +609,12 @@ function loadHDRI(hdriName) {
 
       // FIX for r179: Must also set envMap on each material!
       applyEnvMapToMaterials(scene, envMap, CURRENT_ENV_INTENSITY);
+      
+      // Remove any fallback lighting if HDRI loads successfully
+      const fallbackLight = scene.getObjectByName("HDRI_Fallback_Light");
+      if (fallbackLight) {
+        scene.remove(fallbackLight);
+      }
 
       console.log(`✓ Loaded HDRI for lighting: ${hdriName}`);
     },
@@ -618,7 +624,19 @@ function loadHDRI(hdriName) {
     },
     (error) => {
       console.error("Failed to load HDRI:", error);
-      console.log("Scene will work but shadows will be very dark");
+      console.log("Applying fallback lighting to prevent black scene");
+      
+      // Apply basic fallback lighting so scene isn't completely dark
+      const fallbackAmbient = new THREE.AmbientLight(0x404050, 0.3);
+      fallbackAmbient.name = "HDRI_Fallback_Light";
+      
+      // Remove any previous fallback lights
+      const existingFallback = scene.getObjectByName("HDRI_Fallback_Light");
+      if (existingFallback) {
+        scene.remove(existingFallback);
+      }
+      
+      scene.add(fallbackAmbient);
     },
   );
 }
