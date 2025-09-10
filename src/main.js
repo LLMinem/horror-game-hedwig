@@ -1275,36 +1275,50 @@ presetsFolder.add(presetsObj, "realisticNight").name("Realistic Night");
 presetsFolder.open();
 
 // =============== KEYBOARD CONTROLS (keeping for backwards compatibility)
+// Cache for GUI controllers to avoid repeated searches
+const guiControllerCache = new Map();
+
+// Helper function to find and update a specific GUI controller
+function updateGuiController(property, object = null) {
+  const key = object ? `${property}_${object.uuid}` : property;
+  
+  // Check cache first
+  let controller = guiControllerCache.get(key);
+  
+  // If not cached, find it
+  if (!controller) {
+    for (const ctrl of gui.controllersRecursive()) {
+      if (ctrl.property === property && (!object || ctrl.object === object)) {
+        controller = ctrl;
+        guiControllerCache.set(key, ctrl);
+        break;
+      }
+    }
+  }
+  
+  if (controller) {
+    controller.updateDisplay();
+  }
+}
+
 window.addEventListener("keydown", (e) => {
   // Flashlight toggle
   if (e.key.toLowerCase() === "f") {
     flashlight.visible = !flashlight.visible;
-    // Update GUI to reflect change
-    gui.controllersRecursive().forEach((controller) => {
-      if (
-        controller.property === "visible" &&
-        controller.object === flashlight
-      ) {
-        controller.updateDisplay();
-      }
-    });
+    updateGuiController("visible", flashlight);
   }
 
   // Exposure controls (German keyboard) - still work but GUI is better!
   if (e.key === "ü") {
     state.exposure = Math.min(3.0, state.exposure * 1.06);
     renderer.toneMappingExposure = state.exposure;
-    gui.controllersRecursive().forEach((controller) => {
-      if (controller.property === "exposure") controller.updateDisplay();
-    });
+    updateGuiController("exposure");
     console.log("Exposure increased to:", state.exposure.toFixed(2));
   }
   if (e.key === "ä") {
     state.exposure = Math.max(0.3, state.exposure / 1.06);
     renderer.toneMappingExposure = state.exposure;
-    gui.controllersRecursive().forEach((controller) => {
-      if (controller.property === "exposure") controller.updateDisplay();
-    });
+    updateGuiController("exposure");
     console.log("Exposure decreased to:", state.exposure.toFixed(2));
   }
 
@@ -1312,16 +1326,12 @@ window.addEventListener("keydown", (e) => {
   if (e.key === "+") {
     state.envIntensity = Math.min(1.0, state.envIntensity + 0.05);
     setEnvIntensity(scene, state.envIntensity);
-    gui.controllersRecursive().forEach((controller) => {
-      if (controller.property === "envIntensity") controller.updateDisplay();
-    });
+    updateGuiController("envIntensity");
   }
   if (e.key === "-") {
     state.envIntensity = Math.max(0.0, state.envIntensity - 0.05);
     setEnvIntensity(scene, state.envIntensity);
-    gui.controllersRecursive().forEach((controller) => {
-      if (controller.property === "envIntensity") controller.updateDisplay();
-    });
+    updateGuiController("envIntensity");
   }
 });
 
