@@ -586,7 +586,6 @@ const pmrem = new THREE.PMREMGenerator(renderer);
 pmrem.compileEquirectangularShader();
 
 // FIX: In r179, must set envMap directly on materials for intensity to work!
-let globalEnvMap = null; // Store for later use
 
 // Function to load a new HDRI
 function loadHDRI(hdriName) {
@@ -621,7 +620,6 @@ function loadHDRI(hdriName) {
 loadHDRI(HDRI_CHOICE);
 
 function applyEnvMapToMaterials(root, envMap, intensity) {
-  globalEnvMap = envMap; // Store globally
   CURRENT_ENV_INTENSITY = intensity;
   let count = 0;
 
@@ -972,8 +970,7 @@ groundFolder
     grassColorTex.repeat.set(v, v);
     grassNormalTex.repeat.set(v, v);
     // Ground tiling updated
-  })
-;
+  });
 groundFolder
   .add(state, "normalStrength", 0, 2, 0.01)
   .name("Bump Strength")
