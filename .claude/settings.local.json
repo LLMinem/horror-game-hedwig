@@ -27,8 +27,19 @@
         "hooks": [
           {
             "type": "command",
-            "command": "if echo \"$CLAUDE_TOOL_ARGS\" | grep -q '\\.js\"' || echo \"$CLAUDE_TOOL_ARGS\" | grep -q '\\.js$'; then sleep 0.5 && npx prettier --write --cache \"src/**/*.js\" 2>/dev/null && echo '✨ JavaScript files auto-formatted with Prettier' || echo 'Prettier formatting skipped (syntax error or no changes)'; fi",
+            "command": "if echo \"$CLAUDE_TOOL_ARGS\" | grep -q '\\.js\"' || echo \"$CLAUDE_TOOL_ARGS\" | grep -q '\\.js$'; then sleep 0.5 && npx prettier --write --cache \"src/**/*.js\" 2>/dev/null && echo 'JavaScript files auto-formatted with Prettier' || echo 'Prettier formatting skipped (syntax error or no changes)'; fi",
             "timeout": 10
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash $CLAUDE_PROJECT_DIR/.claude/hooks/zen-chat-enhancer.sh \"$CLAUDE_USER_PROMPT\"",
+            "timeout": 5
           }
         ]
       }
