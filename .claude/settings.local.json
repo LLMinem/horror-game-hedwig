@@ -38,8 +38,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash $CLAUDE_PROJECT_DIR/.claude/hooks/zen-chat-enhancer.sh \"$CLAUDE_USER_PROMPT\"",
-            "timeout": 5
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/zen-chat-enhancer.sh\" \"$CLAUDE_USER_PROMPT\" | tee -a \"$CLAUDE_PROJECT_DIR/.claude/hooks/logs/user_prompt_submit.stdout.log\"",
+            "timeout": 15
           }
         ]
       }

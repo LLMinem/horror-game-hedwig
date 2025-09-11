@@ -3,6 +3,19 @@
 # Get the user's prompt
 PROMPT="$1"
 
+# Add logging to diagnose if hook is being called
+LOG_DIR="${CLAUDE_PROJECT_DIR:-$PWD}/.claude/hooks/logs"
+mkdir -p "$LOG_DIR"
+{
+  echo "[$(date -Is)] invoked"
+  echo "CWD: $(pwd)"
+  echo "CLAUDE_PROJECT_DIR: ${CLAUDE_PROJECT_DIR:-<unset>}"
+  echo "ARGC: $#"
+  echo "PROMPT (len=$(printf %s "$PROMPT" | wc -c)):"
+  printf '%s\n' "$PROMPT"
+  echo "---"
+} >> "$LOG_DIR/user_prompt_submit.log" 2>&1
+
 # Remove quoted text temporarily for pattern checking
 # This prevents triggering on "chat with o3" or 'ask gemini'
 PROMPT_NO_QUOTES=$(echo "$PROMPT" | sed -E "s/\"[^\"]*\"//g; s/'[^']*'//g")
