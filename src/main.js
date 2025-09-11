@@ -16,7 +16,7 @@ const SCENE_CONSTANTS = {
   CAMERA_START_Z: 15,         // Starting position
   
   // Stars
-  DEFAULT_STAR_COUNT: 1500,   // Number of stars to generate
+  DEFAULT_STAR_COUNT: 3000,   // Number of stars to generate
   
   // Texture quality
   GROUND_TILING: 64,          // Default texture tiling
@@ -289,7 +289,7 @@ const skyMaterial = new THREE.ShaderMaterial({
     
     // FOG INTEGRATION - Custom fog blending
     fogColor: { value: new THREE.Color(0x141618) },  // Matches scene fog
-    fogDensity: { value: 0.028 },                    // Matches scene fog density
+    fogDensity: { value: 0.02 },                    // Matches scene fog density
     fogMax: { value: 0.95 },                         // Maximum fog opacity at horizon
   },
   vertexShader: skyVertexShader,
@@ -427,12 +427,12 @@ const starMaterial = new THREE.ShaderMaterial({
   uniforms: {
     u_sizeMin: { value: 0.8 },
     u_sizeMax: { value: 5.0 },
-    u_brightness: { value: 0.8 },
+    u_brightness: { value: 1.0 },
     u_horizonFade: { value: 0.3 },
     u_pixelRatio: { value: renderer.getPixelRatio() }, // FIXED: Added missing uniform
     u_useAntiAlias: { value: true }, // Anti-aliasing toggle
     u_cameraPos: { value: camera.position }, // For potential future use
-    u_fogDensity: { value: 0.028 } // Fog density for star fading
+    u_fogDensity: { value: 0.02 } // Fog density for star fading
   },
   vertexShader: starVertexShader,
   fragmentShader: starFragmentShader,
@@ -453,7 +453,7 @@ scene.add(stars);
 const starState = {
   enabled: true,
   count: SCENE_CONSTANTS.DEFAULT_STAR_COUNT,
-  brightness: 0.8,
+  brightness: 1.0,
   sizeMin: 0.8,
   sizeMax: 5.0,
   horizonFade: 0.3
@@ -461,7 +461,7 @@ const starState = {
 
 // =============== FOG (adjusted for skydome interaction)
 // Using FogExp2 for atmospheric depth with improved color
-scene.fog = new THREE.FogExp2(0x141618, 0.028); // Bluish charcoal - matches night atmosphere better
+scene.fog = new THREE.FogExp2(0x141618, 0.02); // Bluish charcoal - matches night atmosphere better
 
 // =============== LIGHTS
 // 1) Moon (directional) - main light source, cool blue-white
@@ -693,7 +693,7 @@ const defaults = {
   moonZ: 16,
   hemiIntensity: 0.25,
   ambientIntensity: 0.05,
-  fogDensity: 0.028, // Optimal for 50-60m visibility
+  fogDensity: 0.02, // Optimal for 70-80m visibility
   fogType: "exp2",
   fogColor: "#141618", // Bluish charcoal for night atmosphere
   fogMax: 0.95, // Maximum fog opacity at horizon
@@ -727,8 +727,8 @@ const defaults = {
   skyDitherAmount: 0.008,      // Dithering to prevent gradient banding
   // THREE.Points star system
   starEnabled: true,
-  starCount: SCENE_CONSTANTS.DEFAULT_STAR_COUNT, // USER TUNED: Sparse stars
-  starBrightness: 0.8,         // USER TUNED: Dimmer stars
+  starCount: SCENE_CONSTANTS.DEFAULT_STAR_COUNT, // USER TUNED: More stars
+  starBrightness: 1.0,         // USER TUNED: Full brightness stars
   starSizeMin: 0.8,            // USER TUNED: Min size
   starSizeMax: 5.0,            // USER TUNED: Max size
   starHorizonFade: 0.3,        // USER TUNED: Horizon fade
@@ -1125,7 +1125,7 @@ const presetsObj = {
     state.moonZ = 16;
     state.hemiIntensity = 0.25;
     state.ambientIntensity = 0.05;
-    state.fogDensity = 0.028;
+    state.fogDensity = 0.02;
     state.fogType = "exp2";
     state.fogColor = "#141618";
     state.fogMax = 0.95;
@@ -1154,7 +1154,7 @@ const presetsObj = {
     state.skyDitherAmount = 0.008;
     state.starEnabled = true;
     state.starCount = SCENE_CONSTANTS.DEFAULT_STAR_COUNT; // USER TUNED
-    state.starBrightness = 0.8;         // USER TUNED
+    state.starBrightness = 1.0;         // USER TUNED
     state.starSizeMin = 0.8;            // USER TUNED
     state.starSizeMax = 5.0;
     state.starHorizonFade = 0.3;
@@ -1244,7 +1244,7 @@ const presetsObj = {
     state.moonZ = 16;
     state.hemiIntensity = 0.25;
     state.ambientIntensity = 0.05;
-    state.fogDensity = 0.028;
+    state.fogDensity = 0.02;
     state.fogType = "exp2";
     state.fogColor = "#141618";
     state.fogMax = 0.95;
@@ -1280,7 +1280,7 @@ const presetsObj = {
     state.skyDitherAmount = 0.008;
     state.starEnabled = true;
     state.starCount = SCENE_CONSTANTS.DEFAULT_STAR_COUNT;
-    state.starBrightness = 0.8;
+    state.starBrightness = 1.0;
     state.starSizeMin = 0.8;
     state.starSizeMax = 5.0;
     state.starHorizonFade = 0.3;
