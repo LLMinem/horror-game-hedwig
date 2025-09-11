@@ -1232,82 +1232,169 @@ const presetsObj = {
     // Reset all values to defaults
   },
 
-  brightTest: () => {
-    // Preset for testing visibility
-    state.exposure = 1.5;
-    state.envIntensity = 0.3;
-    state.moonIntensity = 1.2;
-    renderer.toneMappingExposure = state.exposure;
-    setEnvIntensity(scene, state.envIntensity);
-    moon.intensity = state.moonIntensity;
-    gui
-      .controllersRecursive()
-      .forEach((controller) => controller.updateDisplay());
-    // Applied bright test preset
-  },
-
-  horrorDark: () => {
-    // Preset for maximum horror atmosphere
-    state.exposure = 0.8;
-    state.envIntensity = 0.08;
-    state.moonIntensity = 0.5;
-    state.fogDensity = 0.040; // Denser fog for horror
-    state.fogType = "exp2";
-    // Darker, more oppressive sky colors
-    state.skyHorizonColor = "#0A0807";  // Almost black with hint of brown
-    state.skyMidLowColor = "#080709";   // Very dark grey
-    state.skyMidHighColor = "#050608";  // Darker grey-blue
-    state.skyZenithColor = "#020304";   // Nearly black
-    renderer.toneMappingExposure = state.exposure;
-    setEnvIntensity(scene, state.envIntensity);
-    moon.intensity = state.moonIntensity;
-    if (scene.fog instanceof THREE.FogExp2) {
-      scene.fog.density = state.fogDensity;
-    }
-    skyMaterial.uniforms.horizonColor.value.set(state.skyHorizonColor);
-    skyMaterial.uniforms.midLowColor.value.set(state.skyMidLowColor);
-    skyMaterial.uniforms.midHighColor.value.set(state.skyMidHighColor);
-    skyMaterial.uniforms.zenithColor.value.set(state.skyZenithColor);
-    gui
-      .controllersRecursive()
-      .forEach((controller) => controller.updateDisplay());
-    // Applied horror dark preset
-  },
-
-  realisticNight: () => {
-    // Preset for realistic 10-11pm night sky
-    state.skyHorizonColor = "#2B1E1B";  // Warm grey-brown (light pollution)
-    state.skyMidLowColor = "#15131C";   // Dark plum (transition)
-    state.skyMidHighColor = "#0D1019";  // Deep grey-blue
-    state.skyZenithColor = "#060B14";   // Very dark indigo
-    state.skyMidLowStop = 0.25;         // Natural transition points
-    state.skyMidHighStop = 0.60;
-    state.fogDensity = 0.030;           // Moderate fog
+  userTuned: () => {
+    // Your personally tuned atmospheric night scene settings
+    // These values represent the carefully balanced scene you've created
     state.exposure = 1.0;
-    state.envIntensity = 0.15;
+    state.envIntensity = 0.25;
+    state.hdri = "dikhololo_night";
+    state.moonIntensity = 0.8;
+    state.moonX = 12;
+    state.moonY = 30;
+    state.moonZ = 16;
+    state.hemiIntensity = 0.25;
+    state.ambientIntensity = 0.05;
+    state.fogDensity = 0.028;
+    state.fogType = "exp2";
+    state.fogColor = "#141618";
+    state.fogMax = 0.95;
+    state.flashlightIntensity = 50;
+    state.flashlightAngle = 28;
+    state.flashlightPenumbra = 0.4;
+    state.flashlightDistance = 45;
+    state.shadowBias = -0.001;
+    state.shadowNormalBias = 0.02;
+    state.groundTiling = SCENE_CONSTANTS.GROUND_TILING;
+    state.normalStrength = 1.0;
+    
+    // Your tuned sky colors
+    state.skyHorizonColor = "#2b2822";  // Warmer horizon
+    state.skyMidLowColor = "#0f0e14";   // Dark plum
+    state.skyMidHighColor = "#080a10";  // Deeper blue
+    state.skyZenithColor = "#040608";   // Almost black
+    state.skyMidLowStop = 0.25;
+    state.skyMidHighStop = 0.60;
+    
+    // Your tuned light pollution
+    state.village1Azimuth = -45;
+    state.village1Intensity = 0.15;
+    state.village1Spread = 70;
+    state.village1Height = 0.35;
+    state.village2Azimuth = 135;
+    state.village2Intensity = 0.06;
+    state.village2Spread = 60;
+    state.village2Height = 0.15;
+    state.pollutionColor = "#3D2F28";
+    
+    // Dithering and stars
+    state.skyDitherAmount = 0.008;
+    state.starEnabled = true;
+    state.starCount = SCENE_CONSTANTS.DEFAULT_STAR_COUNT;
+    state.starBrightness = 0.8;
+    state.starSizeMin = 0.8;
+    state.starSizeMax = 5.0;
+    state.starHorizonFade = 0.3;
+    state.starAntiAlias = true;
+
+    // Apply all settings
+    renderer.toneMappingExposure = state.exposure;
+    setEnvIntensity(scene, state.envIntensity);
+    loadHDRI(state.hdri);
+    moon.intensity = state.moonIntensity;
+    moon.position.set(state.moonX, state.moonY, state.moonZ);
+    hemi.intensity = state.hemiIntensity;
+    amb.intensity = state.ambientIntensity;
+    if (state.fogType === "exp2") {
+      scene.fog = new THREE.FogExp2(state.fogColor, state.fogDensity);
+    } else {
+      scene.fog = new THREE.Fog(state.fogColor, 35, 90);
+    }
+    skyMaterial.uniforms.fogDensity.value = state.fogDensity;
+    skyMaterial.uniforms.fogColor.value.set(state.fogColor);
+    skyMaterial.uniforms.fogMax.value = state.fogMax;
+    starMaterial.uniforms.u_fogDensity.value = state.fogDensity;
+    flashlight.intensity = state.flashlightIntensity;
+    flashlight.angle = state.flashlightAngle * DEG2RAD;
+    flashlight.penumbra = state.flashlightPenumbra;
+    flashlight.distance = state.flashlightDistance;
+    moon.shadow.bias = state.shadowBias;
+    moon.shadow.normalBias = state.shadowNormalBias;
+    grassColorTex.repeat.set(state.groundTiling, state.groundTiling);
+    grassNormalTex.repeat.set(state.groundTiling, state.groundTiling);
+    groundMat.normalScale.set(state.normalStrength, state.normalStrength);
     skyMaterial.uniforms.horizonColor.value.set(state.skyHorizonColor);
     skyMaterial.uniforms.midLowColor.value.set(state.skyMidLowColor);
     skyMaterial.uniforms.midHighColor.value.set(state.skyMidHighColor);
     skyMaterial.uniforms.zenithColor.value.set(state.skyZenithColor);
     skyMaterial.uniforms.midLowStop.value = state.skyMidLowStop;
     skyMaterial.uniforms.midHighStop.value = state.skyMidHighStop;
-    if (scene.fog instanceof THREE.FogExp2) {
-      scene.fog.density = state.fogDensity;
+    
+    // Update village light pollution
+    let rad = state.village1Azimuth * DEG2RAD;
+    skyMaterial.uniforms.village1Dir.value.set(Math.sin(rad), 0, -Math.cos(rad)).normalize();
+    skyMaterial.uniforms.village1Intensity.value = state.village1Intensity;
+    skyMaterial.uniforms.village1Spread.value = state.village1Spread * DEG2RAD;
+    skyMaterial.uniforms.village1Height.value = state.village1Height;
+    rad = state.village2Azimuth * DEG2RAD;
+    skyMaterial.uniforms.village2Dir.value.set(Math.sin(rad), 0, -Math.cos(rad)).normalize();
+    skyMaterial.uniforms.village2Intensity.value = state.village2Intensity;
+    skyMaterial.uniforms.village2Spread.value = state.village2Spread * DEG2RAD;
+    skyMaterial.uniforms.village2Height.value = state.village2Height;
+    skyMaterial.uniforms.pollutionColor.value.set(state.pollutionColor);
+    skyMaterial.uniforms.ditherAmount.value = state.skyDitherAmount;
+    
+    // Apply star changes
+    stars.visible = state.starEnabled;
+    starState.enabled = state.starEnabled;
+    if (state.starCount !== starState.count) {
+      starGeometry.dispose();
+      const newGeometry = generateStarGeometry(state.starCount);
+      stars.geometry = newGeometry;
+      starState.count = state.starCount;
     }
+    starMaterial.uniforms.u_brightness.value = state.starBrightness;
+    starMaterial.uniforms.u_sizeMin.value = state.starSizeMin;
+    starMaterial.uniforms.u_sizeMax.value = state.starSizeMax;
+    starMaterial.uniforms.u_horizonFade.value = state.starHorizonFade;
+    starState.brightness = state.starBrightness;
+    starState.sizeMin = state.starSizeMin;
+    starState.sizeMax = state.starSizeMax;
+    starState.horizonFade = state.starHorizonFade;
+    starMaterial.uniforms.u_useAntiAlias.value = state.starAntiAlias;
+
+    // Update GUI to reflect changes
+    gui.controllersRecursive().forEach((controller) => controller.updateDisplay());
+    console.log("✓ Applied User Tuned preset - Your personal atmospheric settings");
+  },
+
+  brightTest: () => {
+    // Testing preset - User Tuned settings but brighter for visibility testing
+    // First apply user tuned as base
+    presetsObj.userTuned();
+    
+    // Then brighten key values
+    state.exposure = 1.5;
+    state.envIntensity = 0.35;
+    state.hdri = "dikhololo_night"; // Brightest HDRI
+    state.moonIntensity = 1.2;
+    state.hemiIntensity = 0.35;
+    state.ambientIntensity = 0.08;
+    state.fogDensity = 0.020; // Less fog for better visibility
+    state.starBrightness = 1.2;
+    
+    // Apply the brightened values
     renderer.toneMappingExposure = state.exposure;
     setEnvIntensity(scene, state.envIntensity);
-    gui
-      .controllersRecursive()
-      .forEach((controller) => controller.updateDisplay());
-    // Applied realistic night preset
+    loadHDRI(state.hdri);
+    moon.intensity = state.moonIntensity;
+    hemi.intensity = state.hemiIntensity;
+    amb.intensity = state.ambientIntensity;
+    if (scene.fog instanceof THREE.FogExp2) {
+      scene.fog.density = state.fogDensity;
+      skyMaterial.uniforms.fogDensity.value = state.fogDensity;
+      starMaterial.uniforms.u_fogDensity.value = state.fogDensity;
+    }
+    starMaterial.uniforms.u_brightness.value = state.starBrightness;
+    
+    gui.controllersRecursive().forEach((controller) => controller.updateDisplay());
+    console.log("✓ Applied Bright Test preset - Enhanced visibility for testing");
   },
 };
 
 const presetsFolder = gui.addFolder("Presets");
 presetsFolder.add(presetsObj, "resetToDefaults").name("Reset to Defaults");
+presetsFolder.add(presetsObj, "userTuned").name("User Tuned (Normal)");
 presetsFolder.add(presetsObj, "brightTest").name("Bright (Testing)");
-presetsFolder.add(presetsObj, "horrorDark").name("Horror Dark");
-presetsFolder.add(presetsObj, "realisticNight").name("Realistic Night");
 presetsFolder.open();
 
 // =============== KEYBOARD CONTROLS (keeping for backwards compatibility)
