@@ -828,7 +828,7 @@ skyFolder
   .name("Dithering (Anti-banding)")
   .onChange((v) => (skyMaterial.uniforms.ditherAmount.value = v));
 
-skyFolder.open();
+// skyFolder.open(); // Start collapsed
 
 // THREE.Points Star System controls
 const starsFolder = gui.addFolder("Stars (THREE.Points)");
@@ -892,7 +892,7 @@ starsFolder
     starMaterial.uniforms.u_useAntiAlias.value = v;
   });
 
-starsFolder.open();
+// starsFolder.open(); // Start collapsed
 
 // Light Pollution folder for dual village sources
 const pollutionFolder = gui.addFolder("Light Pollution (2 Villages)");
@@ -952,8 +952,8 @@ pollutionFolder
     skyMaterial.uniforms.pollutionColor.value.set(v);
   });
 
-pollutionFolder.open();
-village1Sub.open();
+// pollutionFolder.open(); // Start collapsed
+// village1Sub.open(); // Start collapsed
 
 // Rendering folder
 const renderFolder = gui.addFolder("Rendering");
@@ -962,7 +962,7 @@ renderFolder
   .add(state, "exposure", 0.3, 3.0, 0.01)
   .name("Exposure")
   .onChange((v) => (renderer.toneMappingExposure = v));
-renderFolder.open();
+// renderFolder.open(); // Start collapsed
 
 // Environment folder
 const envFolder = gui.addFolder("Environment");
@@ -982,7 +982,7 @@ envFolder
     HDRI_CHOICE = v;
     loadHDRI(v);
   });
-envFolder.open();
+// envFolder.open(); // Start collapsed
 
 // Ground texture folder
 const groundFolder = gui.addFolder("Ground Texture");
