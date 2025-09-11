@@ -5,18 +5,19 @@ PROMPT="$1"
 
 # Remove quoted text temporarily for pattern checking
 # This prevents triggering on "chat with o3" or 'ask gemini'
-PROMPT_NO_QUOTES=$(echo "$PROMPT" | sed -E "s/[\"'][^\"']*[\"']//g")
+PROMPT_NO_QUOTES=$(echo "$PROMPT" | sed -E "s/\"[^\"]*\"//g; s/'[^']*'//g")
 
 # Check if prompt contains trigger patterns (case-insensitive)
-if echo "$PROMPT_NO_QUOTES" | grep -iE '\b(chat with|ask)\s+(o3|gemini|gpt5)\b' > /dev/null; then
+# Using portable regex that works with grep -E
+if echo "$PROMPT_NO_QUOTES" | grep -iE '(^|[^[:alnum:]_])(chat with|ask)[[:space:]]+(o3|gemini|gpt5)($|[^[:alnum:]_])' > /dev/null; then
     
     # Detect which model was mentioned
     MODEL=""
-    if echo "$PROMPT_NO_QUOTES" | grep -iE '\bo3\b' > /dev/null; then
+    if echo "$PROMPT_NO_QUOTES" | grep -iE '(^|[^[:alnum:]_])o3($|[^[:alnum:]_])' > /dev/null; then
         MODEL="o3"
-    elif echo "$PROMPT_NO_QUOTES" | grep -iE '\bgemini\b' > /dev/null; then
+    elif echo "$PROMPT_NO_QUOTES" | grep -iE '(^|[^[:alnum:]_])gemini($|[^[:alnum:]_])' > /dev/null; then
         MODEL="gemini"
-    elif echo "$PROMPT_NO_QUOTES" | grep -iE '\bgpt5\b' > /dev/null; then
+    elif echo "$PROMPT_NO_QUOTES" | grep -iE '(^|[^[:alnum:]_])gpt5($|[^[:alnum:]_])' > /dev/null; then
         MODEL="gpt5"
     fi
     
