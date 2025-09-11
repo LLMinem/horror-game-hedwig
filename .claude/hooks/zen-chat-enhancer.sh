@@ -1,7 +1,11 @@
 #!/bin/bash
 
-# Get the user's prompt
-PROMPT="$1"
+# Get the user's prompt from argument or stdin
+if [ -n "$1" ]; then
+  PROMPT="$1"
+else
+  PROMPT="$(cat)"
+fi
 
 # Add logging to diagnose if hook is being called
 LOG_DIR="${CLAUDE_PROJECT_DIR:-$PWD}/.claude/hooks/logs"
