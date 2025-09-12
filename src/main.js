@@ -788,7 +788,16 @@ const defaults = {
   starSizeMin: 0.8,            // USER TUNED: Min size
   starSizeMax: 5.0,            // USER TUNED: Max size
   starHorizonFade: 0.3,        // USER TUNED: Horizon fade
-  starAntiAlias: true
+  starAntiAlias: true,
+  starTint: "#FFFFFF",         // Star color tint (white by default)
+  // Horror atmosphere controls
+  horrorEnabled: false,        // Horror mode off by default
+  horrorDesat: 0.25,          // Desaturation amount
+  horrorGreenTint: 0.12,      // Green tint strength
+  horrorContrast: 0.12,       // Contrast adjustment
+  horrorVignette: 0.35,       // Vignette strength
+  horrorBreatheAmp: 0.0,      // Breathing amplitude (off by default)
+  horrorBreatheSpeed: 0.15    // Breathing speed
 };
 
 // State object initialized from defaults
@@ -948,6 +957,13 @@ starsFolder
     starMaterial.uniforms.u_useAntiAlias.value = v;
   });
 
+starsFolder
+  .addColor(state, "starTint")
+  .name("Star Tint")
+  .onChange((v) => {
+    starMaterial.uniforms.u_tintColor.value.set(v);
+  });
+
 // starsFolder.open(); // Start collapsed
 
 // Light Pollution folder for dual village sources
@@ -1010,6 +1026,61 @@ pollutionFolder
 
 // pollutionFolder.open(); // Start collapsed
 // village1Sub.open(); // Start collapsed
+
+// Horror Tuning folder
+const horrorFolder = gui.addFolder("Horror Tuning");
+enhanceGuiWithReset(horrorFolder);
+
+horrorFolder
+  .add(state, "horrorEnabled")
+  .name("Enable Horror Mode")
+  .onChange((v) => {
+    skyMaterial.uniforms.u_horrorEnabled.value = v ? 1.0 : 0.0;
+  });
+
+horrorFolder
+  .add(state, "horrorDesat", 0.0, 1.0, 0.01)
+  .name("Desaturation")
+  .onChange((v) => {
+    skyMaterial.uniforms.u_desat.value = v;
+  });
+
+horrorFolder
+  .add(state, "horrorGreenTint", 0.0, 0.5, 0.01)
+  .name("Green Tint")
+  .onChange((v) => {
+    skyMaterial.uniforms.u_greenTint.value = v;
+  });
+
+horrorFolder
+  .add(state, "horrorContrast", -0.5, 0.5, 0.01)
+  .name("Contrast")
+  .onChange((v) => {
+    skyMaterial.uniforms.u_contrast.value = v;
+  });
+
+horrorFolder
+  .add(state, "horrorVignette", 0.0, 0.6, 0.01)
+  .name("Vignette")
+  .onChange((v) => {
+    skyMaterial.uniforms.u_vignette.value = v;
+  });
+
+horrorFolder
+  .add(state, "horrorBreatheAmp", 0.0, 0.02, 0.001)
+  .name("Breathing Amp")
+  .onChange((v) => {
+    skyMaterial.uniforms.u_breatheAmp.value = v;
+  });
+
+horrorFolder
+  .add(state, "horrorBreatheSpeed", 0.0, 1.0, 0.01)
+  .name("Breathing Speed")
+  .onChange((v) => {
+    skyMaterial.uniforms.u_breatheSpeed.value = v;
+  });
+
+// horrorFolder.open(); // Start collapsed
 
 // Rendering folder
 const renderFolder = gui.addFolder("Rendering");
@@ -1215,6 +1286,14 @@ const presetsObj = {
     state.starSizeMax = 5.0;
     state.starHorizonFade = 0.3;
     state.starAntiAlias = true;
+    state.starTint = "#FFFFFF";
+    state.horrorEnabled = false;
+    state.horrorDesat = 0.25;
+    state.horrorGreenTint = 0.12;
+    state.horrorContrast = 0.12;
+    state.horrorVignette = 0.35;
+    state.horrorBreatheAmp = 0.0;
+    state.horrorBreatheSpeed = 0.15;
 
     // Apply all changes
     renderer.toneMappingExposure = state.exposure;
@@ -1279,6 +1358,16 @@ const presetsObj = {
     starState.sizeMax = state.starSizeMax;
     starState.horizonFade = state.starHorizonFade;
     starMaterial.uniforms.u_useAntiAlias.value = state.starAntiAlias;
+    starMaterial.uniforms.u_tintColor.value.set(state.starTint);
+    
+    // Apply horror settings
+    skyMaterial.uniforms.u_horrorEnabled.value = state.horrorEnabled ? 1.0 : 0.0;
+    skyMaterial.uniforms.u_desat.value = state.horrorDesat;
+    skyMaterial.uniforms.u_greenTint.value = state.horrorGreenTint;
+    skyMaterial.uniforms.u_contrast.value = state.horrorContrast;
+    skyMaterial.uniforms.u_vignette.value = state.horrorVignette;
+    skyMaterial.uniforms.u_breatheAmp.value = state.horrorBreatheAmp;
+    skyMaterial.uniforms.u_breatheSpeed.value = state.horrorBreatheSpeed;
 
     // Update GUI to reflect changes
     gui
