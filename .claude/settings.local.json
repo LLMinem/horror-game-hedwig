@@ -13,13 +13,13 @@
       "mcp__zen__chat"
     ]
   },
+  "enableAllProjectMcpServers": false,
   "enabledMcpjsonServers": [
     "context7",
     "puppeteer",
     "browser-tools",
     "zen"
   ],
-  "enableAllProjectMcpServers": false,
   "hooks": {
     "PostToolUse": [
       {
@@ -44,5 +44,6 @@
         ]
       }
     ]
-  }
+  },
+  "outputStyle": "default"
 }

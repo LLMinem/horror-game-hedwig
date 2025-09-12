@@ -47,6 +47,9 @@ renderer.toneMappingExposure = 1.0; // neutral starting point
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 document.body.appendChild(renderer.domElement);
 
+// Clock for time-based effects
+const clock = new THREE.Clock();
+
 // =============== CAMERA
 const camera = new THREE.PerspectiveCamera(
   75,
@@ -167,6 +170,17 @@ const skyFragmentShader = `
   uniform float fogDensity;        // Scene fog density for matching
   uniform float fogMax;            // Maximum fog opacity at horizon
   
+  // HORROR GRADING
+  uniform vec2 u_resolution;       // Viewport size for vignette
+  uniform float u_time;            // Animation time in seconds
+  uniform float u_horrorEnabled;   // 0.0 = off, 1.0 = on
+  uniform float u_desat;           // Desaturation amount (0.0-1.0)
+  uniform float u_greenTint;       // Green tint strength (0.0-1.0)
+  uniform float u_contrast;        // Contrast adjustment (-0.5 to 0.5)
+  uniform float u_vignette;        // Vignette strength (0.0-0.6)
+  uniform float u_breatheAmp;      // Breathing amplitude (0.0-0.02)
+  uniform float u_breatheSpeed;    // Breathing speed (0.0-1.0)
+  
   // Note: Star field now handled by separate THREE.Points geometry (see ADR-003)
   
   varying vec3 vDir;  // World-space direction (same as used for light pollution)
@@ -175,6 +189,11 @@ const skyFragmentShader = `
   float hash(vec2 p) {
     // This creates a pseudo-random value based on screen position
     return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453);
+  }
+  
+  // Luminance calculation for desaturation
+  float luma(vec3 c) { 
+    return dot(c, vec3(0.2126, 0.7152, 0.0722)); 
   }
   
   // Note: Star generation functions removed - stars now rendered via THREE.Points (see ADR-003)
@@ -250,6 +269,30 @@ const skyFragmentShader = `
     // Blend sky color with fog color
     col = mix(col, fogColor, fogFactor);
     
+    // HORROR ATMOSPHERE GRADING (optional post-processing)
+    if (u_horrorEnabled > 0.5) {
+      // Ultra-subtle breathing effect (stronger near horizon)
+      float breath = u_breatheAmp * sin(u_time * (1.0 + u_breatheSpeed * 5.0));
+      float altWeight = 1.0 - altitude; // Stronger at horizon
+      col *= 1.0 + breath * altWeight;
+      
+      // Desaturation - drain life from the scene
+      float Y = luma(col);
+      col = mix(col, vec3(Y), u_desat);
+      
+      // Slight green bias - sickly, unnatural tint
+      col *= mix(vec3(1.0), vec3(0.94, 1.03, 0.96), u_greenTint);
+      
+      // Gentle contrast adjustment around mid-grey
+      col = (col - 0.5) * (1.0 + u_contrast) + 0.5;
+      
+      // Screen-space vignette (darkens edges, strengthens silhouettes)
+      vec2 uv = gl_FragCoord.xy / u_resolution;
+      float d = distance(uv, vec2(0.5));
+      float vig = smoothstep(0.40, 0.80, d);
+      col *= 1.0 - u_vignette * vig;
+    }
+    
     gl_FragColor = vec4(col, 1.0);
   }
 `;
@@ -291,6 +334,17 @@ const skyMaterial = new THREE.ShaderMaterial({
     fogColor: { value: new THREE.Color(0x141618) },  // Matches scene fog
     fogDensity: { value: 0.02 },                    // Matches scene fog density
     fogMax: { value: 0.95 },                         // Maximum fog opacity at horizon
+    
+    // HORROR GRADING - Post-processing effects
+    u_resolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
+    u_time: { value: 0.0 },
+    u_horrorEnabled: { value: 0.0 },    // Off by default
+    u_desat: { value: 0.25 },          // Default desaturation amount
+    u_greenTint: { value: 0.12 },      // Default green tint strength
+    u_contrast: { value: 0.12 },       // Default contrast adjustment
+    u_vignette: { value: 0.35 },       // Default vignette strength
+    u_breatheAmp: { value: 0.0 },      // Breathing off by default
+    u_breatheSpeed: { value: 0.15 },   // Default breathing speed
   },
   vertexShader: skyVertexShader,
   fragmentShader: skyFragmentShader,
@@ -384,6 +438,7 @@ const starFragmentShader = `
   uniform float u_horizonFade;
   uniform bool u_useAntiAlias;
   uniform float u_fogDensity;    // Fog density for star fading
+  uniform vec3 u_tintColor;      // Star color tint
   
   varying float vBrightness;
   varying vec3 vWorldPosition;   // Receive world position
@@ -418,7 +473,7 @@ const starFragmentShader = `
     // Fog-based fading - stars disappear in dense fog
     alpha *= exp(-u_fogDensity * 60.0 * (1.0 - altitude)); // 60 is empirical scale
     
-    gl_FragColor = vec4(1.0, 1.0, 1.0, alpha);
+    gl_FragColor = vec4(u_tintColor, alpha);
   }
 `;
 
@@ -432,7 +487,8 @@ const starMaterial = new THREE.ShaderMaterial({
     u_pixelRatio: { value: renderer.getPixelRatio() }, // FIXED: Added missing uniform
     u_useAntiAlias: { value: true }, // Anti-aliasing toggle
     u_cameraPos: { value: camera.position }, // For potential future use
-    u_fogDensity: { value: 0.02 } // Fog density for star fading
+    u_fogDensity: { value: 0.02 }, // Fog density for star fading
+    u_tintColor: { value: new THREE.Color(1.0, 1.0, 1.0) } // Star tint color (default white)
   },
   vertexShader: starVertexShader,
   fragmentShader: starFragmentShader,
@@ -1466,6 +1522,9 @@ window.addEventListener("resize", () => {
   
   // Update pixel ratio for star rendering
   starMaterial.uniforms.u_pixelRatio.value = renderer.getPixelRatio();
+  
+  // Update resolution for horror vignette effect
+  skyMaterial.uniforms.u_resolution.value.set(window.innerWidth, window.innerHeight);
 });
 
 // =============== LOOP
@@ -1489,6 +1548,9 @@ function animate() {
       .copy(camera.position)
       .add(tmpDir.multiplyScalar(10));
   }
+
+  // Update time for horror atmosphere effects
+  skyMaterial.uniforms.u_time.value = clock.getElapsedTime();
 
   renderer.render(scene, camera);
 }
