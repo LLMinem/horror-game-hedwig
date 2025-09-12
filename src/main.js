@@ -1534,12 +1534,120 @@ const presetsObj = {
     gui.controllersRecursive().forEach((controller) => controller.updateDisplay());
     console.log("✓ Applied Bright Test preset - Enhanced visibility for testing");
   },
+
+  horrorAtmosphere: () => {
+    // Horror Atmosphere preset based on GPT-5 recommendations
+    // Creates unsettling atmosphere with desaturated green-grey tones
+    
+    // Sky colors - desaturated with greenish tint
+    state.skyHorizonColor = "#2A241F";  // Warm dirty brown
+    state.skyMidLowColor = "#171A16";   // Greenish charcoal
+    state.skyMidHighColor = "#0B1110";  // Deep sickly teal-grey
+    state.skyZenithColor = "#060B0A";   // Very dark green-blue
+    state.skyMidLowStop = 0.26;
+    state.skyMidHighStop = 0.62;
+    
+    // Fog - greenish and denser for 50-60m visibility
+    state.fogColor = "#0F1512";         // Greenish charcoal
+    state.fogDensity = 0.035;           // ~50-60m visibility
+    state.fogMax = 0.93;
+    
+    // Lighting - darker overall
+    state.exposure = 0.90;
+    state.envIntensity = 0.12;
+    state.moonIntensity = 0.6;
+    state.hemiIntensity = 0.20;
+    state.ambientIntensity = 0.04;
+    
+    // Light pollution - reduced with dirty sodium color
+    state.pollutionColor = "#3A2E26";
+    state.village1Intensity = 0.12;
+    state.village1Spread = 80;
+    state.village1Height = 0.30;
+    state.village2Intensity = 0.05;
+    state.village2Spread = 65;
+    state.village2Height = 0.12;
+    
+    // Stars - dimmer with greenish tint
+    state.starBrightness = 0.65;
+    state.starSizeMin = 0.9;
+    state.starSizeMax = 4.5;
+    state.starHorizonFade = 0.28;
+    state.starTint = "#E6FFF0";         // Slight green-white tint
+    
+    // Horror grading - ENABLED
+    state.horrorEnabled = true;
+    state.horrorDesat = 0.28;           // More desaturation
+    state.horrorGreenTint = 0.14;       // Subtle green bias
+    state.horrorContrast = 0.12;        // Slight contrast boost
+    state.horrorVignette = 0.30;        // Moderate vignette
+    state.horrorBreatheAmp = 0.0;       // Keep breathing off by default
+    state.horrorBreatheSpeed = 0.15;
+    
+    // Apply all settings
+    renderer.toneMappingExposure = state.exposure;
+    setEnvIntensity(scene, state.envIntensity);
+    moon.intensity = state.moonIntensity;
+    hemi.intensity = state.hemiIntensity;
+    amb.intensity = state.ambientIntensity;
+    
+    scene.fog.color.set(state.fogColor);
+    if (scene.fog instanceof THREE.FogExp2) {
+      scene.fog.density = state.fogDensity;
+    }
+    skyMaterial.uniforms.fogColor.value.set(state.fogColor);
+    skyMaterial.uniforms.fogDensity.value = state.fogDensity;
+    skyMaterial.uniforms.fogMax.value = state.fogMax;
+    starMaterial.uniforms.u_fogDensity.value = state.fogDensity;
+    
+    // Apply sky colors
+    skyMaterial.uniforms.horizonColor.value.set(state.skyHorizonColor);
+    skyMaterial.uniforms.midLowColor.value.set(state.skyMidLowColor);
+    skyMaterial.uniforms.midHighColor.value.set(state.skyMidHighColor);
+    skyMaterial.uniforms.zenithColor.value.set(state.skyZenithColor);
+    skyMaterial.uniforms.midLowStop.value = state.skyMidLowStop;
+    skyMaterial.uniforms.midHighStop.value = state.skyMidHighStop;
+    
+    // Apply light pollution
+    skyMaterial.uniforms.pollutionColor.value.set(state.pollutionColor);
+    let rad = state.village1Azimuth * DEG2RAD;
+    skyMaterial.uniforms.village1Dir.value.set(Math.sin(rad), 0, -Math.cos(rad)).normalize();
+    skyMaterial.uniforms.village1Intensity.value = state.village1Intensity;
+    skyMaterial.uniforms.village1Spread.value = state.village1Spread * DEG2RAD;
+    skyMaterial.uniforms.village1Height.value = state.village1Height;
+    rad = state.village2Azimuth * DEG2RAD;
+    skyMaterial.uniforms.village2Dir.value.set(Math.sin(rad), 0, -Math.cos(rad)).normalize();
+    skyMaterial.uniforms.village2Intensity.value = state.village2Intensity;
+    skyMaterial.uniforms.village2Spread.value = state.village2Spread * DEG2RAD;
+    skyMaterial.uniforms.village2Height.value = state.village2Height;
+    
+    // Apply star settings
+    starMaterial.uniforms.u_brightness.value = state.starBrightness;
+    starMaterial.uniforms.u_sizeMin.value = state.starSizeMin;
+    starMaterial.uniforms.u_sizeMax.value = state.starSizeMax;
+    starMaterial.uniforms.u_horizonFade.value = state.starHorizonFade;
+    starMaterial.uniforms.u_tintColor.value.set(state.starTint);
+    
+    // Apply horror grading
+    skyMaterial.uniforms.u_horrorEnabled.value = state.horrorEnabled ? 1.0 : 0.0;
+    skyMaterial.uniforms.u_desat.value = state.horrorDesat;
+    skyMaterial.uniforms.u_greenTint.value = state.horrorGreenTint;
+    skyMaterial.uniforms.u_contrast.value = state.horrorContrast;
+    skyMaterial.uniforms.u_vignette.value = state.horrorVignette;
+    skyMaterial.uniforms.u_breatheAmp.value = state.horrorBreatheAmp;
+    skyMaterial.uniforms.u_breatheSpeed.value = state.horrorBreatheSpeed;
+    
+    // Update GUI
+    gui.controllersRecursive().forEach((controller) => controller.updateDisplay());
+    console.log("🎭 Applied Horror Atmosphere preset - Unsettling green-grey tones with 50-60m visibility");
+  },
 };
 
 const presetsFolder = gui.addFolder("Presets");
 presetsFolder.add(presetsObj, "resetToDefaults").name("Reset to Defaults");
 presetsFolder.add(presetsObj, "userTuned").name("User Tuned (Normal)");
 presetsFolder.add(presetsObj, "brightTest").name("Bright (Testing)");
+presetsFolder.add(presetsObj, "horrorAtmosphere").name("Horror Atmosphere");
 presetsFolder.open();
 
 // =============== KEYBOARD CONTROLS (keeping for backwards compatibility)
