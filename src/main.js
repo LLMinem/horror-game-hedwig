@@ -789,7 +789,7 @@ const defaults = {
   starSizeMax: 5.0,            // USER TUNED: Max size
   starHorizonFade: 0.3,        // USER TUNED: Horizon fade
   starAntiAlias: true,
-  starTint: "#FFFFFF",         // Star color tint (white by default)
+  starTint: "#F5FFF9",         // Star color tint (neutral white, less green)
   // Horror atmosphere controls
   horrorEnabled: false,        // Horror mode off by default
   horrorDesat: 0.25,          // Desaturation amount
@@ -1535,6 +1535,38 @@ const presetsObj = {
     console.log("✓ Applied Bright Test preset - Enhanced visibility for testing");
   },
 
+  exportCurrentSettings: () => {
+    // Export current settings to clipboard as JSON
+    const settings = { ...state };
+    const json = JSON.stringify(settings, null, 2);
+    
+    // Try to copy to clipboard
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(json).then(() => {
+        console.log("✅ Settings copied to clipboard!");
+        console.log("You can now paste this JSON anywhere to save your custom preset.");
+      }).catch(err => {
+        console.error("Failed to copy to clipboard:", err);
+        console.log("Settings JSON (copy manually):", json);
+      });
+    } else {
+      // Fallback for older browsers or non-HTTPS
+      console.log("📋 Settings JSON (copy this manually):");
+      console.log(json);
+    }
+    
+    // Also provide as downloadable file
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `horror-game-preset-${Date.now()}.json`;
+    link.click();
+    URL.revokeObjectURL(url);
+    
+    console.log("📥 Settings also downloaded as JSON file");
+  },
+
   horrorAtmosphere: () => {
     // Horror Atmosphere preset based on GPT-5 recommendations
     // Creates unsettling atmosphere with desaturated green-grey tones
@@ -1648,6 +1680,7 @@ presetsFolder.add(presetsObj, "resetToDefaults").name("Reset to Defaults");
 presetsFolder.add(presetsObj, "userTuned").name("User Tuned (Normal)");
 presetsFolder.add(presetsObj, "brightTest").name("Bright (Testing)");
 presetsFolder.add(presetsObj, "horrorAtmosphere").name("Horror Atmosphere");
+presetsFolder.add(presetsObj, "exportCurrentSettings").name("📥 Export Current Settings");
 presetsFolder.open();
 
 // =============== KEYBOARD CONTROLS (keeping for backwards compatibility)
