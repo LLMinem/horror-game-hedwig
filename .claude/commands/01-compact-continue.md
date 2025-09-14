@@ -27,8 +27,8 @@ Recover lost context after auto-compaction and resume development exactly where 
 
 1. Run `git status` to show uncommitted changes and working directory state.
 2. Run `git diff --stat` to show summary of uncommitted changes.
-3. Run `git log -10 --oneline` for high-level overview of recent work.
-4. Run `git log -5` for detailed view of recent commits.
+3. Run `git log -15 --oneline` for high-level overview of recent work.
+4. Run `git log -10` for detailed view of recent commits.
 5. Run `find src -name "*.js" -exec grep -l "TODO\|FIXME\|XXX" {} \;` to find files with incomplete work markers.
 6. Run `ls -la src/` to see current source directory structure.
 
