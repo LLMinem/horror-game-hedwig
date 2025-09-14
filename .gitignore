@@ -117,3 +117,6 @@ temp/
 # MCP config backups
 .mcp.json.*
 .mcp*.json
+
+# Private documentation
+docs/private/
