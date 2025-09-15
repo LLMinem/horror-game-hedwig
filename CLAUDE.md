@@ -79,27 +79,21 @@ Last Verified: 2025-09-15 (1686556)
 
 ---
 
-## PROJECT STRUCTURE (Planned - Not Yet Implemented)
+## PROJECT STRUCTURE (Current + Planned)
 
-Currently, we're working entirely in `src/main.js` during the learning/prototyping phase. The planned structure for later refactoring:
+Currently, we're working entirely in `src/main.js` during the learning/prototyping phase. Planned structure for later refactoring:
 
 ```
 /src
   main.js              # Current working file (everything here for now)
   /core               # Future: Engine and game loop
-  /world              # Future: Level generation from GeoJSON
+  /world              # Future: Level composition (manual placement)
   /player             # Future: Movement and controls
   /entities           # Future: Husband, graves, taps
   /systems            # Future: Darkness, audio, HUD
   /utils              # Future: Helpers and constants
 
-/data
-  cemetery_final.geojson  # Line-based map (DO NOT read directly - too much context)
-  
-/docs
-  night-scene-makeover-guide.md  # CURRENT IMPLEMENTATION GUIDE
-  development-plan.md             # High-level phases (reference only)
-  spec.md                        # Technical specification (older, take with grain of salt)
+/docs                 # Project documentation (see <active-files> for current files)
 
 /public/assets
   /hdri               # Night environment maps
@@ -134,24 +128,9 @@ Currently, we're working entirely in `src/main.js` during the learning/prototypi
 - Clean, minimal UI
 - Night HDRI for image-based lighting
 
----
+### Level Design
 
-## CRITICAL MAP INFORMATION
-
-### DO NOT READ cemetery_final.geojson DIRECTLY
-
-- It's 69KB of coordinates - will pollute context
-- It's LINE-BASED, not polygons
-- Generate geometry at runtime from lines + width
-
-### Map Pipeline (Future Discussion)
-
-The approach to converting the GeoJSON map is still to be determined. Options include:
-1. Runtime generation from lines (original plan)
-2. Alternative simplified approach
-3. Manual placement for MVP
-
-This will be discussed and decided when we reach that phase.
+- **Manual placement in Three.js for MVP** (no GeoJSON import)
 
 ---
 
@@ -244,10 +223,7 @@ Always maintain the educational, patient tone. Remember that Michael is learning
 
 ## KEY FILES TO REFERENCE
 
-- **CURRENT GUIDE:** `@docs/night-scene-makeover-guide.md` - The step-by-step implementation plan
-- High-level overview: `@docs/development-plan.md` - General project phases
-- Technical details: `@docs/spec.md` - Original spec (take with grain of salt)
-- This file: `CLAUDE.md` - Project context and working principles
+Refer to the <active-files> section above for current working files and guides.
 
 ---
 
