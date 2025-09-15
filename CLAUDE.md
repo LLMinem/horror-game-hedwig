@@ -31,8 +31,13 @@ Michael is a beginner developer with 8 months of programming experience and ZERO
 
 ### 3. FOLLOW THE CURRENT PLAN
 
-- **Current implementation guide:** `@docs/night-scene-makeover-guide.md`
-- High-level project overview: `@docs/development-plan.md` (for context only)
+<project-status>
+Current Phase: Ground Textures Implementation
+Active Plan: docs/night-scene-makeover-guide.md
+Next Priority: Ground texture with micro-detail
+Last Verified: 2025-09-15 (1686556)
+</project-status>
+
 - Work through phases sequentially
 - Don't skip ahead
 - Each phase has specific checkpoints
@@ -150,25 +155,54 @@ This will be discussed and decided when we reach that phase.
 
 ---
 
+## DOCUMENTATION STANDARDS
+
+### YAML Frontmatter (REQUIRED for all markdown docs)
+
+Every markdown file in this project MUST include YAML frontmatter:
+
+```yaml
+---
+type: plan|guide|spec|context|adr|report
+status: active|outdated|archived
+created: YYYY-MM-DD
+last_verified: YYYY-MM-DD
+last_verified_commit: abc123f
+owned_by: plan-tracker|claude-context|doc-auditor|human
+supersedes: [optional-old-doc.md]
+superseded_by: [optional-new-doc.md]
+---
+```
+
+This enables agents to quickly assess documentation state using `head -10`.
+
+### Documentation Maintenance Agents
+
+The project uses specialized subagents for documentation:
+
+- **plan-tracker**: Updates planning documents after commits (tracks completion)
+- **claude-context**: Maintains this file's managed sections (suggest-first mode)
+- **doc-auditor**: Weekly consistency checks (report-only, no auto-fixes)
+
+Agents only modify their designated sections. XML-style tags mark managed content.
+
+---
+
 ## CURRENT DEVELOPMENT STATUS
 
-**Current Phase:** Night Scene Makeover (Step 3 Complete)
-**Next Step:** Ground textures with micro-detail
-**Reference:** `@docs/night-scene-makeover-guide.md`
+<active-files>
+- src/main.js - Primary implementation file
+- docs/night-scene-makeover-guide.md - Current development guide
+- docs/atmospheric-sky-implementation-plan.md - Completed reference
+- CLAUDE.md - This file (project context)
+</active-files>
 
-### Completed:
-- ✅ Basic Three.js setup with atmospheric night scene
-- ✅ Night HDRI environment lighting (5 options)
-- ✅ lil-gui developer panel with full controls
-- ✅ Double-click reset on all GUI values
-- ✅ Proper fog validation
-- ✅ Updated flashlight defaults
-
-### Next Steps:
+<next-steps>
 - Ground texture application (color + normal maps)
 - Fog fine-tuning
 - Shadow quality optimization
 - Dev room for asset testing
+</next-steps>
 
 ---
 
@@ -190,7 +224,7 @@ Before claiming anything works:
 - **Always** use `npm run dev -- --host` to run the dev server (accessible from network)
 - **Format code:** `npx prettier --write "**/*.{js,json,md,html,css}"`
 - **Check git status:** `git status`
-- **View recent commits:** `git log --oneline -10`
+- **View recent commits:** `git log -10`
 
 ---
 

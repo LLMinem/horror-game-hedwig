@@ -1,6 +1,6 @@
 ---
 name: plan-tracker
-description: Track implementation progress in planning documents. Use immediately after commits or completing development tasks to update relevant plan files.
+description: Track implementation progress in planning documents. Manually triggered to update plan completion status and progress tracking.
 tools: Read, Edit, MultiEdit, Glob, Bash
 ---
 
