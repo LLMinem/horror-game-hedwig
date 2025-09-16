@@ -15,7 +15,8 @@ Recover lost context after auto-compaction and resume development exactly where 
 ### 📋 Critical Project Files (READ THESE FIRST)
 
 - **`CLAUDE.md`** - Project context and collaboration instructions
-- **`docs/night-scene-makeover-guide.md`** - **HIGHEST PRIORITY** - Current active implementation guide
+- **`docs/pragmatic-refactor-plan.md`** - **HIGHEST PRIORITY** - Current active refactor plan
+- **`docs/night-scene-makeover-guide.md`** - Completed atmospheric work (reference)
 - **`docs/archive/atmospheric-sky-implementation-plan.md`** - Recently completed atmospheric sky implementation
 
 ### 🔍 Implementation Files
@@ -35,7 +36,7 @@ Recover lost context after auto-compaction and resume development exactly where 
 ## Context Recovery Tasks
 
 1. **Read the compression summary** to understand what was being worked on.
-2. **Identify the exact step** in `night-scene-makeover-guide.md` that was in progress.
+2. **Identify the exact phase/step** in `pragmatic-refactor-plan.md` that was in progress.
 3. **Read any files with uncommitted changes** to understand modifications made.
 4. **Reconstruct the todo list** based on discovered state using TodoWrite tool.
 
@@ -53,7 +54,7 @@ $ARGUMENTS
 
 After completing this analysis, provide:
 
-1. **Current Implementation Step** - Exact position in night-scene-makeover-guide.md
+1. **Current Implementation Phase** - Exact position in pragmatic-refactor-plan.md
 2. **Work Status** - What was completed vs in-progress
 3. **Reconstructed TODO List** - Clear next steps based on recovered context
 4. **Continuation Point** - Exactly where to resume work
