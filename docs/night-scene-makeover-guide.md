@@ -1,3 +1,13 @@
+---
+type: guide
+status: active
+created: 2025-09-05
+last_verified: 2025-09-16
+last_verified_commit: b6a4891
+owned_by: plan-tracker
+superseded_by: []
+---
+
 # Night-Scene Makeover: Implementation Guide & Progress
 
 ## 🎯 Current Progress
@@ -31,12 +41,14 @@
 ### 📋 Remaining Steps
 
 **Atmospheric Sky Pipeline (Priority):**
+
 - Atmospheric Sky Step 4a: Fragment shader stars [DEPRECATED - See ADR-003]
 - Atmospheric Sky Step 4b: THREE.Points geometry-based stars [COMPLETE - 2025-09-09]
 - Atmospheric Sky Step 5: Comprehensive atmospheric fog system [COMPLETE (MVP Quality) - 2025-09-10]
 - Atmospheric Sky Step 6: Horror atmosphere tuning [COMPLETE - 2025-09-13]
 
 **Original Night Scene Steps:**
+
 - Step 4: Ground texture micro-detail (was Step 3)
 - Step 5: Fog tuning (was Step 4)
 - Step 6: Shadow quality (was Step 5)
@@ -130,9 +142,9 @@ Each step includes: **(A) what you'll learn, (B) what you'll change, (C) accepta
 // STEP 0: your existing main.js + exposure hotkeys (add to render setup)
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.0;
-window.addEventListener("keydown", (e) => {
-  if (e.key === "ü") renderer.toneMappingExposure *= 1.06; // German keyboard
-  if (e.key === "ä") renderer.toneMappingExposure /= 1.06;
+window.addEventListener('keydown', (e) => {
+  if (e.key === 'ü') renderer.toneMappingExposure *= 1.06; // German keyboard
+  if (e.key === 'ä') renderer.toneMappingExposure /= 1.06;
 });
 ```
 
@@ -170,47 +182,15 @@ window.addEventListener("keydown", (e) => {
 
 ---
 
-### STEP 3 — Add a **Dev Panel** (lil-gui) for live control 🚧
+### STEP 3 — Add a **Dev Panel** (lil-gui) for live control ✅
 
+**Implemented:** Commit `716e148`
 **NOTE: Moved up from original Step 6 for better development experience**
+**What worked:** Full controls with double-click reset functionality
 
-**A. Learn:** Live sliders keep you focused and curious, great for ADHD brains.  
-**B. Change:** Add lil-gui controls for exposure, light intensities, fog near/far, environment intensity, and HDRI selection.  
+**A. Learn:** Live sliders keep you focused and curious, great for ADHD brains.
+**B. Change:** Add lil-gui controls for exposure, light intensities, fog near/far, environment intensity, and HDRI selection.
 **C. Accept:** You can nudge values while watching the scene; panel in top-right corner.
-
-```js
-// npm i lil-gui
-import GUI from "lil-gui";
-
-const gui = new GUI();
-const state = {
-  exposure: renderer.toneMappingExposure,
-  envIntensity: 0.15,
-  hdri: "moonless_golf",
-  moon: moon.intensity,
-  hemi: hemi.intensity,
-  ambient: amb.intensity,
-  fogNear: scene.fog.near,
-  fogFar: scene.fog.far,
-};
-
-// Add controls with reset buttons
-gui
-  .add(state, "exposure", 0.5, 3.0, 0.01)
-  .onChange((v) => (renderer.toneMappingExposure = v));
-gui
-  .add(state, "envIntensity", 0, 1, 0.01)
-  .onChange((v) => setEnvIntensity(scene, v));
-gui
-  .add(state, "hdri", [
-    "moonless_golf",
-    "satara_night",
-    "dikhololo_night",
-    "kloppenheim_02",
-  ])
-  .onChange((v) => loadHDRI(v));
-// ... more controls
-```
 
 ---
 
@@ -331,21 +311,23 @@ This is a lighting class disguised as a game. We're not "adding hacks"; we're **
 Current focus: **Atmospheric sky enhancement** following the detailed plan in `atmospheric-sky-implementation-plan.md`
 
 ### Atmospheric Sky Implementation Status
+
 **Step 1 COMPLETE (2025-09-07):** Four-stop gradient with proper horizon alignment  
 **Step 2 COMPLETE (2025-09-08):** Dual-source light pollution system with physics-based falloff
+
 - **Fine-tuned (2025-09-08):** Adjusted default values for more realistic appearance  
-**Step 3 COMPLETE (2025-09-08):** Dithering (anti-banding) with hash-based screen-space noise
+  **Step 3 COMPLETE (2025-09-08):** Dithering (anti-banding) with hash-based screen-space noise
 - **Eliminates color banding:** Smooth gradients across all display types
 - **Minimal performance impact:** Single hash calculation per pixel
-**Step 4a DEPRECATED (2025-09-09):** Fragment shader stars abandoned due to architectural flaws
+  **Step 4a DEPRECATED (2025-09-09):** Fragment shader stars abandoned due to architectural flaws
 - **Issues:** View-dependent recalculation, unstable brightness, unfixable camera movement bugs
 - **Resolution:** ADR-003 documents switch to THREE.Points geometry-based approach
-**Step 4b COMPLETE (2025-09-09):** THREE.Points geometry-based stars with flicker-free rendering
-**Step 5 COMPLETE (2025-09-10):** Comprehensive atmospheric fog system (MVP quality)
+  **Step 4b COMPLETE (2025-09-09):** THREE.Points geometry-based stars with flicker-free rendering
+  **Step 5 COMPLETE (2025-09-10):** Comprehensive atmospheric fog system (MVP quality)
 - **Key Achievement:** Complete fog system with altitude-based sky blending, synchronized fog across all elements
 - **Quality Level:** MVP production-ready standards achieved
 - **Performance:** Maintains 60 FPS with complex atmospheric calculations
-**Step 6 COMPLETE (2025-09-13):** Horror atmosphere tuning with comprehensive shader grading system
+  **Step 6 COMPLETE (2025-09-13):** Horror atmosphere tuning with comprehensive shader grading system
 - **Key Achievement:** Complete horror atmosphere system with desaturation, green tint, contrast boost, vignette, and breathing effects
 - **Horror Atmosphere preset:** GPT-5 optimized values for maximum horror impact
 - **Settings export feature:** Custom preset creation and documentation capability
@@ -356,7 +338,9 @@ Current focus: **Atmospheric sky enhancement** following the detailed plan in `a
 **Reference:** See `docs/atmospheric-sky-implementation-plan.md` for complete implementation details
 
 ### Additional Features
-**Mouse Look Controls COMPLETE (2025-09-08):** First-person camera control with pointer lock API  
-- Smooth horizontal/vertical rotation with clamped angles  
-- Fixed horizontal inversion issue for natural feel  
+
+**Mouse Look Controls COMPLETE (2025-09-08):** First-person camera control with pointer lock API
+
+- Smooth horizontal/vertical rotation with clamped angles
+- Fixed horizontal inversion issue for natural feel
 - Integrated with existing WASD movement system
