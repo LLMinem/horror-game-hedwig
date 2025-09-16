@@ -32,10 +32,10 @@ Michael is a beginner developer with 8 months of programming experience and ZERO
 ### 3. FOLLOW THE CURRENT PLAN
 
 <project-status>
-Current Phase: Ground Textures Implementation
-Active Plan: docs/night-scene-makeover-guide.md
-Next Priority: Ground texture with micro-detail
-Last Verified: 2025-09-15 (1686556)
+Current Phase: Pragmatic Refactor - Foundation Phase
+Active Plan: docs/pragmatic-refactor-plan.md
+Next Priority: Extract Constants and Engine modules
+Last Verified: 2025-09-16 (6e55def)
 </project-status>
 
 - Work through phases sequentially
@@ -81,24 +81,38 @@ Last Verified: 2025-09-15 (1686556)
 
 ## PROJECT STRUCTURE (Current + Planned)
 
-Currently, we're working entirely in `src/main.js` during the learning/prototyping phase. Planned structure for later refactoring:
+Currently, we're working entirely in `src/main.js` during the learning/prototyping phase. Planned refactor structure (from pragmatic-refactor-plan.md):
 
 ```
 /src
-  main.js              # Current working file (everything here for now)
-  /core               # Future: Engine and game loop
-  /world              # Future: Level composition (manual placement)
-  /player             # Future: Movement and controls
-  /entities           # Future: Husband, graves, taps
-  /systems            # Future: Darkness, audio, HUD
-  /utils              # Future: Helpers and constants
+  main.js              # Entry point, wires everything (< 50 lines after refactor)
+  /core
+    Engine.js          # Renderer, scene, camera, clock, resize
+  /atmosphere
+    Atmosphere.js      # Sky + stars together (one visual system)
+  /world
+    World.js           # Fog, lights, ground, test objects
+    Environment.js     # HDRI loading, envMap fixes for r179
+  /gameplay
+    PlayerController.js # Mouse look + WASD movement + flashlight
+    AIUncle.js         # Future: Uncle pathing AI
+    Gameplay.js        # Future: Game logic, win/lose conditions
+  /assets
+    Assets.js          # Asset loading utilities
+    DevRoom.js         # Future: Asset testing area
+  /ui
+    DebugGui.js        # All lil-gui controls in one place
+  /loop
+    Loop.js            # Animation loop
+  /config
+    Constants.js       # SCENE_CONSTANTS + defaults
 
-/docs                 # Project documentation (see <active-files> for current files)
+/docs                  # Project documentation (see <active-files> for current files)
 
 /public/assets
-  /hdri               # Night environment maps
-  /textures           # Visual assets (to be added)
-  /audio              # Sound effects (future)
+  /hdri                # Night environment maps
+  /textures            # Ground and asset textures
+  /audio               # Sound effects (future)
 ```
 
 ---
@@ -170,17 +184,17 @@ Agents only modify their designated sections. XML-style tags mark managed conten
 ## CURRENT DEVELOPMENT STATUS
 
 <active-files>
-- src/main.js - Primary implementation file
-- docs/night-scene-makeover-guide.md - Current development guide
-- docs/atmospheric-sky-implementation-plan.md - Completed reference
+- docs/pragmatic-refactor-plan.md - Current refactor plan (active)
+- src/main.js - Primary implementation file (to be refactored)
+- docs/night-scene-makeover-guide.md - Completed scene work (reference)
 - CLAUDE.md - This file (project context)
 </active-files>
 
 <next-steps>
-- Ground texture application (color + normal maps)
-- Fog fine-tuning
-- Shadow quality optimization
-- Dev room for asset testing
+- Phase 1: Extract Constants and Engine modules from main.js
+- Phase 2: Extract Atmosphere and World systems
+- Phase 3: Add WASD movement during PlayerController refactor
+- Maintain working game state at each step
 </next-steps>
 
 ---

@@ -5,10 +5,12 @@ created: 2025-09-05
 last_verified: 2025-09-16
 last_verified_commit: 11ce7af
 owned_by: plan-tracker
-superseded_by: []
+superseded_by: [pragmatic-refactor-plan.md]
 ---
 
 # Night-Scene Makeover: Implementation Guide & Progress
+
+> **📌 Status Note:** This guide documents the completed atmospheric implementation work (7/8 steps done). Development has now moved to the **[Pragmatic Refactor Plan](./pragmatic-refactor-plan.md)**, which is the active development focus. Step 7 (Dev Room) will be implemented during the refactor phase. This document serves as a reference for the atmospheric work completed.
 
 ## 🎯 Current Progress
 
@@ -41,10 +43,12 @@ superseded_by: []
 ### 📋 Remaining Work
 
 **Not Yet Implemented:**
+
 - Step 7: Dev room habit (asset testing area)
 
 **Visual Fine-Tuning Phase (Post-Refactor):**
 While Steps 4, 5, 6, and 8 are technically complete and functional, all require manual aesthetic tuning through lil-gui:
+
 - **Ground textures:** Tiling amount, normal map strength
 - **Fog:** Density vs visibility balance, color matching
 - **Shadows:** Bias values to eliminate artifacts
