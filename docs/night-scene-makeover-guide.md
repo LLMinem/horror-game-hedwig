@@ -34,20 +34,9 @@ superseded_by: []
 - **Atmospheric Sky Step 5:** Comprehensive atmospheric fog → `6484727` **COMPLETE (MVP Quality)** [2025-09-10]
 - **Atmospheric Sky Step 6:** Horror atmosphere tuning → **COMPLETE** [2025-09-13]
 
-### ⚠️ Current Issues (Priority)
-
-- **GitHub Issue #4:** Star field bugs - stars reposition when camera moves, poor defaults, unnatural distribution [RESOLVED via ADR-003 - architectural change]
-
 ### 📋 Remaining Steps
 
-**Atmospheric Sky Pipeline (Priority):**
-
-- Atmospheric Sky Step 4a: Fragment shader stars [DEPRECATED - See ADR-003]
-- Atmospheric Sky Step 4b: THREE.Points geometry-based stars [COMPLETE - 2025-09-09]
-- Atmospheric Sky Step 5: Comprehensive atmospheric fog system [COMPLETE (MVP Quality) - 2025-09-10]
-- Atmospheric Sky Step 6: Horror atmosphere tuning [COMPLETE - 2025-09-13]
-
-**Original Night Scene Steps:**
+**Night Scene Steps:**
 
 - Step 4: Ground texture micro-detail (was Step 3)
 - Step 5: Fog tuning (was Step 4)
@@ -61,8 +50,6 @@ superseded_by: []
 
 **Context**
 
-- three.js: **r179.1** (modern pipeline: physically-correct lights by default, strict color management).
-- Goal: turn a too-bright/too-flat "indoor-ish" look into a **believable, playable moonlit cemetery**.
 - Collaboration style: **slow, methodical, one change at a time**. After each change the agent **MUST** pause, explain _why_, and ask for approval before moving on.
 - The human (Michael) is a **beginner** and wants to learn. The agent must give plain-language explanations and short acceptance tests for each step.
 
@@ -78,22 +65,6 @@ superseded_by: []
 6. **No cascade of changes.** Never jump to the next step without explicit "continue".
 7. **Version awareness (r179).** Prefer up-to-date APIs; avoid outdated patterns.
 8. **Rollback friendly.** If something looks worse, revert to the previous working state.
-
----
-
-## Why the current scene looks off (diagnosis)
-
-- You used **RoomEnvironment** as image-based lighting (IBL). It's an _indoor studio_ probe: bright, neutral, and "daylighty." Outdoors at night, IBL should be **faint and bluish**. Studio IBL makes objects look like plastic toys.
-- **ACES tone mapping** + exposure set high + bright IBL = milky highlights and low contrast.
-- Materials use **PBR** (`MeshStandardMaterial`), which expects:
-  - a reasonable **albedo** (base color not near black),
-  - **roughness/metalness** that matches the material,
-  - some **micro-detail** (normal/roughness maps).  
-    Flat colors + very high roughness everywhere = bland, rubbery look.
-- **scene.background** (your gradient) **does not light** objects. Only **scene.environment** (a PMREM env map) contributes to PBR lighting.
-- Fog/sky banding and a perfectly flat ground amplify the artificial feel.
-
-**So the fix** is not "add more lights" but **rebalance energy**: faint, cool IBL + a believable moon directional light + gentle sky bounce, correct exposure, and materials with micro-detail. Then sprinkle fog and shadows.
 
 ---
 
@@ -117,15 +88,6 @@ superseded_by: []
 You and the agent will move from "visible but wrong" → "moody and playable."  
 Each step includes: **(A) what you'll learn, (B) what you'll change, (C) acceptance test, (D) full code**.
 
-> Directory assumption (Vite): static assets live in `/public`. Put textures/HDRIs there:
->
-> ```
-> public/
->   assets/
->     hdri/
->     textures/
-> ```
-
 ---
 
 ### STEP 0 — Baseline snapshot + handy debug keys ✅
@@ -137,16 +99,6 @@ Each step includes: **(A) what you'll learn, (B) what you'll change, (C) accepta
 **A. Learn:** We'll add bracket keys `[` `]` to tweak exposure live.  
 **B. Change:** Keep your current scene but add exposure hotkeys; confirm everything compiles.  
 **C. Accept:** Press `]` → scene gets brighter; `[` → darker.
-
-```js
-// STEP 0: your existing main.js + exposure hotkeys (add to render setup)
-renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.0;
-window.addEventListener('keydown', (e) => {
-  if (e.key === 'ü') renderer.toneMappingExposure *= 1.06; // German keyboard
-  if (e.key === 'ä') renderer.toneMappingExposure /= 1.06;
-});
-```
 
 ---
 
@@ -185,7 +137,6 @@ window.addEventListener('keydown', (e) => {
 ### STEP 3 — Add a **Dev Panel** (lil-gui) for live control ✅
 
 **Implemented:** Commit `716e148`
-**NOTE: Moved up from original Step 6 for better development experience**
 **What worked:** Full controls with double-click reset functionality
 
 **A. Learn:** Live sliders keep you focused and curious, great for ADHD brains.
@@ -195,8 +146,6 @@ window.addEventListener('keydown', (e) => {
 ---
 
 ### STEP 4 — Ground **micro-detail** (color + normal map) 📋
-
-**Previously Step 3, moved to Step 4**
 
 **A. Learn:** Flat colors read as plastic. A tiling **color map** + **normal map** gives grass "bite" under moonlight.  
 **B. Manual:** Download two seamless textures (e.g., **AmbientCG**: `Grass005_1K_Color.jpg`, `Grass005_1K_NormalGL.jpg`). Save to:  
@@ -208,8 +157,6 @@ window.addEventListener('keydown', (e) => {
 
 ### STEP 5 — Fog + sky polish 📋
 
-**Previously Step 4, moved to Step 5**
-
 **A. Learn:** Fog binds the world to the horizon; your gradient can band if too low-res.  
 **B. Change:** Keep the taller 2048px gradient; tune fog to `near=30–40, far=85–95` and align color to horizon.  
 **C. Accept:** Distant objects soften toward the horizon; no harsh "cut line".
@@ -217,8 +164,6 @@ window.addEventListener('keydown', (e) => {
 ---
 
 ### STEP 6 — Shadow tuning 📋
-
-**Previously Step 5, moved to Step 6**
 
 **A. Learn:** Soft but defined moon shadows sell the mood. One shadow-casting light only.  
 **B. Change:** Keep `mapSize=1024` (or 2048 if GPU allows), bias in `[-0.0005, -0.002]`, `normalBias≈0.02`. Fit shadow camera to the play area (±60 already good).  
@@ -274,22 +219,6 @@ In Three.js r179, `envMapIntensity` only works when `material.envMap` is set dir
 1. Set `scene.environment` for diffuse IBL
 2. Also set `material.envMap` on each material for intensity control
 3. This was fixed in r181+
-
-### Key Bindings for German Keyboard
-
-- ü/ä work better than brackets on German layout
-- ü for increase (up), ä for decrease (down)
-- +/- for environment intensity adjustment
-
-### HDRI Selection Strategy
-
-Downloaded 5 HDRIs for different moods:
-
-- `moonless_golf` - Very dark (horror baseline)
-- `satara_night_no_lamps` - Dark with stars
-- `satara_night` - Dark with lamp glow
-- `dikhololo_night` - Brighter for testing
-- `kloppenheim_02` - Brightest
 
 ---
 
