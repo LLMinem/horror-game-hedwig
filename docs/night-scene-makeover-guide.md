@@ -3,7 +3,7 @@ type: guide
 status: active
 created: 2025-09-05
 last_verified: 2025-09-16
-last_verified_commit: b6a4891
+last_verified_commit: 11ce7af
 owned_by: plan-tracker
 superseded_by: []
 ---
@@ -12,10 +12,10 @@ superseded_by: []
 
 ## 🎯 Current Progress
 
-**Base Commit:** `15ca4ab` - ChatGPT's baseline night scene  
-**Current Status:** Steps 0-3 complete, atmospheric sky Steps 1-6 ALL COMPLETE (100% finished), mouse controls added  
-**Latest Working:** Atmospheric sky implementation 100% complete with horror atmosphere tuning  
-**Current Focus:** Ground textures (Step 4) or other development phases
+**Base Commit:** `15ca4ab` - ChatGPT's baseline night scene
+**Current Status:** Steps 0-6 & 8 complete (7/8 steps done), atmospheric sky 100% complete
+**Latest Working:** All core features implemented, pending visual fine-tuning
+**Current Focus:** Dev room implementation (Step 7) and visual fine-tuning phase
 
 ### ✅ Completed Steps
 
@@ -24,6 +24,10 @@ superseded_by: []
 - **Step 2:** Night HDRI with intensity → `e2bfd91` (fixed r179 bug with envMap)
   - Additional fixes: `eef2c15` (precision), `d957860` (key swap)
 - **Step 3:** lil-gui Dev Panel → `716e148` (full controls with double-click reset)
+- **Step 4:** Ground textures → `466a52e` and `7a4056a` (color + normal maps with 2K textures) [COMPLETE 2025-09-05]
+- **Step 5:** Fog tuning → `6484727` (comprehensive atmospheric fog system) [COMPLETE 2025-09-10]
+- **Step 6:** Shadow quality → Full shadow controls implemented [COMPLETE]
+- **Step 8:** Flashlight polish → Full SpotLight system with GUI controls [COMPLETE]
 - **Mouse Look Controls:** First-person camera → `8335bac` (pointer lock API with smooth rotation) [COMPLETE 2025-09-08]
 - **Atmospheric Sky Step 1:** Four-stop gradient → `505d23f` (proper horizon alignment) [COMPLETE 2025-09-07]
 - **Atmospheric Sky Step 2:** Dual-source light pollution → `f173843` (realistic village glow system) [COMPLETE 2025-09-08]
@@ -34,15 +38,19 @@ superseded_by: []
 - **Atmospheric Sky Step 5:** Comprehensive atmospheric fog → `6484727` **COMPLETE (MVP Quality)** [2025-09-10]
 - **Atmospheric Sky Step 6:** Horror atmosphere tuning → **COMPLETE** [2025-09-13]
 
-### 📋 Remaining Steps
+### 📋 Remaining Work
 
-**Night Scene Steps:**
+**Not Yet Implemented:**
+- Step 7: Dev room habit (asset testing area)
 
-- Step 4: Ground texture micro-detail (was Step 3)
-- Step 5: Fog tuning (was Step 4)
-- Step 6: Shadow quality (was Step 5)
-- Step 7: Dev room habit
-- Step 8: Flashlight polish
+**Visual Fine-Tuning Phase (Post-Refactor):**
+While Steps 4, 5, 6, and 8 are technically complete and functional, all require manual aesthetic tuning through lil-gui:
+- **Ground textures:** Tiling amount, normal map strength
+- **Fog:** Density vs visibility balance, color matching
+- **Shadows:** Bias values to eliminate artifacts
+- **Flashlight:** Intensity, angle, penumbra for optimal gameplay
+
+This fine-tuning will be addressed after the planned major refactor to modularize the codebase.
 
 ---
 
@@ -145,28 +153,40 @@ Each step includes: **(A) what you'll learn, (B) what you'll change, (C) accepta
 
 ---
 
-### STEP 4 — Ground **micro-detail** (color + normal map) 📋
+### STEP 4 — Ground **micro-detail** (color + normal map) ✅
 
-**A. Learn:** Flat colors read as plastic. A tiling **color map** + **normal map** gives grass "bite" under moonlight.  
-**B. Manual:** Download two seamless textures (e.g., **AmbientCG**: `Grass005_1K_Color.jpg`, `Grass005_1K_NormalGL.jpg`). Save to:  
-`public/assets/textures/grass_col.jpg`, `public/assets/textures/grass_nrm.jpg`  
-**C. Change:** Apply, tile 16×, mark color map as sRGB.  
+**Implemented:** Commits `466a52e` (1K textures) and `7a4056a` (upgraded to 2K) - 2025-09-05
+**Current state:** Ground has grass color + normal maps with configurable tiling (default 64x)
+**Note:** Values require fine-tuning for optimal visual balance
+
+**A. Learn:** Flat colors read as plastic. A tiling **color map** + **normal map** gives grass "bite" under moonlight.
+**B. Manual:** Download two seamless textures (e.g., **AmbientCG**: `Grass005_1K_Color.jpg`, `Grass005_1K_NormalGL.jpg`). Save to:
+`public/assets/textures/grass_col.jpg`, `public/assets/textures/grass_nrm.jpg`
+**C. Change:** Apply, tile 16×, mark color map as sRGB.
 **D. Accept:** The ground shows fine detail; close to camera it no longer looks like painted plywood.
 
 ---
 
-### STEP 5 — Fog + sky polish 📋
+### STEP 5 — Fog + sky polish ✅
 
-**A. Learn:** Fog binds the world to the horizon; your gradient can band if too low-res.  
-**B. Change:** Keep the taller 2048px gradient; tune fog to `near=30–40, far=85–95` and align color to horizon.  
+**Implemented:** Commit `6484727` - Comprehensive atmospheric fog system (2025-09-10)
+**Current state:** FogExp2 with density 0.02, full GUI controls, altitude-based sky blending
+**Note:** Values require fine-tuning for optimal visibility vs atmosphere balance
+
+**A. Learn:** Fog binds the world to the horizon; your gradient can band if too low-res.
+**B. Change:** Keep the taller 2048px gradient; tune fog to `near=30–40, far=85–95` and align color to horizon.
 **C. Accept:** Distant objects soften toward the horizon; no harsh "cut line".
 
 ---
 
-### STEP 6 — Shadow tuning 📋
+### STEP 6 — Shadow tuning ✅
 
-**A. Learn:** Soft but defined moon shadows sell the mood. One shadow-casting light only.  
-**B. Change:** Keep `mapSize=1024` (or 2048 if GPU allows), bias in `[-0.0005, -0.002]`, `normalBias≈0.02`. Fit shadow camera to the play area (±60 already good).  
+**Implemented:** Shadow system with full controls in place
+**Current state:** mapSize=1024, bias=-0.001, normalBias=0.02, full GUI controls
+**Note:** Values require fine-tuning for eliminating acne/peter-panning artifacts
+
+**A. Learn:** Soft but defined moon shadows sell the mood. One shadow-casting light only.
+**B. Change:** Keep `mapSize=1024` (or 2048 if GPU allows), bias in `[-0.0005, -0.002]`, `normalBias≈0.02`. Fit shadow camera to the play area (±60 already good).
 **C. Accept:** No acne or peter-panning; shadows neither razor-thin nor blotchy.
 
 ---
@@ -179,15 +199,15 @@ Each step includes: **(A) what you'll learn, (B) what you'll change, (C) accepta
 
 ---
 
-### STEP 8 — Polish the **flashlight** 📋
+### STEP 8 — Polish the **flashlight** ✅
 
-**Note: Flashlight already exists, just needs tuning**
+**Implemented:** Full SpotLight flashlight with F-key toggle and GUI controls
+**Current state:** Intensity=50, angle=28°, penumbra=0.4, distance=45, warm color (0xfff2d0)
+**Note:** Values require fine-tuning for better visibility/atmosphere balance
 
-**A. Learn:** A spotlight attached to the camera. We'll keep it a **tool**, not a crutch.  
-**B. Change:** Toggle with `F`, warm color, narrow cone, soft penumbra.  
+**A. Learn:** A spotlight attached to the camera. We'll keep it a **tool**, not a crutch.
+**B. Change:** Toggle with `F`, warm color, narrow cone, soft penumbra.
 **C. Accept:** When ON, bright cone with soft edges; when OFF, baseline scene stays playable.
-
-Current implementation already has flashlight (F key), but intensity/angle may need adjustment via GUI.
 
 ---
 
