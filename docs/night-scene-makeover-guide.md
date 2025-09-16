@@ -237,7 +237,7 @@ In Three.js r179, `envMapIntensity` only works when `material.envMap` is set dir
 
 This is a lighting class disguised as a game. We're not "adding hacks"; we're **teaching the renderer what kind of night it is**: faint, cool sky; a single distant moon; tiny ambient bounce; materials with just enough micro-detail to catch that light. With the dev panel and dev room, you'll be able to audition any future asset in minutes.
 
-Current focus: **Atmospheric sky enhancement** following the detailed plan in `atmospheric-sky-implementation-plan.md`
+Recently completed: **Atmospheric sky enhancement** - See archived plan in `docs/archive/atmospheric-sky-implementation-plan.md`
 
 ### Atmospheric Sky Implementation Status
 
@@ -262,9 +262,9 @@ Current focus: **Atmospheric sky enhancement** following the detailed plan in `a
 - **Settings export feature:** Custom preset creation and documentation capability
 - **Performance:** All horror effects run at 60 FPS with minimal GPU impact
 
-**ATMOSPHERIC SKY IMPLEMENTATION: 100% COMPLETE**  
-**Next Priority:** Ground textures (Step 4) or other development phases  
-**Reference:** See `docs/atmospheric-sky-implementation-plan.md` for complete implementation details
+**ATMOSPHERIC SKY IMPLEMENTATION: 100% COMPLETE**
+**Next Priority:** Ground textures (Step 4) or other development phases
+**Reference:** See `docs/archive/atmospheric-sky-implementation-plan.md` for complete implementation details
 
 ### Additional Features
 

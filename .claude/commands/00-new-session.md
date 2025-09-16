@@ -15,9 +15,9 @@ Explore the project to gain a **deep understanding** of it, in order to prepare 
 ### 📋 Critical Project Files (READ THESE FIRST)
 
 - **`CLAUDE.md`** - Most important project context and collaboration instructions
-- **`docs/atmospheric-sky-implementation-plan.md`** - **HIGHEST PRIORITY** - Current active implementation guide
-- **`docs/night-scene-makeover-guide.md`** - High-level implementation guide and collaboration instructions (superseeded by `atmospheric-sky-implementation-plan.md`)
+- **`docs/night-scene-makeover-guide.md`** - **HIGHEST PRIORITY** - Current active implementation guide
 - **`docs/development-plan.md`** - High-level roadmap (take with grain of salt - somewhat outdated)
+- **`docs/archive/atmospheric-sky-implementation-plan.md`** - Recently completed atmospheric sky implementation
 
 ### 🔍 Implementation Files
 
