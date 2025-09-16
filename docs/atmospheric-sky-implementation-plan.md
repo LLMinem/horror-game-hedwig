@@ -1,3 +1,13 @@
+---
+type: plan
+status: archived
+created: 2025-09-07
+last_verified: 2025-09-16
+last_verified_commit: b6a4891
+owned_by: plan-tracker
+superseded_by: []
+---
+
 # Atmospheric Sky Implementation Plan
 
 ## 🎯 Current Status

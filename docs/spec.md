@@ -1,3 +1,14 @@
+---
+type: spec
+status: outdated
+created: 2025-09-03
+last_verified: 2025-09-16
+last_verified_commit: b6a4891
+owned_by: human
+supersedes: []
+superseded_by: []
+---
+
 # Cemetery Horror Game - Technical Specification
 
 ## 0. Overview & Scope (MVP)
