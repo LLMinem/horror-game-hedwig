@@ -2,8 +2,8 @@
 type: plan
 status: active
 created: 2025-09-16
-last_verified: 2025-09-16
-last_verified_commit: pending
+last_verified: 2025-09-17
+last_verified_commit: 5750f94
 owned_by: plan-tracker
 supersedes: [night-scene-makeover-guide.md]
 superseded_by: []
@@ -90,11 +90,19 @@ refactor(module): extract [what] from main.js
 
 ## Phase-by-Phase Implementation
 
-### PHASE 1: Foundation (Day 1 Morning)
+## Current Status
+**Last Updated**: 2025-09-17
+**Progress**: 2/6 phases complete (33%)
+**Current Phase**: Phase 3 - World and Environment extraction
+**Next Up**: Extract World.js and Environment.js modules
+
+### PHASE 1: Foundation (Day 1 Morning) ✅ 2025-09-17
 
 **Extract the stable, rarely-changing core**
 
-#### Step 1.1: Extract Constants
+#### Step 1.1: Extract Constants ✅ 2025-09-17
+**Status**: Complete (commit 24ea36e)
+**Implementation Notes**: Successfully extracted all scene constants and GUI defaults to dedicated config module
 
 Create `config/Constants.js`:
 
@@ -122,7 +130,9 @@ export const DEFAULTS = {
 };
 ```
 
-#### Step 1.2: Extract Engine
+#### Step 1.2: Extract Engine ✅ 2025-09-17
+**Status**: Complete (commit 24ea36e)
+**Implementation Notes**: Extracted renderer, scene, camera, clock, and resize handling into clean Engine module
 
 Create `core/Engine.js`:
 
@@ -159,14 +169,16 @@ export function createEngine(constants) {
 }
 ```
 
-**Test**: Scene renders, can resize window
-**Commit**: `refactor(core): extract Engine and Constants`
+**Test**: Scene renders, can resize window ✅
+**Commit**: `refactor(core): extract Engine and Constants` ✅ (24ea36e)
 
-### PHASE 2: Atmosphere (Day 1 Afternoon)
+### PHASE 2: Atmosphere (Day 1 Afternoon) ✅ 2025-09-17
 
 **Extract the complete sky system**
 
-#### Step 2.1: Extract Atmosphere
+#### Step 2.1: Extract Atmosphere ✅ 2025-09-17
+**Status**: Complete (commit 5750f94)
+**Implementation Notes**: Successfully extracted complete sky and star system (~500 lines) with proper encapsulation and API methods
 
 Create `atmosphere/Atmosphere.js`:
 
@@ -229,14 +241,16 @@ export function createAtmosphere({ scene, renderer, camera, constants }) {
 }
 ```
 
-**Test**: Sky gradient works, stars visible, light pollution shows
-**Commit**: `refactor(atmosphere): extract sky and stars together`
+**Test**: Sky gradient works, stars visible, light pollution shows ✅
+**Commit**: `refactor(atmosphere): extract sky and stars together` ✅ (5750f94)
 
-### PHASE 3: World (Day 2 Morning)
+### PHASE 3: World (Day 2 Morning) 🚀 Next Up
 
 **Extract physical world elements**
 
-#### Step 3.1: Extract World
+#### Step 3.1: Extract World 📋 Pending
+**Status**: Ready to implement
+**Target**: Extract fog, lights, ground, and test objects
 
 Create `world/World.js`:
 
@@ -290,7 +304,9 @@ export function createWorld({ scene, constants }) {
 }
 ```
 
-#### Step 3.2: Extract Environment
+#### Step 3.2: Extract Environment 📋 Pending
+**Status**: Ready to implement
+**Target**: Extract HDRI loading and r179 environment map fixes
 
 Create `world/Environment.js`:
 
@@ -343,11 +359,13 @@ export function createEnvironment({ renderer, scene }) {
 **Test**: Fog visible, lights work, ground textured, HDRI reflections work
 **Commit**: `refactor(world): extract world elements and environment`
 
-### PHASE 4: Player Controls (Day 2 Afternoon)
+### PHASE 4: Player Controls (Day 2 Afternoon) 📋 Pending
 
 **Extract input and movement (ADD WASD HERE!)**
 
-#### Step 4.1: Extract PlayerController
+#### Step 4.1: Extract PlayerController 📋 Pending
+**Status**: Ready to implement
+**Target**: Extract mouse look, add WASD movement, flashlight control
 
 Create `gameplay/PlayerController.js`:
 
@@ -453,11 +471,13 @@ export function createPlayerController({ camera, renderer, scene, flashlight }) 
 **Test**: Mouse look works, WASD movement functional, flashlight follows camera
 **Commit**: `refactor(gameplay): extract player controls and add WASD movement`
 
-### PHASE 5: GUI Extraction (Day 3)
+### PHASE 5: GUI Extraction (Day 3) 📋 Pending
 
 **Move all GUI to one place**
 
-#### Step 5.1: Extract DebugGui
+#### Step 5.1: Extract DebugGui 📋 Pending
+**Status**: Ready to implement
+**Target**: Move all lil-gui controls to dedicated module
 
 Create `ui/DebugGui.js`:
 
@@ -544,11 +564,13 @@ export function setupDebugGui({
 **Test**: All GUI controls work, presets apply correctly
 **Commit**: `refactor(ui): extract all GUI controls`
 
-### PHASE 6: Animation Loop (Day 3)
+### PHASE 6: Animation Loop (Day 3) 📋 Pending
 
 **Clean up the game loop**
 
-#### Step 6.1: Extract Loop
+#### Step 6.1: Extract Loop 📋 Pending
+**Status**: Ready to implement
+**Target**: Clean animation loop with system updates
 
 Create `loop/Loop.js`:
 
@@ -575,7 +597,7 @@ export function startLoop({ renderer, scene, camera, clock, systems }) {
 }
 ```
 
-### PHASE 7: Final Wiring (Day 3)
+### PHASE 7: Final Wiring (Day 3) 📋 Pending
 
 **Connect everything in main.js**
 
