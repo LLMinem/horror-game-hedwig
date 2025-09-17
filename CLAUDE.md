@@ -32,10 +32,10 @@ Michael is a beginner developer with 8 months of programming experience and ZERO
 ### 3. FOLLOW THE CURRENT PLAN
 
 <project-status>
-Current Phase: Pragmatic Refactor - Foundation Phase
+Current Phase: Pragmatic Refactor - Phase 3 (World & Environment)
 Active Plan: docs/pragmatic-refactor-plan.md
-Next Priority: Extract Constants and Engine modules
-Last Verified: 2025-09-16 (6e55def)
+Next Priority: Extract World and Environment modules (2 of 6 phases complete - 33%)
+Last Verified: 2025-09-17 (f311385)
 </project-status>
 
 - Work through phases sequentially
@@ -191,9 +191,10 @@ Agents only modify their designated sections. XML-style tags mark managed conten
 </active-files>
 
 <next-steps>
-- Phase 1: Extract Constants and Engine modules from main.js
-- Phase 2: Extract Atmosphere and World systems
-- Phase 3: Add WASD movement during PlayerController refactor
+- Phase 3: Extract World and Environment modules (current priority)
+- Phase 4: Extract PlayerController and add WASD movement
+- Phase 5: Extract Loop and DebugGui modules
+- Phase 6: Final main.js cleanup and testing
 - Maintain working game state at each step
 </next-steps>
 
