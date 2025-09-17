@@ -7,6 +7,7 @@ import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js';
 // Import our new modules
 import { SCENE_CONSTANTS, DEG2RAD, DEFAULTS } from './config/Constants.js';
 import { createEngine } from './core/Engine.js';
+import { createAtmosphere } from './atmosphere/Atmosphere.js';
 
 // Constants now imported from ./config/Constants.js
 
@@ -76,404 +77,27 @@ function updateCameraRotation() {
   );
 }
 
-// =============== SKYDOME (replaces the 2D gradient background)
-// Vertex shader - calculates world-space direction for stable star positions
-const skyVertexShader = `
-  varying vec3 vDir;  // World-space direction (ignores camera translation)
-  
-  void main() {
-    // CRITICAL: Extract only rotation from modelMatrix, ignore translation.
-    // This provides a stable world-space direction for the celestial sphere.
-    // This is what makes the light pollution stay fixed in the northwest!
-    mat3 rotationOnly = mat3(modelMatrix);
-    vDir = rotationOnly * position;
-    
-    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-  }
-`;
-
-// Fragment shader - creates 4-stop gradient aligned with visual horizon
-const skyFragmentShader = `
-  precision highp float;
-  
-  // Four color stops for complex gradient
-  uniform vec3 horizonColor;    // Bottom color (light pollution)
-  uniform vec3 midLowColor;     // Lower-mid transition
-  uniform vec3 midHighColor;    // Upper-mid transition  
-  uniform vec3 zenithColor;     // Top color (darkest sky)
-  
-  // Control where transitions happen (0-1 range)
-  uniform float midLowStop;     // Where horizon transitions to mid-low
-  uniform float midHighStop;    // Where mid-low transitions to mid-high
-  
-  // LIGHT POLLUTION SOURCES
-  // Near village (NW-N, ~250m away)
-  uniform vec3 village1Dir;        // Direction to village (normalized)
-  uniform float village1Intensity; // Glow intensity (0.0-1.0)
-  uniform float village1Spread;    // Angular spread in radians
-  uniform float village1Height;    // Max height above horizon (0-1)
-  
-  // Distant village (SE, ~2km away)  
-  uniform vec3 village2Dir;        // Direction to distant village
-  uniform float village2Intensity; // Much weaker intensity
-  uniform float village2Spread;    // Broader spread
-  uniform float village2Height;    // Lower height limit
-  
-  // DITHERING
-  uniform float ditherAmount;      // How strong the dither effect is (0.0-0.01)
-  
-  // POLLUTION COLOR
-  uniform vec3 pollutionColor;     // Color of light pollution glow
-  
-  // FOG INTEGRATION
-  uniform vec3 fogColor;           // Scene fog color for blending
-  uniform float fogDensity;        // Scene fog density for matching
-  uniform float fogMax;            // Maximum fog opacity at horizon
-  
-  // HORROR GRADING
-  uniform vec2 u_resolution;       // Viewport size for vignette
-  uniform float u_time;            // Animation time in seconds
-  uniform float u_horrorEnabled;   // 0.0 = off, 1.0 = on
-  uniform float u_desat;           // Desaturation amount (0.0-1.0)
-  uniform float u_greenTint;       // Green tint strength (0.0-1.0)
-  uniform float u_contrast;        // Contrast adjustment (-0.5 to 0.5)
-  uniform float u_vignette;        // Vignette strength (0.0-0.6)
-  uniform float u_breatheAmp;      // Breathing amplitude (0.0-0.02)
-  uniform float u_breatheSpeed;    // Breathing speed (0.0-1.0)
-  
-  // Note: Star field now handled by separate THREE.Points geometry (see ADR-003)
-  
-  varying vec3 vDir;  // World-space direction (same as used for light pollution)
-  
-  // Simple hash function for dithering noise
-  float hash(vec2 p) {
-    // This creates a pseudo-random value based on screen position
-    return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453);
-  }
-  
-  // Luminance calculation for desaturation
-  float luma(vec3 c) { 
-    return dot(c, vec3(0.2126, 0.7152, 0.0722)); 
-  }
-  
-  // Note: Star generation functions removed - stars now rendered via THREE.Points (see ADR-003)
-  
-  void main() {
-    // Normalize the world-space direction
-    vec3 dir = normalize(vDir);
-    
-    // Use Y component for altitude: 0 = horizon, 1 = straight up
-    // Since we're using world-space direction, this is stable
-    float altitude = clamp(dir.y, 0.0, 1.0);
-    
-    // SMOOTHSTEP: Creates smooth S-curve transitions
-    // Now altitude=0 is TRUE VISUAL HORIZON, altitude=1 is zenith
-    
-    // Transition 1: Horizon to Mid-Low
-    float t1 = smoothstep(0.0, midLowStop, altitude);
-    vec3 col = mix(horizonColor, midLowColor, t1);
-    
-    // Transition 2: Mid-Low to Mid-High  
-    float t2 = smoothstep(midLowStop, midHighStop, altitude);
-    col = mix(col, midHighColor, t2);
-    
-    // Transition 3: Mid-High to Zenith
-    float t3 = smoothstep(midHighStop, 1.0, altitude);
-    col = mix(col, zenithColor, t3);
-    
-    // ============ LIGHT POLLUTION CALCULATION ============
-    // Calculate horizontal direction (ignore vertical component)
-    vec3 horizDir = normalize(vec3(dir.x, 0.0, dir.z));
-    
-    // VILLAGE 1 (Near, NW-N, ~250m)
-    float village1Alignment = dot(horizDir, village1Dir);
-    // Convert alignment to glow intensity (falloff from center)
-    float village1Glow = smoothstep(
-      cos(village1Spread),  // Cutoff angle
-      1.0,                  // Maximum at perfect alignment
-      village1Alignment     // Current alignment
-    ) * village1Intensity;
-    
-    // Fade with altitude (stronger near horizon)
-    village1Glow *= smoothstep(village1Height, 0.0, altitude);
-    
-    // VILLAGE 2 (Distant, SE, ~2km)  
-    float village2Alignment = dot(horizDir, village2Dir);
-    float village2Glow = smoothstep(
-      cos(village2Spread),
-      1.0,
-      village2Alignment
-    ) * village2Intensity;
-    
-    // Even stronger altitude falloff for distant source
-    village2Glow *= smoothstep(village2Height, 0.0, altitude);
-    
-    // Add light pollution to base gradient
-    col += pollutionColor * (village1Glow + village2Glow);
-    
-    // Note: Stars removed from fragment shader - now rendered via THREE.Points (see ADR-003)
-    
-    // Apply dithering to prevent color banding
-    // Uses screen-space position for stable noise pattern
-    float dither = hash(gl_FragCoord.xy);
-    dither = (dither - 0.5) * ditherAmount; // Center around 0, scale by amount
-    col += vec3(dither); // Add noise to break up gradients
-    
-    // CUSTOM FOG BLENDING - blend fog color based on altitude
-    // Lower altitude = more fog (horizon gets fogged, zenith stays clear)
-    float fogFactor = 1.0 - altitude; // Inverted: 1.0 at horizon, 0.0 at zenith
-    fogFactor = pow(fogFactor, 2.0); // Strengthen the effect near horizon
-    // Scale with fog density - denser fog = more sky obscured
-    fogFactor *= clamp(fogDensity * 35.0, 0.0, fogMax); // 35 is empirical scale factor
-    
-    // Blend sky color with fog color
-    col = mix(col, fogColor, fogFactor);
-    
-    // HORROR ATMOSPHERE GRADING (optional post-processing)
-    if (u_horrorEnabled > 0.5) {
-      // Ultra-subtle breathing effect (stronger near horizon)
-      float breath = u_breatheAmp * sin(u_time * (1.0 + u_breatheSpeed * 5.0));
-      float altWeight = 1.0 - altitude; // Stronger at horizon
-      col *= 1.0 + breath * altWeight;
-      
-      // Desaturation - drain life from the scene
-      float Y = luma(col);
-      col = mix(col, vec3(Y), u_desat);
-      
-      // Slight green bias - sickly, unnatural tint
-      col *= mix(vec3(1.0), vec3(0.94, 1.03, 0.96), u_greenTint);
-      
-      // Gentle contrast adjustment around mid-grey
-      col = (col - 0.5) * (1.0 + u_contrast) + 0.5;
-      
-      // Screen-space vignette (darkens edges, strengthens silhouettes)
-      vec2 uv = gl_FragCoord.xy / u_resolution;
-      float d = distance(uv, vec2(0.5));
-      float vig = smoothstep(0.40, 0.80, d);
-      col *= 1.0 - u_vignette * vig;
-    }
-    
-    gl_FragColor = vec4(col, 1.0);
-  }
-`;
-
-// Create skydome geometry and material
-// FIXED: Reduced radius and disabled depth test completely
-const skyGeometry = new THREE.SphereGeometry(SCENE_CONSTANTS.SKYDOME_RADIUS, 32, 32);
-const skyMaterial = new THREE.ShaderMaterial({
-  uniforms: {
-    // Four color stops for realistic night gradient
-    horizonColor: { value: new THREE.Color(0x2b2822) }, // USER TUNED: Warmer horizon
-    midLowColor: { value: new THREE.Color(0x0f0e14) }, // USER TUNED: Dark plum
-    midHighColor: { value: new THREE.Color(0x080a10) }, // USER TUNED: Deeper blue
-    zenithColor: { value: new THREE.Color(0x040608) }, // USER TUNED: Almost black
-
-    // Control where color transitions happen
-    midLowStop: { value: 0.25 }, // 25% up from horizon
-    midHighStop: { value: 0.6 }, // 60% up from horizon
-
-    // NEAR VILLAGE (NW-N, ~250m) - Noticeable glow
-    village1Dir: { value: new THREE.Vector3(-0.7, 0, -0.7).normalize() }, // Northwest
-    village1Intensity: { value: 0.15 }, // USER TUNED: Focused glow
-    village1Spread: { value: 70 * DEG2RAD }, // USER TUNED: 70° spread
-    village1Height: { value: 0.35 }, // USER TUNED: Up to 35% altitude
-
-    // DISTANT VILLAGE (SE, ~2km) - Very subtle
-    village2Dir: { value: new THREE.Vector3(0.7, 0, 0.7).normalize() }, // Southeast
-    village2Intensity: { value: 0.06 }, // USER TUNED: Very subtle
-    village2Spread: { value: 60 * DEG2RAD }, // USER TUNED: 60° spread
-    village2Height: { value: 0.15 }, // USER TUNED: Low on horizon
-
-    // DITHERING - Prevents gradient banding
-    ditherAmount: { value: 0.008 }, // Noise to break up gradients
-
-    // POLLUTION COLOR
-    pollutionColor: { value: new THREE.Color(0x3d2f28) }, // Warm sodium lamp color
-
-    // FOG INTEGRATION - Custom fog blending
-    fogColor: { value: new THREE.Color(0x141618) }, // Matches scene fog
-    fogDensity: { value: 0.02 }, // Matches scene fog density
-    fogMax: { value: 0.95 }, // Maximum fog opacity at horizon
-
-    // HORROR GRADING - Post-processing effects
-    u_resolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
-    u_time: { value: 0.0 },
-    u_horrorEnabled: { value: 0.0 }, // Off by default
-    u_desat: { value: 0.25 }, // Default desaturation amount
-    u_greenTint: { value: 0.12 }, // Default green tint strength
-    u_contrast: { value: 0.12 }, // Default contrast adjustment
-    u_vignette: { value: 0.35 }, // Default vignette strength
-    u_breatheAmp: { value: 0.0 }, // Breathing off by default
-    u_breatheSpeed: { value: 0.15 }, // Default breathing speed
-  },
-  vertexShader: skyVertexShader,
-  fragmentShader: skyFragmentShader,
-  side: THREE.BackSide, // Render inside of sphere
-  depthWrite: false, // Don't write to depth buffer
-  depthTest: false, // CRITICAL: Don't test depth at all
-  fog: false, // MUST be false - fog on skydome with no depth causes black screen!
+// =============== ATMOSPHERE (Sky + Stars)
+// Create the complete atmosphere system
+const atmosphere = createAtmosphere({
+  scene,
+  renderer,
+  camera,
+  constants: SCENE_CONSTANTS,
+  defaults: DEFAULTS
 });
 
-const skydome = new THREE.Mesh(skyGeometry, skyMaterial);
-skydome.renderOrder = -999; // CRITICAL: Render before everything else
-skydome.frustumCulled = false; // Never cull the sky
-scene.add(skydome);
+// Extract the objects we need for GUI controls
+const { skydome, skyMaterial, stars } = atmosphere;
 
-// =============== THREE.Points STAR SYSTEM (replaces fragment shader stars)
-// Generate star positions on the celestial sphere
-function generateStarGeometry(starCount = SCENE_CONSTANTS.DEFAULT_STAR_COUNT) {
-  const positions = new Float32Array(starCount * 3);
-  const sizes = new Float32Array(starCount);
-  const brightnesses = new Float32Array(starCount);
+// REMOVED: ~400 lines of sky and star code moved to Atmosphere module
+// The following was extracted:
+// - Sky vertex and fragment shaders
+// - Skydome creation and material
+// - Star geometry generation
+// - Star vertex and fragment shaders
+// - Star system creation
 
-  for (let i = 0; i < starCount; i++) {
-    // Generate points only in upper hemisphere (no stars below horizon)
-    const theta = Math.random() * Math.PI * 2; // 0 to 2π (full circle)
-    const phi = Math.random() * Math.PI * 0.5; // 0 to π/2 (upper hemisphere only)
-
-    // Convert spherical to cartesian coordinates
-    // Radius matches skydome (1000 units)
-    const radius = SCENE_CONSTANTS.SKYDOME_RADIUS;
-    const x = radius * Math.sin(phi) * Math.cos(theta);
-    const y = radius * Math.cos(phi); // Y is up
-    const z = radius * Math.sin(phi) * Math.sin(theta);
-
-    positions[i * 3] = x;
-    positions[i * 3 + 1] = y;
-    positions[i * 3 + 2] = z;
-
-    // Random size for each star (will be multiplied by uniforms)
-    sizes[i] = Math.random();
-
-    // Random brightness for each star
-    brightnesses[i] = 0.3 + Math.random() * 0.7; // 30% to 100% brightness
-  }
-
-  const geometry = new THREE.BufferGeometry();
-  geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-  geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
-  geometry.setAttribute('brightness', new THREE.BufferAttribute(brightnesses, 1));
-
-  return geometry;
-}
-
-// Custom shaders for star rendering
-const starVertexShader = `
-  attribute float size;
-  attribute float brightness;
-  
-  uniform float u_sizeMin;
-  uniform float u_sizeMax;
-  uniform float u_brightness;
-  uniform float u_pixelRatio;
-  
-  varying float vBrightness;
-  varying vec3 vWorldPosition;   // Pass world position for horizon fade
-  varying float vCalculatedSize; // Pass calculated size for smooth fade
-  
-  void main() {
-    vBrightness = brightness * u_brightness;
-    
-    // Get world position before transformation
-    vWorldPosition = position;
-    
-    vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
-    gl_Position = projectionMatrix * mvPosition;
-    
-    // Calculate point size based on attributes and uniforms
-    float starSize = mix(u_sizeMin, u_sizeMax, size);
-    
-    // Size attenuation: make distant stars smaller (perspective)
-    float calculatedSize = starSize * (300.0 / -mvPosition.z);
-    vCalculatedSize = calculatedSize; // Pass to fragment shader
-    
-    // FIX: Enforce 2-pixel minimum to prevent sub-pixel flickering
-    // 2 logical pixels accounting for device pixel ratio
-    float minPixels = 2.0 * u_pixelRatio;
-    gl_PointSize = max(calculatedSize, minPixels);
-  }
-`;
-
-const starFragmentShader = `
-  uniform float u_horizonFade;
-  uniform bool u_useAntiAlias;
-  uniform float u_fogDensity;    // Fog density for star fading
-  uniform vec3 u_tintColor;      // Star color tint
-  
-  varying float vBrightness;
-  varying vec3 vWorldPosition;   // Receive world position
-  varying float vCalculatedSize; // Receive calculated size for smooth fade
-  
-  void main() {
-    // Create circular star
-    float dist = length(gl_PointCoord - 0.5);
-    
-    float alpha;
-    if (u_useAntiAlias) {
-      // Smooth anti-aliased edges
-      alpha = smoothstep(0.5, 0.3, dist);
-    } else {
-      // Hard edges (for testing)
-      alpha = dist < 0.5 ? 1.0 : 0.0;
-    }
-    
-    // Apply star brightness
-    alpha *= vBrightness;
-    
-    // CRITICAL FIX: Smooth fade based on calculated size
-    // Stars that would be < 2 pixels fade out smoothly
-    float sizeFade = smoothstep(0.0, 2.0, vCalculatedSize);
-    alpha *= sizeFade;
-
-    // Horizon fade based on star altitude
-    float altitude = normalize(vWorldPosition).y; // Y is up, gives 0.0 at horizon, 1.0 at zenith
-    float horizonFadeAlpha = smoothstep(0.0, u_horizonFade, altitude);
-    alpha *= horizonFadeAlpha;
-    
-    // Fog-based fading - stars disappear in dense fog
-    alpha *= exp(-u_fogDensity * 60.0 * (1.0 - altitude)); // 60 is empirical scale
-    
-    gl_FragColor = vec4(u_tintColor, alpha);
-  }
-`;
-
-// Create star material
-const starMaterial = new THREE.ShaderMaterial({
-  uniforms: {
-    u_sizeMin: { value: 0.8 },
-    u_sizeMax: { value: 5.0 },
-    u_brightness: { value: 1.0 },
-    u_horizonFade: { value: 0.3 },
-    u_pixelRatio: { value: renderer.getPixelRatio() }, // FIXED: Added missing uniform
-    u_useAntiAlias: { value: true }, // Anti-aliasing toggle
-    u_cameraPos: { value: camera.position }, // For potential future use
-    u_fogDensity: { value: 0.02 }, // Fog density for star fading
-    u_tintColor: { value: new THREE.Color(1.0, 1.0, 1.0) }, // Star tint color (default white)
-  },
-  vertexShader: starVertexShader,
-  fragmentShader: starFragmentShader,
-  transparent: true,
-  blending: THREE.AdditiveBlending,
-  depthWrite: false, // Don't write to depth buffer (stars are background)
-  depthTest: true, // But DO test depth so objects can occlude stars
-});
-
-// Create stars
-const starGeometry = generateStarGeometry(SCENE_CONSTANTS.DEFAULT_STAR_COUNT);
-const stars = new THREE.Points(starGeometry, starMaterial);
-stars.renderOrder = -1000; // Render before skydome
-stars.frustumCulled = false; // Never cull stars
-scene.add(stars);
-
-// Star system state for GUI controls
-const starState = {
-  enabled: true,
-  count: SCENE_CONSTANTS.DEFAULT_STAR_COUNT,
-  brightness: 1.0,
-  sizeMin: 0.8,
-  sizeMax: 5.0,
-  horizonFade: 0.3,
-};
 
 // =============== FOG (adjusted for skydome interaction)
 // Using FogExp2 for atmospheric depth with improved color
@@ -797,7 +421,6 @@ starsFolder
   .name('Enable Stars')
   .onChange((v) => {
     stars.visible = v;
-    starState.enabled = v;
   });
 
 starsFolder
@@ -805,56 +428,49 @@ starsFolder
   .name('Star Count')
   .onChange((v) => {
     // Regenerate star geometry with new count
-    starGeometry.dispose();
-    const newGeometry = generateStarGeometry(v);
-    stars.geometry = newGeometry;
-    starState.count = v;
+    atmosphere.regenerateStars(v);
   });
 
 starsFolder
   .add(state, 'starBrightness', 0, 3, 0.01)
   .name('Brightness')
   .onChange((v) => {
-    starMaterial.uniforms.u_brightness.value = v;
-    starState.brightness = v;
+    atmosphere.setStarBrightness(v);
   });
 
 starsFolder
   .add(state, 'starSizeMin', 0.5, 5, 0.1)
   .name('Min Size')
   .onChange((v) => {
-    starMaterial.uniforms.u_sizeMin.value = v;
-    starState.sizeMin = v;
+    atmosphere.setStarSizeMin(v);
   });
 
 starsFolder
   .add(state, 'starSizeMax', 2, 15, 0.1)
   .name('Max Size')
   .onChange((v) => {
-    starMaterial.uniforms.u_sizeMax.value = v;
-    starState.sizeMax = v;
+    atmosphere.setStarSizeMax(v);
   });
 
 starsFolder
   .add(state, 'starHorizonFade', 0, 0.5, 0.01)
   .name('Horizon Fade')
   .onChange((v) => {
-    starMaterial.uniforms.u_horizonFade.value = v;
-    starState.horizonFade = v;
+    atmosphere.setStarHorizonFade(v);
   });
 
 starsFolder
   .add(state, 'starAntiAlias')
   .name('Anti-Aliasing')
   .onChange((v) => {
-    starMaterial.uniforms.u_useAntiAlias.value = v;
+    atmosphere.setStarAntiAlias(v);
   });
 
 starsFolder
   .addColor(state, 'starTint')
   .name('Star Tint')
   .onChange((v) => {
-    starMaterial.uniforms.u_tintColor.value.set(v);
+    atmosphere.setStarTintColor(v);
   });
 
 // starsFolder.open(); // Start collapsed
@@ -1075,8 +691,7 @@ fogFolder
     if (scene.fog instanceof THREE.FogExp2) {
       scene.fog.density = v;
       state.fogDensity = v; // Update state
-      skyMaterial.uniforms.fogDensity.value = v; // Update skydome fog density
-      starMaterial.uniforms.u_fogDensity.value = v; // Update star fog density
+      atmosphere.setFogDensity(v); // Update both sky and star fog density
       // Log visibility distance for reference
       const visibilityMeters = Math.round(2 / v); // Rough approximation
       // Fog density updated
@@ -1203,7 +818,7 @@ const presetsObj = {
     skyMaterial.uniforms.fogDensity.value = state.fogDensity;
     skyMaterial.uniforms.fogColor.value.set(state.fogColor);
     skyMaterial.uniforms.fogMax.value = state.fogMax;
-    starMaterial.uniforms.u_fogDensity.value = state.fogDensity;
+    atmosphere.setFogDensity(state.fogDensity);
     flashlight.intensity = state.flashlightIntensity;
     flashlight.angle = state.flashlightAngle * DEG2RAD;
     flashlight.penumbra = state.flashlightPenumbra;
@@ -1234,23 +849,13 @@ const presetsObj = {
     skyMaterial.uniforms.ditherAmount.value = state.skyDitherAmount;
     // Apply star changes
     stars.visible = state.starEnabled;
-    starState.enabled = state.starEnabled;
-    if (state.starCount !== starState.count) {
-      starGeometry.dispose();
-      const newGeometry = generateStarGeometry(state.starCount);
-      stars.geometry = newGeometry;
-      starState.count = state.starCount;
-    }
-    starMaterial.uniforms.u_brightness.value = state.starBrightness;
-    starMaterial.uniforms.u_sizeMin.value = state.starSizeMin;
-    starMaterial.uniforms.u_sizeMax.value = state.starSizeMax;
-    starMaterial.uniforms.u_horizonFade.value = state.starHorizonFade;
-    starState.brightness = state.starBrightness;
-    starState.sizeMin = state.starSizeMin;
-    starState.sizeMax = state.starSizeMax;
-    starState.horizonFade = state.starHorizonFade;
-    starMaterial.uniforms.u_useAntiAlias.value = state.starAntiAlias;
-    starMaterial.uniforms.u_tintColor.value.set(state.starTint);
+    atmosphere.regenerateStars(state.starCount);
+    atmosphere.setStarBrightness(state.starBrightness);
+    atmosphere.setStarSizeMin(state.starSizeMin);
+    atmosphere.setStarSizeMax(state.starSizeMax);
+    atmosphere.setStarHorizonFade(state.starHorizonFade);
+    atmosphere.setStarAntiAlias(state.starAntiAlias);
+    atmosphere.setStarTintColor(state.starTint);
 
     // Apply horror settings
     skyMaterial.uniforms.u_horrorEnabled.value = state.horrorEnabled ? 1.0 : 0.0;
@@ -1337,7 +942,7 @@ const presetsObj = {
     skyMaterial.uniforms.fogDensity.value = state.fogDensity;
     skyMaterial.uniforms.fogColor.value.set(state.fogColor);
     skyMaterial.uniforms.fogMax.value = state.fogMax;
-    starMaterial.uniforms.u_fogDensity.value = state.fogDensity;
+    atmosphere.setFogDensity(state.fogDensity);
     flashlight.intensity = state.flashlightIntensity;
     flashlight.angle = state.flashlightAngle * DEG2RAD;
     flashlight.penumbra = state.flashlightPenumbra;
@@ -1370,22 +975,12 @@ const presetsObj = {
 
     // Apply star changes
     stars.visible = state.starEnabled;
-    starState.enabled = state.starEnabled;
-    if (state.starCount !== starState.count) {
-      starGeometry.dispose();
-      const newGeometry = generateStarGeometry(state.starCount);
-      stars.geometry = newGeometry;
-      starState.count = state.starCount;
-    }
-    starMaterial.uniforms.u_brightness.value = state.starBrightness;
-    starMaterial.uniforms.u_sizeMin.value = state.starSizeMin;
-    starMaterial.uniforms.u_sizeMax.value = state.starSizeMax;
-    starMaterial.uniforms.u_horizonFade.value = state.starHorizonFade;
-    starState.brightness = state.starBrightness;
-    starState.sizeMin = state.starSizeMin;
-    starState.sizeMax = state.starSizeMax;
-    starState.horizonFade = state.starHorizonFade;
-    starMaterial.uniforms.u_useAntiAlias.value = state.starAntiAlias;
+    atmosphere.regenerateStars(state.starCount);
+    atmosphere.setStarBrightness(state.starBrightness);
+    atmosphere.setStarSizeMin(state.starSizeMin);
+    atmosphere.setStarSizeMax(state.starSizeMax);
+    atmosphere.setStarHorizonFade(state.starHorizonFade);
+    atmosphere.setStarAntiAlias(state.starAntiAlias);
 
     // Update GUI to reflect changes
     gui.controllersRecursive().forEach((controller) => controller.updateDisplay());
@@ -1417,9 +1012,9 @@ const presetsObj = {
     if (scene.fog instanceof THREE.FogExp2) {
       scene.fog.density = state.fogDensity;
       skyMaterial.uniforms.fogDensity.value = state.fogDensity;
-      starMaterial.uniforms.u_fogDensity.value = state.fogDensity;
+      atmosphere.setStarFogDensity(state.fogDensity);
     }
-    starMaterial.uniforms.u_brightness.value = state.starBrightness;
+    atmosphere.setStarBrightness(state.starBrightness);
 
     gui.controllersRecursive().forEach((controller) => controller.updateDisplay());
     console.log('✓ Applied Bright Test preset - Enhanced visibility for testing');
@@ -1523,7 +1118,7 @@ const presetsObj = {
     skyMaterial.uniforms.fogColor.value.set(state.fogColor);
     skyMaterial.uniforms.fogDensity.value = state.fogDensity;
     skyMaterial.uniforms.fogMax.value = state.fogMax;
-    starMaterial.uniforms.u_fogDensity.value = state.fogDensity;
+    atmosphere.setStarFogDensity(state.fogDensity);
 
     // Apply sky colors
     skyMaterial.uniforms.horizonColor.value.set(state.skyHorizonColor);
@@ -1547,11 +1142,11 @@ const presetsObj = {
     skyMaterial.uniforms.village2Height.value = state.village2Height;
 
     // Apply star settings
-    starMaterial.uniforms.u_brightness.value = state.starBrightness;
-    starMaterial.uniforms.u_sizeMin.value = state.starSizeMin;
-    starMaterial.uniforms.u_sizeMax.value = state.starSizeMax;
-    starMaterial.uniforms.u_horizonFade.value = state.starHorizonFade;
-    starMaterial.uniforms.u_tintColor.value.set(state.starTint);
+    atmosphere.setStarBrightness(state.starBrightness);
+    atmosphere.setStarSizeMin(state.starSizeMin);
+    atmosphere.setStarSizeMax(state.starSizeMax);
+    atmosphere.setStarHorizonFade(state.starHorizonFade);
+    atmosphere.setStarTintColor(state.starTint);
 
     // Apply horror grading
     skyMaterial.uniforms.u_horrorEnabled.value = state.horrorEnabled ? 1.0 : 0.0;
@@ -1640,16 +1235,9 @@ window.addEventListener('keydown', (e) => {
 });
 
 // =============== RESIZE
-window.addEventListener('resize', () => {
-  camera.aspect = window.innerWidth / window.innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth, window.innerHeight);
-
-  // Update pixel ratio for star rendering
-  starMaterial.uniforms.u_pixelRatio.value = renderer.getPixelRatio();
-
-  // Update resolution for horror vignette effect
-  skyMaterial.uniforms.u_resolution.value.set(window.innerWidth, window.innerHeight);
+// The Engine module handles basic resize, we just register atmosphere's resize callback
+onResize(() => {
+  atmosphere.onResize();
 });
 
 // =============== LOOP
@@ -1660,10 +1248,8 @@ function animate() {
   // Update camera rotation from mouse look
   updateCameraRotation();
 
-  // IMPORTANT: Skydome and stars follow camera to appear infinitely distant
-  // The eye-ray calculation in the shader handles horizon alignment properly
-  skydome.position.copy(camera.position);
-  stars.position.copy(camera.position);
+  // Update atmosphere (handles skydome and stars positioning)
+  atmosphere.update(clock.getElapsedTime());
 
   // Attach flashlight to camera
   if (flashlight.visible) {
@@ -1671,9 +1257,6 @@ function animate() {
     camera.getWorldDirection(tmpDir).normalize();
     flashlight.target.position.copy(camera.position).add(tmpDir.multiplyScalar(10));
   }
-
-  // Update time for horror atmosphere effects
-  skyMaterial.uniforms.u_time.value = clock.getElapsedTime();
 
   renderer.render(scene, camera);
 }
