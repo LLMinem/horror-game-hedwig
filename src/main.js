@@ -1,63 +1,23 @@
-// main.js (with fog-aware skydome)
+// main.js - Refactored with modular architecture
 // --------------------------------------------------
 import GUI from 'lil-gui';
 import * as THREE from 'three';
 import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js';
 
-// =============== SCENE CONSTANTS
-const SCENE_CONSTANTS = {
-  // World dimensions
-  SKYDOME_RADIUS: 1000, // Celestial sphere radius
-  GROUND_SIZE: 500, // Ground plane dimensions
-  FAR_PLANE: 5000, // Camera far clipping plane
+// Import our new modules
+import { SCENE_CONSTANTS, DEG2RAD, DEFAULTS } from './config/Constants.js';
+import { createEngine } from './core/Engine.js';
 
-  // Camera settings
-  CAMERA_HEIGHT: 1.7, // Player eye level
-  CAMERA_START_Z: 15, // Starting position
-
-  // Stars
-  DEFAULT_STAR_COUNT: 3000, // Number of stars to generate
-
-  // Texture quality
-  GROUND_TILING: 64, // Default texture tiling
-};
-
-// Math helper constants
-const DEG2RAD = Math.PI / 180; // Degree to radian conversion factor
+// Constants now imported from ./config/Constants.js
 
 // =============== HDRI SELECTION (easy to switch!)
 // Options: 'moonless_golf', 'dikhololo_night', 'satara_night'
 let HDRI_CHOICE = 'dikhololo_night'; // Beautiful stars, good for testing
 let CURRENT_ENV_INTENSITY = 0.25; // Increased for better object visibility with moonless_golf
 
-// =============== SCENE & RENDERER
-const scene = new THREE.Scene();
-// Skydome handles all sky visuals now
-
-const renderer = new THREE.WebGLRenderer({
-  antialias: true,
-  powerPreference: 'high-performance',
-});
-renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.0; // neutral starting point
-renderer.outputColorSpace = THREE.SRGBColorSpace;
-document.body.appendChild(renderer.domElement);
-
-// Clock for time-based effects
-const clock = new THREE.Clock();
-
-// =============== CAMERA
-const camera = new THREE.PerspectiveCamera(
-  75,
-  window.innerWidth / window.innerHeight,
-  0.1,
-  SCENE_CONSTANTS.FAR_PLANE // Far clipping plane
-);
-camera.position.set(0, SCENE_CONSTANTS.CAMERA_HEIGHT, SCENE_CONSTANTS.CAMERA_START_Z);
+// =============== CREATE ENGINE
+// Initialize core Three.js components
+const { scene, renderer, camera, clock, onResize } = createEngine(SCENE_CONSTANTS);
 
 // =============== MOUSE LOOK CONTROLS
 let yaw = 0; // Horizontal rotation (radians)
@@ -731,70 +691,10 @@ function setEnvIntensity(root, intensity) {
 // =============== GUI SETUP (Step 3: Developer Panel)
 const gui = new GUI();
 
-// Default values for double-click reset functionality (MUST be defined first!)
-const defaults = {
-  exposure: 1.0,
-  envIntensity: 0.25,
-  hdri: 'dikhololo_night',
-  moonIntensity: 0.8,
-  moonX: 12,
-  moonY: 30,
-  moonZ: 16,
-  hemiIntensity: 0.25,
-  ambientIntensity: 0.05,
-  fogDensity: 0.02, // Optimal for 70-80m visibility
-  fogType: 'exp2',
-  fogColor: '#141618', // Bluish charcoal for night atmosphere
-  fogMax: 0.95, // Maximum fog opacity at horizon
-  flashlightIntensity: 50,
-  flashlightAngle: 28,
-  flashlightPenumbra: 0.4,
-  flashlightDistance: 45,
-  shadowBias: -0.001,
-  shadowNormalBias: 0.02,
-  // Ground texture controls
-  groundTiling: SCENE_CONSTANTS.GROUND_TILING,
-  normalStrength: 1.0,
-  // NEW: Sky controls - 4-stop gradient for realistic night
-  skyHorizonColor: '#2b2822', // USER TUNED: Warmer horizon
-  skyMidLowColor: '#0f0e14', // USER TUNED: Dark plum
-  skyMidHighColor: '#080a10', // USER TUNED: Deeper blue
-  skyZenithColor: '#040608', // USER TUNED: Almost black
-  skyMidLowStop: 0.25, // Where first transition happens
-  skyMidHighStop: 0.6, // Where second transition happens
-  // Light pollution controls
-  village1Azimuth: -45, // Northwest direction (degrees)
-  village1Intensity: 0.15, // USER TUNED: Near village glow
-  village1Spread: 70, // USER TUNED: Focused spread
-  village1Height: 0.35, // USER TUNED: Max altitude
-  village2Azimuth: 135, // Southeast direction (degrees)
-  village2Intensity: 0.06, // USER TUNED: Distant village
-  village2Spread: 60, // USER TUNED: Broader spread
-  village2Height: 0.15, // USER TUNED: Lower on horizon
-  pollutionColor: '#3D2F28', // Warm sodium lamp color
-  // Dithering
-  skyDitherAmount: 0.008, // Dithering to prevent gradient banding
-  // THREE.Points star system
-  starEnabled: true,
-  starCount: SCENE_CONSTANTS.DEFAULT_STAR_COUNT, // USER TUNED: More stars
-  starBrightness: 1.0, // USER TUNED: Full brightness stars
-  starSizeMin: 0.8, // USER TUNED: Min size
-  starSizeMax: 5.0, // USER TUNED: Max size
-  starHorizonFade: 0.3, // USER TUNED: Horizon fade
-  starAntiAlias: true,
-  starTint: '#F5FFF9', // Star color tint (neutral white, less green)
-  // Horror atmosphere controls
-  horrorEnabled: false, // Horror mode off by default
-  horrorDesat: 0.25, // Desaturation amount
-  horrorGreenTint: 0.12, // Green tint strength
-  horrorContrast: 0.12, // Contrast adjustment
-  horrorVignette: 0.35, // Vignette strength
-  horrorBreatheAmp: 0.0, // Breathing amplitude (off by default)
-  horrorBreatheSpeed: 0.15, // Breathing speed
-};
+// Defaults now imported from ./config/Constants.js
 
 // State object initialized from defaults
-const state = { ...defaults };
+const state = { ...DEFAULTS };
 
 // Helper function to add double-click reset to any controller
 function addDblClickReset(controller, defaultValue) {
@@ -825,8 +725,8 @@ function enhanceGuiWithReset(guiOrFolder) {
     const controller = originalAdd(object, property, ...args);
 
     // Check if we have a default value for this property
-    if (defaults.hasOwnProperty(property)) {
-      addDblClickReset(controller, defaults[property]);
+    if (DEFAULTS.hasOwnProperty(property)) {
+      addDblClickReset(controller, DEFAULTS[property]);
     }
 
     return controller;
@@ -837,8 +737,8 @@ function enhanceGuiWithReset(guiOrFolder) {
     const originalAddColor = guiOrFolder.addColor.bind(guiOrFolder);
     guiOrFolder.addColor = function (object, property) {
       const controller = originalAddColor(object, property);
-      if (defaults.hasOwnProperty(property)) {
-        addDblClickReset(controller, defaults[property]);
+      if (DEFAULTS.hasOwnProperty(property)) {
+        addDblClickReset(controller, DEFAULTS[property]);
       }
       return controller;
     };
