@@ -9,69 +9,13 @@ import { createEngine } from './core/Engine.js';
 import { createAtmosphere } from './atmosphere/Atmosphere.js';
 import { createWorld } from './world/World.js';
 import { createEnvironment } from './world/Environment.js';
+import { createPlayerController } from './gameplay/PlayerController.js';
 
 // Constants now imported from ./config/Constants.js
 
 // =============== CREATE ENGINE
 // Initialize core Three.js components
 const { scene, renderer, camera, clock, onResize } = createEngine(SCENE_CONSTANTS);
-
-// =============== MOUSE LOOK CONTROLS
-let yaw = 0; // Horizontal rotation (radians)
-let pitch = 0; // Vertical rotation (radians)
-let mouseSensitivity = 0.002; // How fast the camera rotates
-let isPointerLocked = false;
-
-// Request pointer lock when clicking on the canvas
-renderer.domElement.addEventListener('click', () => {
-  if (!isPointerLocked) {
-    renderer.domElement.requestPointerLock();
-  }
-});
-
-// Handle pointer lock change
-document.addEventListener('pointerlockchange', () => {
-  isPointerLocked = document.pointerLockElement === renderer.domElement;
-  if (isPointerLocked) {
-    console.log('✓ Mouse captured - move to look around, ESC to release');
-  } else {
-    console.log('✓ Mouse released - click to capture again');
-  }
-});
-
-// Handle mouse movement when pointer is locked
-document.addEventListener('mousemove', (event) => {
-  if (!isPointerLocked) return;
-
-  // Get mouse movement delta
-  const movementX = event.movementX || 0;
-  const movementY = event.movementY || 0;
-
-  // Update rotation angles
-  yaw += movementX * mouseSensitivity; // Fixed: was inverted
-  pitch -= movementY * mouseSensitivity;
-
-  // Clamp pitch to prevent over-rotation (looking too far up/down)
-  const maxPitch = Math.PI / 2 - 0.1; // Almost straight up/down
-  pitch = Math.max(-maxPitch, Math.min(maxPitch, pitch));
-});
-
-// Function to update camera rotation based on yaw/pitch
-function updateCameraRotation() {
-  // Calculate direction vector from yaw and pitch
-  const direction = new THREE.Vector3(
-    Math.sin(yaw) * Math.cos(pitch),
-    Math.sin(pitch),
-    -Math.cos(yaw) * Math.cos(pitch)
-  );
-
-  // Point camera in that direction
-  camera.lookAt(
-    camera.position.x + direction.x,
-    camera.position.y + direction.y,
-    camera.position.z + direction.z
-  );
-}
 
 // =============== ATMOSPHERE (Sky + Stars)
 // Create the complete atmosphere system
@@ -132,6 +76,16 @@ const environment = createEnvironment({
 // - Critical r179 fix (applying envMap to materials)
 // - Environment intensity helpers
 // - Fallback lighting system
+
+// =============== PLAYER CONTROLLER (Mouse Look + WASD Movement)
+// Create the player controller with all input handling
+const player = createPlayerController({
+  camera,
+  renderer,
+  scene,
+  flashlight,
+  constants: SCENE_CONSTANTS
+});
 
 // =============== GUI SETUP (Step 3: Developer Panel)
 const gui = new GUI();
@@ -534,6 +488,21 @@ fogFolder
     skyMaterial.uniforms.fogMax.value = v; // Control maximum fog opacity at horizon
   });
 
+// Player Controls folder
+const playerFolder = gui.addFolder('Player Controls');
+enhanceGuiWithReset(playerFolder);
+playerFolder
+  .add(state, 'mouseSensitivity', 0.0005, 0.005, 0.0001)
+  .name('Mouse Sensitivity')
+  .onChange((v) => player.setSensitivity(v));
+playerFolder
+  .add(state, 'walkSpeed', 1, 6, 0.1)
+  .name('Walk Speed (m/s)')
+  .onChange((v) => player.setWalkSpeed(v));
+playerFolder
+  .add({ reset: () => player.reset() }, 'reset')
+  .name('Reset Position');
+
 // Flashlight folder
 const flashFolder = gui.addFolder('Flashlight');
 enhanceGuiWithReset(flashFolder); // Enable double-click reset for this folder
@@ -553,7 +522,7 @@ flashFolder
   .add(state, 'flashlightDistance', 10, 100, 1)
   .name('Distance')
   .onChange((v) => (flashlight.distance = v));
-flashFolder.add(flashlight, 'visible').name('Enabled');
+flashFolder.add(flashlight, 'visible').name('Enabled (F key)');
 
 // Shadows folder
 const shadowFolder = gui.addFolder('Shadows');
@@ -1022,11 +991,7 @@ function updateGuiController(property, object = null) {
 }
 
 window.addEventListener('keydown', (e) => {
-  // Flashlight toggle
-  if (e.key.toLowerCase() === 'f') {
-    flashlight.visible = !flashlight.visible;
-    updateGuiController('visible', flashlight);
-  }
+  // Note: Flashlight toggle is now handled in PlayerController (F key)
 
   // Exposure controls (German keyboard) - still work but GUI is better!
   if (e.key === 'ü') {
@@ -1062,35 +1027,33 @@ onResize(() => {
 });
 
 // =============== LOOP
-const tmpDir = new THREE.Vector3();
 function animate() {
   requestAnimationFrame(animate);
 
-  // Update camera rotation from mouse look
-  updateCameraRotation();
+  // Get delta time for frame-independent movement
+  const deltaTime = clock.getDelta();
+
+  // Update player controller (handles movement, rotation, and flashlight)
+  player.update(deltaTime);
 
   // Update atmosphere (handles skydome and stars positioning)
   atmosphere.update(clock.getElapsedTime());
-
-  // Attach flashlight to camera
-  if (flashlight.visible) {
-    flashlight.position.copy(camera.position);
-    camera.getWorldDirection(tmpDir).normalize();
-    flashlight.target.position.copy(camera.position).add(tmpDir.multiplyScalar(10));
-  }
 
   renderer.render(scene, camera);
 }
 animate();
 
 // Start message
-console.log('🌌 Night Scene with Dual Light Pollution Sources');
+console.log('🎮 Horror Game - Refactored with WASD Movement!');
 console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-console.log('🖱️ CLICK to capture mouse, ESC to release');
-console.log('✨ Two village light sources implemented:');
-console.log('  • Near village (NW, ~250m): Noticeable warm glow');
-console.log('  • Distant village (SE, ~2km): Very subtle glow');
-console.log('🎮 Full GUI controls for both sources');
-console.log('📐 Directions: -45° (NW) and 135° (SE)');
-console.log('🎨 Adjust everything in real-time via GUI');
+console.log('📍 Controls:');
+console.log('  • CLICK to capture mouse, ESC to release');
+console.log('  • WASD or Arrow Keys to move');
+console.log('  • SHIFT to sprint (1.5x speed)');
+console.log('  • F to toggle flashlight');
+console.log('  • Mouse to look around');
+console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+console.log('✨ Phase 4 Complete: PlayerController extracted');
+console.log('🌌 Beautiful atmospheric night scene maintained');
+console.log('🎨 Full GUI controls for everything');
 console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');

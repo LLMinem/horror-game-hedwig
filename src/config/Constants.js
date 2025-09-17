@@ -98,6 +98,10 @@ export const DEFAULTS = {
   horrorVignette: 0.35, // Vignette strength
   horrorBreatheAmp: 0.0, // Breathing amplitude (off by default)
   horrorBreatheSpeed: 0.15, // Breathing speed
+
+  // Player controls
+  mouseSensitivity: 0.002, // Mouse look sensitivity
+  walkSpeed: 3.5, // Walk speed in meters per second
 };
 
 // HDRI options available
