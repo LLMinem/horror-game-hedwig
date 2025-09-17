@@ -2,20 +2,15 @@
 // --------------------------------------------------
 import GUI from 'lil-gui';
 import * as THREE from 'three';
-import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js';
 
 // Import our new modules
 import { SCENE_CONSTANTS, DEG2RAD, DEFAULTS } from './config/Constants.js';
 import { createEngine } from './core/Engine.js';
 import { createAtmosphere } from './atmosphere/Atmosphere.js';
 import { createWorld } from './world/World.js';
+import { createEnvironment } from './world/Environment.js';
 
 // Constants now imported from ./config/Constants.js
-
-// =============== HDRI SELECTION (easy to switch!)
-// Options: 'moonless_golf', 'dikhololo_night', 'satara_night'
-let HDRI_CHOICE = 'dikhololo_night'; // Beautiful stars, good for testing
-let CURRENT_ENV_INTENSITY = 0.25; // Increased for better object visibility with moonless_golf
 
 // =============== CREATE ENGINE
 // Initialize core Three.js components
@@ -121,96 +116,22 @@ const { grassColorTex, grassNormalTex } = textures;
 // - Test objects (tombstones, trees, posts, sphere)
 // - Flashlight (SpotLight)
 
-// =============== IMAGE-BASED LIGHTING (Step 2: Night HDRI)
-const pmrem = new THREE.PMREMGenerator(renderer);
-pmrem.compileEquirectangularShader();
+// =============== ENVIRONMENT (HDRI Image-Based Lighting)
+// Create the environment system for realistic reflections
+const environment = createEnvironment({
+  renderer,
+  scene,
+  initialHDRI: DEFAULTS.hdri,
+  initialIntensity: DEFAULTS.envIntensity
+});
 
-// FIX: In r179, must set envMap directly on materials for intensity to work!
-
-// Function to load a new HDRI
-function loadHDRI(hdriName) {
-  const rgbeLoader = new RGBELoader();
-  rgbeLoader.load(
-    `/assets/hdri/${hdriName}_2k.hdr`,
-    (hdrTexture) => {
-      // Convert HDRI to environment map
-      const envMap = pmrem.fromEquirectangular(hdrTexture).texture;
-      scene.environment = envMap; // For diffuse IBL
-      hdrTexture.dispose(); // Clean up original
-
-      // NOTE: We no longer set scene.background - skydome handles visuals!
-
-      // FIX for r179: Must also set envMap on each material!
-      applyEnvMapToMaterials(scene, envMap, CURRENT_ENV_INTENSITY);
-
-      // Remove any fallback lighting if HDRI loads successfully
-      const fallbackLight = scene.getObjectByName('HDRI_Fallback_Light');
-      if (fallbackLight) {
-        scene.remove(fallbackLight);
-      }
-
-      console.log(`✓ Loaded HDRI for lighting: ${hdriName}`);
-    },
-    (progress) => {
-      const percent = ((progress.loaded / progress.total) * 100).toFixed(0);
-      // Loading HDRI...
-    },
-    (error) => {
-      console.error('Failed to load HDRI:', error);
-      console.log('Applying fallback lighting to prevent black scene');
-
-      // Apply basic fallback lighting so scene isn't completely dark
-      const fallbackAmbient = new THREE.AmbientLight(0x404050, 0.3);
-      fallbackAmbient.name = 'HDRI_Fallback_Light';
-
-      // Remove any previous fallback lights
-      const existingFallback = scene.getObjectByName('HDRI_Fallback_Light');
-      if (existingFallback) {
-        scene.remove(existingFallback);
-      }
-
-      scene.add(fallbackAmbient);
-    }
-  );
-}
-
-// Load initial HDRI
-loadHDRI(HDRI_CHOICE);
-
-function applyEnvMapToMaterials(root, envMap, intensity) {
-  CURRENT_ENV_INTENSITY = intensity;
-  let count = 0;
-
-  root.traverse((obj) => {
-    if (obj.isMesh && obj.material) {
-      if ('envMapIntensity' in obj.material) {
-        // Critical fix: Must set envMap on material in r179!
-        obj.material.envMap = envMap;
-        obj.material.envMapIntensity = intensity;
-        obj.material.needsUpdate = true; // Force shader rebuild
-        count++;
-      }
-    }
-  });
-
-  // Applied envMap to materials
-}
-
-// Helper to just change intensity (after envMap is set)
-function setEnvIntensity(root, intensity) {
-  CURRENT_ENV_INTENSITY = intensity;
-  let count = 0;
-
-  root.traverse((obj) => {
-    if (obj.isMesh && obj.material && obj.material.envMap) {
-      obj.material.envMapIntensity = intensity;
-      // No needsUpdate required for just changing intensity!
-      count++;
-    }
-  });
-
-  // Environment intensity updated
-}
+// REMOVED: ~100 lines of environment code moved to Environment module
+// The following was extracted:
+// - PMREM generator setup
+// - HDRI loading with RGBELoader
+// - Critical r179 fix (applying envMap to materials)
+// - Environment intensity helpers
+// - Fallback lighting system
 
 // =============== GUI SETUP (Step 3: Developer Panel)
 const gui = new GUI();
@@ -506,7 +427,7 @@ enhanceGuiWithReset(envFolder); // Enable double-click reset for this folder
 envFolder
   .add(state, 'envIntensity', 0, 1, 0.01)
   .name('Env Intensity')
-  .onChange((v) => setEnvIntensity(scene, v));
+  .onChange((v) => environment.setEnvIntensity(v));
 envFolder
   .add(state, 'hdri', {
     'Dikhololo Night': 'dikhololo_night',
@@ -515,8 +436,8 @@ envFolder
   })
   .name('HDRI (Lighting)')
   .onChange((v) => {
-    HDRI_CHOICE = v;
-    loadHDRI(v);
+    state.hdri = v;
+    environment.switchHDRI(v);
   });
 // envFolder.open(); // Start collapsed
 
@@ -704,8 +625,8 @@ const presetsObj = {
 
     // Apply all changes
     renderer.toneMappingExposure = state.exposure;
-    setEnvIntensity(scene, state.envIntensity);
-    loadHDRI(state.hdri);
+    environment.setEnvIntensity(state.envIntensity);
+    environment.switchHDRI(state.hdri);
     moon.intensity = state.moonIntensity;
     moon.position.set(state.moonX, state.moonY, state.moonZ);
     hemi.intensity = state.hemiIntensity;
@@ -828,8 +749,8 @@ const presetsObj = {
 
     // Apply all settings
     renderer.toneMappingExposure = state.exposure;
-    setEnvIntensity(scene, state.envIntensity);
-    loadHDRI(state.hdri);
+    environment.setEnvIntensity(state.envIntensity);
+    environment.switchHDRI(state.hdri);
     moon.intensity = state.moonIntensity;
     moon.position.set(state.moonX, state.moonY, state.moonZ);
     hemi.intensity = state.hemiIntensity;
@@ -904,8 +825,8 @@ const presetsObj = {
 
     // Apply the brightened values
     renderer.toneMappingExposure = state.exposure;
-    setEnvIntensity(scene, state.envIntensity);
-    loadHDRI(state.hdri);
+    environment.setEnvIntensity(state.envIntensity);
+    environment.switchHDRI(state.hdri);
     moon.intensity = state.moonIntensity;
     hemi.intensity = state.hemiIntensity;
     amb.intensity = state.ambientIntensity;
@@ -1006,7 +927,7 @@ const presetsObj = {
 
     // Apply all settings
     renderer.toneMappingExposure = state.exposure;
-    setEnvIntensity(scene, state.envIntensity);
+    environment.setEnvIntensity(state.envIntensity);
     moon.intensity = state.moonIntensity;
     hemi.intensity = state.hemiIntensity;
     amb.intensity = state.ambientIntensity;
@@ -1124,12 +1045,12 @@ window.addEventListener('keydown', (e) => {
   // Quick HDRI intensity test (+ and - keys) - still work but GUI is better!
   if (e.key === '+') {
     state.envIntensity = Math.min(1.0, state.envIntensity + 0.05);
-    setEnvIntensity(scene, state.envIntensity);
+    environment.setEnvIntensity(state.envIntensity);
     updateGuiController('envIntensity');
   }
   if (e.key === '-') {
     state.envIntensity = Math.max(0.0, state.envIntensity - 0.05);
-    setEnvIntensity(scene, state.envIntensity);
+    environment.setEnvIntensity(state.envIntensity);
     updateGuiController('envIntensity');
   }
 });
