@@ -3,7 +3,7 @@ type: plan
 status: active
 created: 2025-09-16
 last_verified: 2025-09-17
-last_verified_commit: 5750f94
+last_verified_commit: f8ab681
 owned_by: plan-tracker
 supersedes: [night-scene-makeover-guide.md]
 superseded_by: []
@@ -92,9 +92,9 @@ refactor(module): extract [what] from main.js
 
 ## Current Status
 **Last Updated**: 2025-09-17
-**Progress**: 2/6 phases complete (33%)
-**Current Phase**: Phase 3 - World and Environment extraction
-**Next Up**: Extract World.js and Environment.js modules
+**Progress**: 3/6 phases complete (50%)
+**Current Phase**: Phase 4 - Player Controller extraction
+**Next Up**: Extract PlayerController.js with WASD movement
 
 ### PHASE 1: Foundation (Day 1 Morning) ✅ 2025-09-17
 
@@ -244,13 +244,13 @@ export function createAtmosphere({ scene, renderer, camera, constants }) {
 **Test**: Sky gradient works, stars visible, light pollution shows ✅
 **Commit**: `refactor(atmosphere): extract sky and stars together` ✅ (5750f94)
 
-### PHASE 3: World (Day 2 Morning) 🚀 Next Up
+### PHASE 3: World (Day 2 Morning) ✅ 2025-09-17
 
 **Extract physical world elements**
 
-#### Step 3.1: Extract World 📋 Pending
-**Status**: Ready to implement
-**Target**: Extract fog, lights, ground, and test objects
+#### Step 3.1: Extract World ✅ 2025-09-17
+**Status**: Complete (commit 3a305e1)
+**Implementation Notes**: Successfully extracted fog, lights, ground, and test objects (~300 lines) with clean API for world elements
 
 Create `world/World.js`:
 
@@ -304,9 +304,9 @@ export function createWorld({ scene, constants }) {
 }
 ```
 
-#### Step 3.2: Extract Environment 📋 Pending
-**Status**: Ready to implement
-**Target**: Extract HDRI loading and r179 environment map fixes
+#### Step 3.2: Extract Environment ✅ 2025-09-17
+**Status**: Complete (commit f8ab681)
+**Implementation Notes**: Successfully extracted HDRI loading and r179 environment map fixes with proper encapsulation and intensity controls
 
 Create `world/Environment.js`:
 
@@ -356,10 +356,10 @@ export function createEnvironment({ renderer, scene }) {
 }
 ```
 
-**Test**: Fog visible, lights work, ground textured, HDRI reflections work
-**Commit**: `refactor(world): extract world elements and environment`
+**Test**: Fog visible, lights work, ground textured, HDRI reflections work ✅
+**Commit**: `refactor(world): extract world elements and environment` ✅ (3a305e1, f8ab681)
 
-### PHASE 4: Player Controls (Day 2 Afternoon) 📋 Pending
+### PHASE 4: Player Controls (Day 2 Afternoon) 🚀 Next Up
 
 **Extract input and movement (ADD WASD HERE!)**
 
