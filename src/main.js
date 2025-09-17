@@ -8,6 +8,7 @@ import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js';
 import { SCENE_CONSTANTS, DEG2RAD, DEFAULTS } from './config/Constants.js';
 import { createEngine } from './core/Engine.js';
 import { createAtmosphere } from './atmosphere/Atmosphere.js';
+import { createWorld } from './world/World.js';
 
 // Constants now imported from ./config/Constants.js
 
@@ -98,128 +99,27 @@ const { skydome, skyMaterial, stars } = atmosphere;
 // - Star vertex and fragment shaders
 // - Star system creation
 
-
-// =============== FOG (adjusted for skydome interaction)
-// Using FogExp2 for atmospheric depth with improved color
-scene.fog = new THREE.FogExp2(0x141618, 0.02); // Bluish charcoal - matches night atmosphere better
-
-// =============== LIGHTS
-// 1) Moon (directional) - main light source, cool blue-white
-const moon = new THREE.DirectionalLight(0x9bb7ff, 0.8); // cooler, dimmer moon
-moon.position.set(12, 30, 16);
-moon.target.position.set(0, 0, 0);
-moon.castShadow = true;
-moon.shadow.mapSize.set(1024, 1024);
-moon.shadow.camera.near = 0.5;
-moon.shadow.camera.far = 120;
-moon.shadow.camera.left = -60;
-moon.shadow.camera.right = 60;
-moon.shadow.camera.top = 60;
-moon.shadow.camera.bottom = -60;
-moon.shadow.bias = -0.001;
-moon.shadow.normalBias = 0.02;
-scene.add(moon, moon.target);
-
-// 2) Hemisphere (sky/ground bounce) - subtle blue from above, dark from below
-const hemi = new THREE.HemisphereLight(0x20324f, 0x0a0f18, 0.25);
-scene.add(hemi);
-
-// 3) Ambient (tiny base lift; keep very low or it flattens everything)
-const amb = new THREE.AmbientLight(0x1b1e34, 0.05);
-scene.add(amb);
-
-// =============== GROUND WITH TEXTURES
-const textureLoader = new THREE.TextureLoader();
-
-// Load grass textures (using 2K for better quality)
-const grassColorTex = textureLoader.load('/assets/textures/ground/grass_color_2k.jpg');
-const grassNormalTex = textureLoader.load('/assets/textures/ground/grass_normal_2k.jpg');
-
-// Configure textures for tiling
-const groundTiling = SCENE_CONSTANTS.GROUND_TILING; // Default tiling with 2K textures
-grassColorTex.wrapS = grassColorTex.wrapT = THREE.RepeatWrapping;
-grassNormalTex.wrapS = grassNormalTex.wrapT = THREE.RepeatWrapping;
-grassColorTex.repeat.set(groundTiling, groundTiling);
-grassNormalTex.repeat.set(groundTiling, groundTiling);
-
-// IMPORTANT: Mark color texture as sRGB for correct color management
-grassColorTex.colorSpace = THREE.SRGBColorSpace;
-
-// Ground material with textures
-const groundGeo = new THREE.PlaneGeometry(SCENE_CONSTANTS.GROUND_SIZE, SCENE_CONSTANTS.GROUND_SIZE);
-const groundMat = new THREE.MeshStandardMaterial({
-  map: grassColorTex, // Color texture
-  normalMap: grassNormalTex, // Normal map for surface detail
-  normalScale: new THREE.Vector2(1, 1), // Strength of normal effect
-  roughness: 0.8, // Slightly less rough since texture has detail
-  metalness: 0.0,
-  envMapIntensity: 0.25, // Will be overridden by setEnvIntensity
+// =============== WORLD (Fog, Lights, Ground, Objects)
+// Create the physical world elements
+const world = createWorld({
+  scene,
+  constants: SCENE_CONSTANTS,
+  defaults: DEFAULTS
 });
-const ground = new THREE.Mesh(groundGeo, groundMat);
-ground.rotation.x = -Math.PI / 2;
-ground.receiveShadow = true;
-scene.add(ground);
 
-// =============== TEST OBJECTS (lighten albedo a touch)
-for (let i = 0; i < 5; i++) {
-  const tombMat = new THREE.MeshStandardMaterial({
-    color: 0x7a808a, // stone color
-    roughness: 0.65,
-    metalness: 0.0, // stone isn't metal!
-    envMapIntensity: 0.15, // Will be overridden by setEnvIntensity
-  });
-  const tomb = new THREE.Mesh(new THREE.BoxGeometry(1.5, 2.5, 0.3), tombMat);
-  tomb.position.set(Math.random() * 20 - 10, 1.25, Math.random() * 20 - 10);
-  tomb.castShadow = tomb.receiveShadow = true;
-  scene.add(tomb);
-}
+// Extract the objects we need for GUI controls
+let { fog } = world;  // Let because we might reassign it when changing fog type
+const { lights, ground, groundMat, textures, flashlight } = world;
+const { moon, hemi, amb } = lights;
+const { grassColorTex, grassNormalTex } = textures;
 
-for (let i = 0; i < 3; i++) {
-  const trunk = new THREE.Mesh(
-    new THREE.CylinderGeometry(0.5, 0.7, 6, 8),
-    new THREE.MeshStandardMaterial({ color: 0x3a2f26, roughness: 0.95 })
-  );
-  trunk.position.set(Math.random() * 30 - 15, 3, Math.random() * 30 - 15);
-  trunk.castShadow = trunk.receiveShadow = true;
-  scene.add(trunk);
-}
-
-for (let i = 0; i < 8; i++) {
-  const post = new THREE.Mesh(
-    new THREE.BoxGeometry(0.15, 3, 0.15),
-    new THREE.MeshStandardMaterial({
-      color: 0x9a9a9a,
-      roughness: 0.3,
-      metalness: 1.0,
-      envMapIntensity: 0.5,
-    }) // shinier metal for testing!
-  );
-  post.position.set(-20 + i * 5, 1.5, -15);
-  post.castShadow = post.receiveShadow = true;
-  scene.add(post);
-}
-// Metal posts positioned at 25-60m distance (along -15 Z axis)
-
-const sphere = new THREE.Mesh(
-  new THREE.SphereGeometry(1, 32, 32),
-  new THREE.MeshStandardMaterial({
-    color: 0x9aa2b5,
-    roughness: 0.5,
-    metalness: 0.0,
-    envMapIntensity: 0.15,
-  })
-);
-sphere.position.set(5, 1, 5);
-sphere.castShadow = sphere.receiveShadow = true;
-scene.add(sphere);
-// Sphere positioned at ~7m distance (5,1,5 from camera at 0,1.7,15)
-
-// =============== OPTIONAL: FLASHLIGHT (toggle with 'F')
-// Updated defaults based on testing: intensity 50, angle 28°, penumbra 0.4, distance 45
-const flashlight = new THREE.SpotLight(0xfff2d0, 50, 45, 28 * DEG2RAD, 0.4, 2);
-flashlight.visible = false; // keep OFF by default
-flashlight.castShadow = true;
-scene.add(flashlight, flashlight.target);
+// REMOVED: ~200 lines of world code moved to World module
+// The following was extracted:
+// - Fog setup (FogExp2)
+// - Three light sources (moon, hemisphere, ambient)
+// - Ground plane with grass textures
+// - Test objects (tombstones, trees, posts, sphere)
+// - Flashlight (SpotLight)
 
 // =============== IMAGE-BASED LIGHTING (Step 2: Night HDRI)
 const pmrem = new THREE.PMREMGenerator(renderer);
@@ -675,10 +575,10 @@ fogFolder
   .name('Fog Type')
   .onChange((v) => {
     if (v === 'exp2') {
-      scene.fog = new THREE.FogExp2(state.fogColor, state.fogDensity);
+      fog = scene.fog = new THREE.FogExp2(state.fogColor, state.fogDensity);
       // Switched to exponential fog
     } else {
-      scene.fog = new THREE.Fog(state.fogColor, 35, 90);
+      fog = scene.fog = new THREE.Fog(state.fogColor, 35, 90);
       // Switched to linear fog
     }
   });
@@ -688,8 +588,8 @@ fogFolder
   .add(state, 'fogDensity', 0.01, 0.05, 0.002)
   .name('Density')
   .onChange((v) => {
-    if (scene.fog instanceof THREE.FogExp2) {
-      scene.fog.density = v;
+    if (fog instanceof THREE.FogExp2) {
+      fog.density = v;
       state.fogDensity = v; // Update state
       atmosphere.setFogDensity(v); // Update both sky and star fog density
       // Log visibility distance for reference
@@ -702,7 +602,7 @@ fogFolder
   .addColor(state, 'fogColor')
   .name('Color')
   .onChange((v) => {
-    scene.fog.color.set(v);
+    fog.color.set(v);
     skyMaterial.uniforms.fogColor.value.set(v); // Update skydome fog color too
   });
 
@@ -811,9 +711,9 @@ const presetsObj = {
     hemi.intensity = state.hemiIntensity;
     amb.intensity = state.ambientIntensity;
     if (state.fogType === 'exp2') {
-      scene.fog = new THREE.FogExp2(state.fogColor, state.fogDensity);
+      fog = scene.fog = new THREE.FogExp2(state.fogColor, state.fogDensity);
     } else {
-      scene.fog = new THREE.Fog(state.fogColor, 35, 90);
+      fog = scene.fog = new THREE.Fog(state.fogColor, 35, 90);
     }
     skyMaterial.uniforms.fogDensity.value = state.fogDensity;
     skyMaterial.uniforms.fogColor.value.set(state.fogColor);
@@ -935,9 +835,9 @@ const presetsObj = {
     hemi.intensity = state.hemiIntensity;
     amb.intensity = state.ambientIntensity;
     if (state.fogType === 'exp2') {
-      scene.fog = new THREE.FogExp2(state.fogColor, state.fogDensity);
+      fog = scene.fog = new THREE.FogExp2(state.fogColor, state.fogDensity);
     } else {
-      scene.fog = new THREE.Fog(state.fogColor, 35, 90);
+      fog = scene.fog = new THREE.Fog(state.fogColor, 35, 90);
     }
     skyMaterial.uniforms.fogDensity.value = state.fogDensity;
     skyMaterial.uniforms.fogColor.value.set(state.fogColor);
@@ -1009,8 +909,8 @@ const presetsObj = {
     moon.intensity = state.moonIntensity;
     hemi.intensity = state.hemiIntensity;
     amb.intensity = state.ambientIntensity;
-    if (scene.fog instanceof THREE.FogExp2) {
-      scene.fog.density = state.fogDensity;
+    if (fog instanceof THREE.FogExp2) {
+      fog.density = state.fogDensity;
       skyMaterial.uniforms.fogDensity.value = state.fogDensity;
       atmosphere.setStarFogDensity(state.fogDensity);
     }
@@ -1111,9 +1011,9 @@ const presetsObj = {
     hemi.intensity = state.hemiIntensity;
     amb.intensity = state.ambientIntensity;
 
-    scene.fog.color.set(state.fogColor);
-    if (scene.fog instanceof THREE.FogExp2) {
-      scene.fog.density = state.fogDensity;
+    fog.color.set(state.fogColor);
+    if (fog instanceof THREE.FogExp2) {
+      fog.density = state.fogDensity;
     }
     skyMaterial.uniforms.fogColor.value.set(state.fogColor);
     skyMaterial.uniforms.fogDensity.value = state.fogDensity;
