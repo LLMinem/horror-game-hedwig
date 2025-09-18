@@ -11,9 +11,9 @@ const MOVEMENT_CONFIG = {
   walkSpeed: 3.5,             // Normal walking pace
   backwardMultiplier: 0.5,    // Backward movement is half speed
   sprintMultiplier: 1.5,      // Sprint is 1.5x walk speed (5.25 m/s)
-  acceleration: 25,           // Much quicker acceleration for responsive feel
-  deceleration: 30,           // Even quicker stop for precise control
-  directionChangeSnap: 0.85,  // 85% instant response on direction change
+  acceleration: 20,           // Balanced acceleration for responsive but natural feel
+  deceleration: 25,           // Quick stop for precise control
+  directionChangeSnap: 0.7,   // 70% instant response - smoother direction changes
   mouseSensitivity: 0.002,    // Mouse look sensitivity
 
   // Future-proofing for upcoming features
@@ -191,8 +191,8 @@ export function createPlayerController({ camera, renderer, scene, flashlight, co
         currentSpeed *= MOVEMENT_CONFIG.backwardMultiplier;
       }
 
-      // Apply sprint if allowed (not when moving backward)
-      const canSprint = keys.sprint && !isMovingBackward;
+      // Apply sprint only when moving forward (W key involved, not pure strafing)
+      const canSprint = keys.sprint && keys.forward && !keys.backward;
       if (canSprint) {
         currentSpeed *= MOVEMENT_CONFIG.sprintMultiplier;
       }
@@ -316,7 +316,7 @@ export function createPlayerController({ camera, renderer, scene, flashlight, co
     if (velocity.length() > 0.1) {
       const speed = velocity.length().toFixed(1);
       const isBackward = keys.backward && !keys.forward;
-      const isSprinting = keys.sprint && !isBackward;
+      const isSprinting = keys.sprint && keys.forward && !keys.backward;
       const mode = isSprinting ? 'SPRINT' : (isBackward ? 'BACK' : 'WALK');
       // Movement: ${mode} at ${speed} m/s
     }
