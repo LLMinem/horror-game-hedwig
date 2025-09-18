@@ -8,16 +8,18 @@ import * as THREE from 'three';
 
 // Movement configuration - all speeds in meters per second
 const MOVEMENT_CONFIG = {
-  walkSpeed: 3.5,           // Normal walking pace
-  sprintMultiplier: 1.5,    // Sprint is 1.5x walk speed (5.25 m/s)
-  acceleration: 10,         // How quickly we reach target speed
-  deceleration: 15,         // How quickly we stop (slightly faster than accel)
-  mouseSensitivity: 0.002,  // Mouse look sensitivity
+  walkSpeed: 3.5,             // Normal walking pace
+  backwardMultiplier: 0.5,    // Backward movement is half speed
+  sprintMultiplier: 1.5,      // Sprint is 1.5x walk speed (5.25 m/s)
+  acceleration: 25,           // Much quicker acceleration for responsive feel
+  deceleration: 30,           // Even quicker stop for precise control
+  directionChangeSnap: 0.85,  // 85% instant response on direction change
+  mouseSensitivity: 0.002,    // Mouse look sensitivity
 
   // Future-proofing for upcoming features
-  jumpHeight: 1.5,          // For future jumping
-  stepHeight: 0.3,          // Maximum step-up height (future)
-  slopeLimit: 45,           // Maximum walkable slope in degrees (future)
+  jumpHeight: 1.5,            // For future jumping
+  stepHeight: 0.3,            // Maximum step-up height (future)
+  slopeLimit: 45,             // Maximum walkable slope in degrees (future)
   crouchSpeedMultiplier: 0.5, // For future crouching
 };
 
@@ -54,6 +56,7 @@ export function createPlayerController({ camera, renderer, scene, flashlight, co
   // Movement physics state
   const velocity = new THREE.Vector3(0, 0, 0);      // Current velocity
   const acceleration = new THREE.Vector3(0, 0, 0);  // Current acceleration
+  const previousDesiredVelocity = new THREE.Vector3(0, 0, 0); // Track for direction changes
 
   // Movement calculation helpers
   const moveDirection = new THREE.Vector3();
@@ -161,20 +164,38 @@ export function createPlayerController({ camera, renderer, scene, flashlight, co
     // Calculate strafe direction (perpendicular to forward)
     strafeDirection.crossVectors(moveDirection, worldUp).normalize();
 
-    // Calculate input direction
-    if (keys.forward) desiredVelocity.add(moveDirection);
-    if (keys.backward) desiredVelocity.sub(moveDirection);
-    if (keys.right) desiredVelocity.add(strafeDirection);
-    if (keys.left) desiredVelocity.sub(strafeDirection);
+    // Build movement vector from input
+    const forwardAmount = (keys.forward ? 1 : 0) - (keys.backward ? 1 : 0);
+    const strafeAmount = (keys.right ? 1 : 0) - (keys.left ? 1 : 0);
 
-    // Normalize diagonal movement (so you don't move faster diagonally)
+    // Calculate raw movement direction
+    if (forwardAmount !== 0) {
+      desiredVelocity.add(moveDirection.clone().multiplyScalar(forwardAmount));
+    }
+    if (strafeAmount !== 0) {
+      desiredVelocity.add(strafeDirection.clone().multiplyScalar(strafeAmount));
+    }
+
+    // Normalize diagonal movement
     if (desiredVelocity.length() > 0) {
       desiredVelocity.normalize();
 
-      // Apply movement speed
-      const currentSpeed = keys.sprint ?
-        MOVEMENT_CONFIG.walkSpeed * MOVEMENT_CONFIG.sprintMultiplier :
-        MOVEMENT_CONFIG.walkSpeed;
+      // Determine if we're moving backward (dot product with forward direction is negative)
+      const isMovingBackward = keys.backward && !keys.forward;
+
+      // Calculate base speed
+      let currentSpeed = MOVEMENT_CONFIG.walkSpeed;
+
+      // Apply backward speed reduction
+      if (isMovingBackward) {
+        currentSpeed *= MOVEMENT_CONFIG.backwardMultiplier;
+      }
+
+      // Apply sprint if allowed (not when moving backward)
+      const canSprint = keys.sprint && !isMovingBackward;
+      if (canSprint) {
+        currentSpeed *= MOVEMENT_CONFIG.sprintMultiplier;
+      }
 
       desiredVelocity.multiplyScalar(currentSpeed);
     }
@@ -188,27 +209,40 @@ export function createPlayerController({ camera, renderer, scene, flashlight, co
    * @param {number} deltaTime - Time since last frame
    */
   function smoothMovement(targetVelocity, deltaTime) {
-    // Calculate acceleration needed to reach target velocity
-    acceleration.subVectors(targetVelocity, velocity);
+    // Detect direction change (dot product < 0.5 means > 60 degree change)
+    const isChangingDirection = previousDesiredVelocity.length() > 0 &&
+                                targetVelocity.length() > 0 &&
+                                previousDesiredVelocity.normalize().dot(targetVelocity.clone().normalize()) < 0.5;
 
-    // Limit acceleration (smooth start/stop)
-    const accelMagnitude = acceleration.length();
-    if (accelMagnitude > 0) {
-      const maxAccel = targetVelocity.length() > 0 ?
-        MOVEMENT_CONFIG.acceleration :
-        MOVEMENT_CONFIG.deceleration;
+    if (isChangingDirection) {
+      // Apply instant direction change for responsive controls
+      velocity.lerp(targetVelocity, MOVEMENT_CONFIG.directionChangeSnap);
+    } else {
+      // Normal smooth acceleration/deceleration
+      acceleration.subVectors(targetVelocity, velocity);
 
-      const actualAccel = Math.min(accelMagnitude, maxAccel * deltaTime);
-      acceleration.normalize().multiplyScalar(actualAccel);
+      // Limit acceleration (smooth start/stop)
+      const accelMagnitude = acceleration.length();
+      if (accelMagnitude > 0) {
+        const maxAccel = targetVelocity.length() > 0 ?
+          MOVEMENT_CONFIG.acceleration :
+          MOVEMENT_CONFIG.deceleration;
 
-      // Apply acceleration to velocity
-      velocity.add(acceleration);
+        const actualAccel = Math.min(accelMagnitude, maxAccel * deltaTime);
+        acceleration.normalize().multiplyScalar(actualAccel);
+
+        // Apply acceleration to velocity
+        velocity.add(acceleration);
+      }
     }
 
     // If we're very close to target velocity, just set it
     if (velocity.distanceTo(targetVelocity) < 0.01) {
       velocity.copy(targetVelocity);
     }
+
+    // Store current desired velocity for next frame's direction change detection
+    previousDesiredVelocity.copy(targetVelocity);
   }
 
   /**
@@ -279,9 +313,11 @@ export function createPlayerController({ camera, renderer, scene, flashlight, co
     }
 
     // === Debug output (remove in production) ===
-    if (keys.forward || keys.backward || keys.left || keys.right) {
+    if (velocity.length() > 0.1) {
       const speed = velocity.length().toFixed(1);
-      const mode = keys.sprint ? 'SPRINT' : 'WALK';
+      const isBackward = keys.backward && !keys.forward;
+      const isSprinting = keys.sprint && !isBackward;
+      const mode = isSprinting ? 'SPRINT' : (isBackward ? 'BACK' : 'WALK');
       // Movement: ${mode} at ${speed} m/s
     }
   }
