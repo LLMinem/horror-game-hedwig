@@ -2,8 +2,8 @@
 type: plan
 status: active
 created: 2025-09-16
-last_verified: 2025-09-17
-last_verified_commit: f8ab681
+last_verified: 2025-09-18
+last_verified_commit: 57935d2
 owned_by: plan-tracker
 supersedes: [night-scene-makeover-guide.md]
 superseded_by: []
@@ -91,10 +91,10 @@ refactor(module): extract [what] from main.js
 ## Phase-by-Phase Implementation
 
 ## Current Status
-**Last Updated**: 2025-09-17
-**Progress**: 3/6 phases complete (50%)
-**Current Phase**: Phase 4 - Player Controller extraction
-**Next Up**: Extract PlayerController.js with WASD movement
+**Last Updated**: 2025-09-18
+**Progress**: 4/6 phases complete (67%)
+**Current Phase**: Phase 5 - DebugGui extraction
+**Next Up**: Extract DebugGui.js with all lil-gui controls
 
 ### PHASE 1: Foundation (Day 1 Morning) ✅ 2025-09-17
 
@@ -359,13 +359,13 @@ export function createEnvironment({ renderer, scene }) {
 **Test**: Fog visible, lights work, ground textured, HDRI reflections work ✅
 **Commit**: `refactor(world): extract world elements and environment` ✅ (3a305e1, f8ab681)
 
-### PHASE 4: Player Controls (Day 2 Afternoon) 🚀 Next Up
+### PHASE 4: Player Controls (Day 2 Afternoon) ✅ 2025-09-18
 
 **Extract input and movement (ADD WASD HERE!)**
 
-#### Step 4.1: Extract PlayerController 📋 Pending
-**Status**: Ready to implement
-**Target**: Extract mouse look, add WASD movement, flashlight control
+#### Step 4.1: Extract PlayerController ✅ 2025-09-18
+**Status**: Complete (commit 57935d2)
+**Implementation Notes**: Successfully extracted PlayerController module (~300 lines) with smooth WASD movement, sprint system, and flashlight control. Vector-based movement provides proper first-person controls.
 
 Create `gameplay/PlayerController.js`:
 
@@ -471,7 +471,7 @@ export function createPlayerController({ camera, renderer, scene, flashlight }) 
 **Test**: Mouse look works, WASD movement functional, flashlight follows camera
 **Commit**: `refactor(gameplay): extract player controls and add WASD movement`
 
-### PHASE 5: GUI Extraction (Day 3) 📋 Pending
+### PHASE 5: GUI Extraction (Day 3) 🚀 Next Up
 
 **Move all GUI to one place**
 
