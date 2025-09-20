@@ -90,14 +90,9 @@ function applyState(currentState, components) {
   atmosphere.setStarTintColor(currentState.starTint);
   atmosphere.setFogDensity(currentState.fogDensity);
 
-  // Regenerate stars if count changed (only if regenerateStars exists)
-  if (atmosphere.regenerateStars && atmosphere.getStarCount) {
-    const currentStarCount = atmosphere.getStarCount();
-    if (currentStarCount !== currentState.starCount) {
-      atmosphere.regenerateStars(currentState.starCount);
-    }
-  } else if (atmosphere.regenerateStars) {
-    // If we can't check current count, always regenerate to be safe
+  // Note: regenerateStars now checks internally if count changed,
+  // so it's safe to call it every time without performance impact
+  if (atmosphere.regenerateStars) {
     atmosphere.regenerateStars(currentState.starCount);
   }
 

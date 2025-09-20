@@ -13,8 +13,8 @@ Keep CLAUDE.md accurately reflecting current project state while preserving core
 ## Analyze Current State
 
 1. Run `date +%Y-%m-%d` to get today's date.
-2. Run `git log -15 --oneline` for recent activity overview.
-3. Run `git log -5` for detailed recent commits.
+2. Run `git log -20 --oneline` for recent activity overview.
+3. Run `git log -10 --format="%h %s%n%b%n---"` for detailed recent commits.
 4. Run `git log -1 --format=%H` to get latest commit hash.
 
 ## Discover Current Focus
@@ -39,6 +39,7 @@ Last Verified: YYYY-MM-DD (commit-hash)
 ```
 
 ONLY update content within these managed sections:
+
 - `<project-status>...</project-status>` - Current development state
 - `<active-files>...</active-files>` - Important file references
 - `<next-steps>...</next-steps>` - Immediate priorities
@@ -47,6 +48,7 @@ ONLY update content within these managed sections:
 
 1. **Analyze** what needs updating based on git history.
 2. **Propose** changes in a clear format:
+
    ```
    Proposed CLAUDE.md Updates:
 
@@ -60,12 +62,14 @@ ONLY update content within these managed sections:
 
    [Show diffs of proposed changes]
    ```
+
 3. **Wait** for approval before applying changes.
 4. **Apply** only approved changes using Edit tool.
 
 ## What NOT to Touch
 
 Never modify these sections:
+
 - Project philosophy and goals
 - Collaboration principles
 - Developer context (name, ADHD notes)
@@ -76,6 +80,7 @@ Never modify these sections:
 ## Change Triggers
 
 Update CLAUDE.md when:
+
 - New plan becomes active (detected via git commits)
 - Major phase completes (detected in plan-tracker updates)
 - Project pivots (PIVOT: in commit message)
@@ -85,6 +90,7 @@ Update CLAUDE.md when:
 ## Validation Checks
 
 Before proposing changes:
+
 1. Verify referenced files exist with Glob.
 2. Confirm new active plan has `status: active` in frontmatter.
 3. Check that current phase matches plan content.

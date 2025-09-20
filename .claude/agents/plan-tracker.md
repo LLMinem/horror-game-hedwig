@@ -13,8 +13,8 @@ Update planning documents that are actively being worked on to accurately track 
 ## Analyze Recent Activity
 
 1. Run `date +%Y-%m-%d` to get today's date for timestamps.
-2. Run `git log -15 --oneline` to get quick overview of recent work.
-3. Run `git log -10` to understand detailed recent development.
+2. Run `git log -20 --oneline` to get quick overview of recent work.
+3. Run `git log -10 --format="%h %s%n%b%n---"` to understand detailed recent development.
 4. Run `git status` to check current working state.
 5. Run `git diff --stat` to see uncommitted changes summary.
 
@@ -49,6 +49,7 @@ For each active planning document identified:
 ## Frontmatter Management
 
 Ensure each plan has frontmatter like:
+
 ```yaml
 ---
 type: plan
@@ -64,15 +65,19 @@ Update `last_verified` and `last_verified_commit` after each run.
 ## Quick Status Template
 
 For completed steps:
+
 ```markdown
 ### Step N: [Feature Name] ✅ [YYYY-MM-DD]
+
 **Status**: Complete
 **Implementation Notes**: [Brief note if different from plan]
 ```
 
 For progress summaries:
+
 ```markdown
 ## 🎯 Current Status
+
 **Last Updated**: YYYY-MM-DD
 **Progress**: X/Y steps complete (Z%)
 **Current Phase**: [Active step name]

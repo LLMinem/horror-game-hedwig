@@ -15,6 +15,7 @@ Michael is a beginner developer with 8 months of programming experience and ZERO
 ### 1. INCREMENTAL DEVELOPMENT - ONE STEP AT A TIME
 
 **This is the MOST IMPORTANT principle.** Our workflow is:
+
 - Implement exactly ONE feature or change
 - Stop and explain what was done and why
 - Show full, working code (not diffs)
@@ -69,7 +70,7 @@ Last Verified: 2025-09-18 (57935d2)
 
 4. **Call out manual actions.** If Michael must download a file or choose an asset, say so clearly and wait.
 
-5. **Acceptance test.** Tell Michael *what to look for on screen*. Ask for approval before continuing.
+5. **Acceptance test.** Tell Michael _what to look for on screen_. Ask for approval before continuing.
 
 6. **No cascade of changes.** Never jump to the next step without explicit "continue".
 
@@ -218,7 +219,7 @@ Before claiming anything works:
 - **Always** use `npm run dev -- --host` to run the dev server (accessible from network)
 - **Format code:** `npx prettier --write "**/*.{js,json,md,html,css}"`
 - **Check git status:** `git status`
-- **View recent commits:** `git log -10`
+- **View recent commits:** `git log -10 --format="%h %s%n%b%n---" --reverse`
 
 ---
 

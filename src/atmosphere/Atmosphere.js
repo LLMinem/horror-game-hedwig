@@ -394,7 +394,8 @@ export function createAtmosphere({ scene, renderer, camera, constants, defaults 
   });
 
   // Create stars
-  const starGeometry = generateStarGeometry(defaults.starCount, constants);
+  let currentStarCount = defaults.starCount;  // Track current star count
+  const starGeometry = generateStarGeometry(currentStarCount, constants);
   const stars = new THREE.Points(starGeometry, starMaterial);
   stars.renderOrder = -1000; // Render before skydome
   stars.frustumCulled = false; // Never cull stars
@@ -431,12 +432,18 @@ export function createAtmosphere({ scene, renderer, camera, constants, defaults 
    * @param {number} count - New star count
    */
   function regenerateStars(count) {
+    // Only regenerate if count actually changed
+    if (count === currentStarCount) return;
+
     // Dispose old geometry
     stars.geometry.dispose();
 
     // Create new geometry
     const newGeometry = generateStarGeometry(count, constants);
     stars.geometry = newGeometry;
+
+    // Update tracked count
+    currentStarCount = count;
   }
 
   // =============== PUBLIC API
@@ -451,6 +458,7 @@ export function createAtmosphere({ scene, renderer, camera, constants, defaults 
     update,
     onResize,
     regenerateStars,
+    getStarCount: () => currentStarCount,
 
     // Star control methods for GUI
     setStarBrightness: (value) => {
