@@ -2,8 +2,8 @@
 type: plan
 status: active
 created: 2025-09-16
-last_verified: 2025-09-18
-last_verified_commit: 57935d2
+last_verified: 2025-09-21
+last_verified_commit: 7b3d7e4
 owned_by: plan-tracker
 supersedes: [night-scene-makeover-guide.md]
 superseded_by: []
@@ -91,10 +91,10 @@ refactor(module): extract [what] from main.js
 ## Phase-by-Phase Implementation
 
 ## Current Status
-**Last Updated**: 2025-09-18
-**Progress**: 4/6 phases complete (67%)
-**Current Phase**: Phase 5 - DebugGui extraction
-**Next Up**: Extract DebugGui.js with all lil-gui controls
+**Last Updated**: 2025-09-21
+**Progress**: 5/6 phases complete (83%)
+**Current Phase**: Phase 6 - Loop extraction
+**Next Up**: Extract Loop.js for clean animation loop
 
 ### PHASE 1: Foundation (Day 1 Morning) ✅ 2025-09-17
 
@@ -367,6 +367,15 @@ export function createEnvironment({ renderer, scene }) {
 **Status**: Complete (commit 57935d2)
 **Implementation Notes**: Successfully extracted PlayerController module (~300 lines) with smooth WASD movement, sprint system, and flashlight control. Vector-based movement provides proper first-person controls.
 
+#### Step 4.2: Movement System Improvements ✅ 2025-09-21
+**Status**: Complete (commits c47781f, d717f91)
+**Implementation Notes**:
+- **v1.3**: Fixed strafe switching bug and improved movement feel with balanced acceleration
+- **v2.0**: Complete KISS principle rewrite - simplified from ~100 to ~50 lines
+- **Hybrid approach**: Forward/back uses smooth lerp (factor 8), strafe is instant for precise dodging
+- **Bug fixes**: Eliminated camera wobble and strafe teleportation issues
+- **Performance**: Maintains 60 FPS with predictable, consistent movement feel
+
 Create `gameplay/PlayerController.js`:
 
 ```javascript
@@ -471,13 +480,17 @@ export function createPlayerController({ camera, renderer, scene, flashlight }) 
 **Test**: Mouse look works, WASD movement functional, flashlight follows camera
 **Commit**: `refactor(gameplay): extract player controls and add WASD movement`
 
-### PHASE 5: GUI Extraction (Day 3) 🚀 Next Up
+### PHASE 5: GUI Extraction (Day 3) ✅ 2025-09-21
 
 **Move all GUI to one place**
 
-#### Step 5.1: Extract DebugGui 📋 Pending
-**Status**: Ready to implement
-**Target**: Move all lil-gui controls to dedicated module
+#### Step 5.1: Extract DebugGui ✅ 2025-09-21
+**Status**: Complete (commit af36459)
+**Implementation Notes**: Successfully extracted complete DebugGui module (~650 lines) with centralized state management. Reduced main.js from 1046 to 175 lines (83% reduction). All GUI controls, presets, and double-click reset functionality preserved.
+
+#### Step 5.2: Fix Star Regeneration Bug ✅ 2025-09-21
+**Status**: Complete (commit 6ebe710)
+**Implementation Notes**: Fixed critical issue where stars regenerated on every GUI change instead of only when star count changed. Added currentStarCount tracking and getStarCount() API method for proper state management.
 
 Create `ui/DebugGui.js`:
 
@@ -564,7 +577,7 @@ export function setupDebugGui({
 **Test**: All GUI controls work, presets apply correctly
 **Commit**: `refactor(ui): extract all GUI controls`
 
-### PHASE 6: Animation Loop (Day 3) 📋 Pending
+### PHASE 6: Animation Loop (Day 3) 🚀 Next Up
 
 **Clean up the game loop**
 
