@@ -10,6 +10,7 @@ import { createWorld } from './world/World.js';
 import { createEnvironment } from './world/Environment.js';
 import { createPlayerController } from './gameplay/PlayerController.js';
 import { initDebugGui } from './ui/DebugGui.js';
+import { startLoop } from './loop/Loop.js';
 
 // Constants now imported from ./config/Constants.js
 
@@ -143,24 +144,23 @@ onResize(() => {
 });
 
 // =============== LOOP
-function animate() {
-  requestAnimationFrame(animate);
+// Start the animation loop with all systems
+startLoop({
+  renderer,
+  scene,
+  camera,
+  clock,
+  systems: [
+    // Player controller for movement and flashlight
+    { update: (deltaTime) => player.update(deltaTime) },
 
-  // Get delta time for frame-independent movement
-  const deltaTime = clock.getDelta();
-
-  // Update player controller (handles movement, rotation, and flashlight)
-  player.update(deltaTime);
-
-  // Update atmosphere (handles skydome and stars positioning)
-  atmosphere.update(clock.getElapsedTime());
-
-  renderer.render(scene, camera);
-}
-animate();
+    // Atmosphere for sky and stars animation
+    { update: (deltaTime, elapsedTime) => atmosphere.update(elapsedTime) }
+  ]
+});
 
 // Start message
-console.log('🎮 Horror Game - Refactored with WASD Movement!');
+console.log('🎮 Horror Game - Fully Refactored!');
 console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
 console.log('📍 Controls:');
 console.log('  • CLICK to capture mouse, ESC to release');
@@ -169,7 +169,8 @@ console.log('  • SHIFT to sprint (1.5x speed)');
 console.log('  • F to toggle flashlight');
 console.log('  • Mouse to look around');
 console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-console.log('✨ Phase 5 Complete: DebugGui extracted with centralized state');
+console.log('✨ Phase 6 Complete: Loop module extracted');
+console.log('🏗️  Main.js reduced from 1792 → 175 lines');
+console.log('📦 Clean modular architecture achieved');
 console.log('🌌 Beautiful atmospheric night scene maintained');
-console.log('🎨 Full GUI controls with improved state management');
 console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
