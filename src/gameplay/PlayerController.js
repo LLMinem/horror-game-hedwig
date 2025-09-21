@@ -7,13 +7,16 @@
 import * as THREE from 'three';
 
 // Movement configuration - all speeds in meters per second
+// TODO: Movement feel needs further fine-tuning through playtesting
+// Current values are a compromise between responsive arcade feel and weighted realism
+// Known issue: slight camera wobble when turning while moving - needs investigation
 const MOVEMENT_CONFIG = {
   walkSpeed: 3.5,             // Normal walking pace
   backwardMultiplier: 0.5,    // Backward movement is half speed
   sprintMultiplier: 1.5,      // Sprint is 1.5x walk speed (5.25 m/s)
-  acceleration: 20,           // Balanced acceleration for responsive but natural feel
+  acceleration: 20,           // Balanced acceleration - responsive but not twitchy
   deceleration: 25,           // Quick stop for precise control
-  directionChangeSnap: 0.7,   // 70% instant response - smoother direction changes
+  directionChangeSnap: 0.5,   // 50% instant response - balanced between smooth and responsive
   mouseSensitivity: 0.002,    // Mouse look sensitivity
 
   // Future-proofing for upcoming features
@@ -209,13 +212,14 @@ export function createPlayerController({ camera, renderer, scene, flashlight, co
    * @param {number} deltaTime - Time since last frame
    */
   function smoothMovement(targetVelocity, deltaTime) {
-    // Detect direction change (dot product < 0.5 means > 60 degree change)
-    const isChangingDirection = previousDesiredVelocity.length() > 0 &&
-                                targetVelocity.length() > 0 &&
-                                previousDesiredVelocity.normalize().dot(targetVelocity.clone().normalize()) < 0.5;
+    // Detect true reversals only (dot product < -0.5 means > 120 degree change)
+    // This prevents the strafe switching bug while still allowing quick 180° turns
+    const isReversingDirection = previousDesiredVelocity.length() > 0 &&
+                                 targetVelocity.length() > 0 &&
+                                 previousDesiredVelocity.normalize().dot(targetVelocity.clone().normalize()) < -0.5;
 
-    if (isChangingDirection) {
-      // Apply instant direction change for responsive controls
+    if (isReversingDirection) {
+      // Apply partial instant change only for true reversals (backing up)
       velocity.lerp(targetVelocity, MOVEMENT_CONFIG.directionChangeSnap);
     } else {
       // Normal smooth acceleration/deceleration
