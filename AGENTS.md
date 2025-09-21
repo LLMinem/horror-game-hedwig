@@ -188,7 +188,7 @@ Agents only modify their designated sections. XML-style tags mark managed conten
 - docs/pragmatic-refactor-plan.md - Current refactor plan (active)
 - src/main.js - Primary implementation file (to be refactored)
 - docs/night-scene-makeover-guide.md - Completed scene work (reference)
-- CLAUDE.md - This file (project context)
+- AGENTS.md - This file (project context)
 </active-files>
 
 <next-steps>

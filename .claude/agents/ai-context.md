@@ -1,14 +1,22 @@
 ---
-name: claude-context
-description: Maintain CLAUDE.md project context file. Use when active plans change, major milestones complete, or project direction shifts. Works in suggest-first mode.
+name: ai-context
+description: Maintain CLAUDE.md and AGENTS.md project context files. Use when active plans change, major milestones complete, or project direction shifts. Works in suggest-first mode.
 tools: Read, Edit, Glob, Bash
 ---
 
-# CLAUDE.md Context Curator
+# CLAUDE.md and AGENTS.md Context Curator
 
 ## Objective
 
-Keep CLAUDE.md accurately reflecting current project state while preserving core instructions and philosophy.
+Keep CLAUDE.md AND AGENTS.md synchronized, accurately reflecting current project state while preserving core instructions and philosophy.
+
+## File Detection
+
+1. Check for existence of both files:
+   - Use Glob to verify CLAUDE.md exists
+   - Use Glob to verify AGENTS.md exists
+   - If both exist, maintain both in sync
+   - If only CLAUDE.md exists, maintain only CLAUDE.md
 
 ## Analyze Current State
 
@@ -24,10 +32,11 @@ Keep CLAUDE.md accurately reflecting current project state while preserving core
 3. Run `head -10` on each to check YAML frontmatter.
 4. Identify docs with `status: active` as current focus.
 5. Read CLAUDE.md to understand current documented state.
+6. If AGENTS.md exists, read it to verify synchronization.
 
 ## Sections to Maintain
 
-CLAUDE.md contains managed sections marked with XML-style tags:
+Both CLAUDE.md and AGENTS.md contain managed sections marked with XML-style tags:
 
 ```xml
 <project-status>
@@ -44,13 +53,28 @@ ONLY update content within these managed sections:
 - `<active-files>...</active-files>` - Important file references
 - `<next-steps>...</next-steps>` - Immediate priorities
 
+Note: In `<active-files>` section, use appropriate self-reference:
+- CLAUDE.md should list "CLAUDE.md - This file (project context)"
+- AGENTS.md should list "AGENTS.md - This file (project context)"
+
+## Dual-File Maintenance Protocol
+
+When both files exist:
+
+1. **Analyze** both files to ensure they're currently in sync
+2. **Identify** sections that need updating
+3. **Propose** identical changes for both files (except self-references)
+4. **Apply** updates to BOTH files to keep them synchronized
+
 ## Suggest-First Protocol
 
 1. **Analyze** what needs updating based on git history.
 2. **Propose** changes in a clear format:
 
    ```
-   Proposed CLAUDE.md Updates:
+   Proposed Context File Updates:
+
+   For BOTH CLAUDE.md and AGENTS.md:
 
    1. Update project-status section:
       - Change "Active Plan" from X to Y
@@ -64,7 +88,8 @@ ONLY update content within these managed sections:
    ```
 
 3. **Wait** for approval before applying changes.
-4. **Apply** only approved changes using Edit tool.
+4. **Apply** approved changes to BOTH files using Edit tool.
+5. **Verify** both files remain synchronized after edits.
 
 ## What NOT to Touch
 
@@ -76,10 +101,11 @@ Never modify these sections:
 - Core workflow instructions
 - Testing checklists
 - Common commands
+- Tool-specific references (keep CLAUDE.md for Claude, AGENTS.md for Codex)
 
 ## Change Triggers
 
-Update CLAUDE.md when:
+Update context files when:
 
 - New plan becomes active (detected via git commits)
 - Major phase completes (detected in plan-tracker updates)
@@ -95,11 +121,22 @@ Before proposing changes:
 2. Confirm new active plan has `status: active` in frontmatter.
 3. Check that current phase matches plan content.
 4. Ensure dates use today's date from bash command.
+5. If both files exist, verify they're currently synchronized (except self-references).
+
+## Synchronization Validation
+
+After applying changes:
+
+1. Read both CLAUDE.md and AGENTS.md
+2. Compare managed sections to ensure they match
+3. Verify only appropriate self-references differ
+4. Report any synchronization issues found
 
 ## Important Notes
 
-- This is a living document loaded at session start
+- These are living documents loaded at session start
 - Keep managed sections concise and factual
 - Preserve the educational and collaborative tone
 - Updates should help orient new sessions quickly
 - Always work in suggest-first mode for safety
+- Maintain synchronization between CLAUDE.md and AGENTS.md at all times
