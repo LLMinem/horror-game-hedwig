@@ -22,6 +22,7 @@ let sceneComponents = null;
 function applyState(currentState, components) {
   const {
     renderer,
+    scene,
     atmosphere,
     world,
     environment,
@@ -97,7 +98,7 @@ function applyState(currentState, components) {
   }
 
   // =============== WORLD SETTINGS
-  const { lights, fog, flashlight, groundMat, textures } = world;
+  let { lights, fog, flashlight, groundMat, textures } = world;
   const { moon, hemi, amb } = lights;
   const { grassColorTex, grassNormalTex } = textures;
 
@@ -109,19 +110,24 @@ function applyState(currentState, components) {
 
   // Fog
   if (currentState.fogType === 'exp2') {
-    if (!(fog instanceof THREE.FogExp2)) {
+    if (!(scene.fog instanceof THREE.FogExp2)) {
       // Need to recreate fog
-      world.fog = renderer.scene.fog = new THREE.FogExp2(currentState.fogColor, currentState.fogDensity);
+      scene.fog = new THREE.FogExp2(currentState.fogColor, currentState.fogDensity);
+      world.fog = scene.fog;
+      fog = scene.fog;
     } else {
-      fog.color.set(currentState.fogColor);
-      fog.density = currentState.fogDensity;
+      scene.fog.color.set(currentState.fogColor);
+      scene.fog.density = currentState.fogDensity;
     }
   } else {
-    if (!(fog instanceof THREE.Fog)) {
+    if (!(scene.fog instanceof THREE.Fog)) {
       // Need to recreate fog
-      world.fog = renderer.scene.fog = new THREE.Fog(currentState.fogColor, 35, 90);
+      scene.fog = new THREE.Fog(currentState.fogColor, 35, 90);
+      world.fog = scene.fog;
+      fog = scene.fog;
     } else {
-      fog.color.set(currentState.fogColor);
+      scene.fog.color.set(currentState.fogColor);
+      // For linear fog, we could also update near/far if we had controls for them
     }
   }
 
