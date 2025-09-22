@@ -33,10 +33,10 @@ Michael is a beginner developer with 8 months of programming experience and ZERO
 ### 3. FOLLOW THE CURRENT PLAN
 
 <project-status>
-Current Phase: Pragmatic Refactor - Phase 6 (Loop Extraction)
-Active Plan: docs/pragmatic-refactor-plan.md
-Next Priority: Extract Loop module (5 of 6 phases complete - 83%)
-Last Verified: 2025-09-21 (9053fa2)
+Current Phase: Refactor COMPLETE - Ready for merge
+Active Plan: docs/pragmatic-refactor-plan.md (100% complete)
+Next Priority: Merge to main branch, then asset integration
+Last Verified: 2025-09-22 (1ba0274)
 </project-status>
 
 - Work through phases sequentially
@@ -185,18 +185,18 @@ Agents only modify their designated sections. XML-style tags mark managed conten
 ## CURRENT DEVELOPMENT STATUS
 
 <active-files>
-- docs/pragmatic-refactor-plan.md - Current refactor plan (active)
-- src/main.js - Primary implementation file (to be refactored)
-- docs/night-scene-makeover-guide.md - Completed scene work (reference)
+- docs/pragmatic-refactor-plan.md - COMPLETE refactor plan (100% done)
+- src/main.js - Ultra-clean 44-line entry point (refactored)
+- All 12 modules successfully created and working
 - CLAUDE.md - This file (project context)
 </active-files>
 
 <next-steps>
-- Phase 6: Extract Loop module (current priority)
-- Phase 7: Final main.js wiring and cleanup
-- Complete refactor testing and validation
-- Maintain working game state at each step
-- Test all features work correctly after refactor
+- Merge refactor/pragmatic to main branch (immediate priority)
+- Begin asset integration phase (post-merge)
+- Consider future features (physical moon, clouds, Uncle AI)
+- All refactor goals achieved (97.5% code reduction)
+- All known issues fixed (HDRI switching, linear fog)
 </next-steps>
 
 ---
