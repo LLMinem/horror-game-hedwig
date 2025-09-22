@@ -108,6 +108,14 @@ function applyState(currentState, components) {
   hemi.intensity = currentState.hemiIntensity;
   amb.intensity = currentState.ambientIntensity;
 
+  // Helper to map exponential-style density slider to linear fog near/far values
+  const mapDensityToLinearFog = (density) => {
+    const normalized = THREE.MathUtils.clamp((density - 0.01) / 0.04, 0, 1);
+    const near = THREE.MathUtils.lerp(20, 10, normalized);
+    const far = THREE.MathUtils.lerp(120, 45, normalized);
+    return { near, far };
+  };
+
   // Fog
   if (currentState.fogType === 'exp2') {
     if (!(scene.fog instanceof THREE.FogExp2)) {
@@ -122,12 +130,15 @@ function applyState(currentState, components) {
   } else {
     if (!(scene.fog instanceof THREE.Fog)) {
       // Need to recreate fog
-      scene.fog = new THREE.Fog(currentState.fogColor, 35, 90);
+      const { near, far } = mapDensityToLinearFog(currentState.fogDensity);
+      scene.fog = new THREE.Fog(currentState.fogColor, near, far);
       world.fog = scene.fog;
       fog = scene.fog;
     } else {
       scene.fog.color.set(currentState.fogColor);
-      // For linear fog, we could also update near/far if we had controls for them
+      const { near, far } = mapDensityToLinearFog(currentState.fogDensity);
+      scene.fog.near = near;
+      scene.fog.far = far;
     }
   }
 
