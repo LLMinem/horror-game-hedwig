@@ -1,9 +1,6 @@
-// main.js - Refactored with modular architecture
-// --------------------------------------------------
+// main.js - Horror Game Entry Point
 import * as THREE from 'three';
-
-// Import our new modules
-import { SCENE_CONSTANTS, DEG2RAD, DEFAULTS } from './config/Constants.js';
+import { SCENE_CONSTANTS, DEFAULTS } from './config/Constants.js';
 import { createEngine } from './core/Engine.js';
 import { createAtmosphere } from './atmosphere/Atmosphere.js';
 import { createWorld } from './world/World.js';
@@ -12,165 +9,36 @@ import { createPlayerController } from './gameplay/PlayerController.js';
 import { initDebugGui } from './ui/DebugGui.js';
 import { startLoop } from './loop/Loop.js';
 
-// Constants now imported from ./config/Constants.js
-
-// =============== CREATE ENGINE
-// Initialize core Three.js components
+// Create core systems
 const { scene, renderer, camera, clock, onResize } = createEngine(SCENE_CONSTANTS);
 
-// =============== ATMOSPHERE (Sky + Stars)
-// Create the complete atmosphere system
-const atmosphere = createAtmosphere({
-  scene,
-  renderer,
-  camera,
-  constants: SCENE_CONSTANTS,
-  defaults: DEFAULTS
-});
+// Create world systems
+const atmosphere = createAtmosphere({ scene, renderer, camera, constants: SCENE_CONSTANTS, defaults: DEFAULTS });
+const world = createWorld({ scene, constants: SCENE_CONSTANTS, defaults: DEFAULTS });
+const environment = createEnvironment({ renderer, scene, initialHDRI: DEFAULTS.hdri, initialIntensity: DEFAULTS.envIntensity });
 
-// Extract the objects we need for GUI controls
-const { skydome, skyMaterial, stars } = atmosphere;
+// Create player controller
+const player = createPlayerController({ camera, renderer, scene, flashlight: world.flashlight, constants: SCENE_CONSTANTS });
 
-// REMOVED: ~400 lines of sky and star code moved to Atmosphere module
-// The following was extracted:
-// - Sky vertex and fragment shaders
-// - Skydome creation and material
-// - Star geometry generation
-// - Star vertex and fragment shaders
-// - Star system creation
+// Setup GUI
+const guiControls = initDebugGui({ renderer, scene, atmosphere, world, environment, player });
 
-// =============== WORLD (Fog, Lights, Ground, Objects)
-// Create the physical world elements
-const world = createWorld({
-  scene,
-  constants: SCENE_CONSTANTS,
-  defaults: DEFAULTS
-});
-
-// Extract the objects we need for GUI controls
-let { fog } = world;  // Let because we might reassign it when changing fog type
-const { lights, ground, groundMat, textures, flashlight } = world;
-const { moon, hemi, amb } = lights;
-const { grassColorTex, grassNormalTex } = textures;
-
-// REMOVED: ~200 lines of world code moved to World module
-// The following was extracted:
-// - Fog setup (FogExp2)
-// - Three light sources (moon, hemisphere, ambient)
-// - Ground plane with grass textures
-// - Test objects (tombstones, trees, posts, sphere)
-// - Flashlight (SpotLight)
-
-// =============== ENVIRONMENT (HDRI Image-Based Lighting)
-// Create the environment system for realistic reflections
-const environment = createEnvironment({
-  renderer,
-  scene,
-  initialHDRI: DEFAULTS.hdri,
-  initialIntensity: DEFAULTS.envIntensity
-});
-
-// REMOVED: ~100 lines of environment code moved to Environment module
-// The following was extracted:
-// - PMREM generator setup
-// - HDRI loading with RGBELoader
-// - Critical r179 fix (applying envMap to materials)
-// - Environment intensity helpers
-// - Fallback lighting system
-
-// =============== PLAYER CONTROLLER (Mouse Look + WASD Movement)
-// Create the player controller with all input handling
-const player = createPlayerController({
-  camera,
-  renderer,
-  scene,
-  flashlight,
-  constants: SCENE_CONSTANTS
-});
-
-// =============== GUI SETUP
-// Initialize the debug GUI with centralized state management
-const guiControls = initDebugGui({
-  renderer,
-  scene,
-  atmosphere,
-  world,
-  environment,
-  player
-});
-
-// Extract the controls we need
-const { gui, state, updateGuiController } = guiControls;
-
-// REMOVED: ~850 lines of GUI setup code moved to DebugGui module
-// The following was extracted:
-// - All GUI folder creation
-// - All control setup
-// - Preset functions
-// - State management
-// - Double-click reset functionality
-
-// =============== KEYBOARD CONTROLS (keeping for backwards compatibility)
+// Legacy keyboard shortcuts (optional - GUI provides same controls)
 window.addEventListener('keydown', (e) => {
-  // Note: Flashlight toggle is now handled in PlayerController (F key)
-
-  // Exposure controls (German keyboard) - still work but GUI is better!
-  if (e.key === 'ü') {
-    state.exposure = Math.min(3.0, state.exposure * 1.06);
-    guiControls.applyState();
-    // Exposure increased
-  }
-  if (e.key === 'ä') {
-    state.exposure = Math.max(0.3, state.exposure / 1.06);
-    guiControls.applyState();
-    // Exposure decreased
-  }
-
-  // Quick HDRI intensity test (+ and - keys) - still work but GUI is better!
-  if (e.key === '+') {
-    state.envIntensity = Math.min(1.0, state.envIntensity + 0.05);
-    guiControls.applyState();
-  }
-  if (e.key === '-') {
-    state.envIntensity = Math.max(0.0, state.envIntensity - 0.05);
-    guiControls.applyState();
-  }
+  const keys = { 'ü': () => guiControls.state.exposure = Math.min(3.0, guiControls.state.exposure * 1.06),
+                 'ä': () => guiControls.state.exposure = Math.max(0.3, guiControls.state.exposure / 1.06),
+                 '+': () => guiControls.state.envIntensity = Math.min(1.0, guiControls.state.envIntensity + 0.05),
+                 '-': () => guiControls.state.envIntensity = Math.max(0.0, guiControls.state.envIntensity - 0.05) };
+  if (keys[e.key]) { keys[e.key](); guiControls.applyState(); }
 });
 
-// =============== RESIZE
-// The Engine module handles basic resize, we just register atmosphere's resize callback
-onResize(() => {
-  atmosphere.onResize();
-});
+// Handle resize
+onResize(() => atmosphere.onResize());
 
-// =============== LOOP
-// Start the animation loop with all systems
-startLoop({
-  renderer,
-  scene,
-  camera,
-  clock,
-  systems: [
-    // Player controller for movement and flashlight
-    { update: (deltaTime) => player.update(deltaTime) },
+// Start game loop
+startLoop({ renderer, scene, camera, clock, systems: [
+  { update: (dt) => player.update(dt) },
+  { update: (dt, elapsed) => atmosphere.update(elapsed) }
+]});
 
-    // Atmosphere for sky and stars animation
-    { update: (deltaTime, elapsedTime) => atmosphere.update(elapsedTime) }
-  ]
-});
-
-// Start message
-console.log('🎮 Horror Game - Fully Refactored!');
-console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-console.log('📍 Controls:');
-console.log('  • CLICK to capture mouse, ESC to release');
-console.log('  • WASD or Arrow Keys to move');
-console.log('  • SHIFT to sprint (1.5x speed)');
-console.log('  • F to toggle flashlight');
-console.log('  • Mouse to look around');
-console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-console.log('✨ Phase 6 Complete: Loop module extracted');
-console.log('🏗️  Main.js reduced from 1792 → 175 lines');
-console.log('📦 Clean modular architecture achieved');
-console.log('🌌 Beautiful atmospheric night scene maintained');
-console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+console.log('🌙 Horror Game - Refactored and Ready');
