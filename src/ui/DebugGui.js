@@ -143,7 +143,7 @@ function applyState(currentState, components) {
   // =============== ENVIRONMENT SETTINGS
   environment.setEnvIntensity(currentState.envIntensity);
   // Only switch HDRI if it changed
-  if (environment.getCurrentHDRI && environment.getCurrentHDRI() !== currentState.hdri) {
+  if (environment.currentHDRI !== currentState.hdri) {
     environment.switchHDRI(currentState.hdri);
   }
 
