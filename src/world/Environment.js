@@ -104,12 +104,14 @@ export function createEnvironment({ renderer, scene, initialHDRI = 'dikhololo_ni
 
           // Convert the equirectangular HDR image to a cube environment map
           // This is what allows for realistic reflections from all angles
-          const envMap = pmrem.fromEquirectangular(hdrTexture).texture;
+          const pmremTarget = pmrem.fromEquirectangular(hdrTexture);
+          const envMap = pmremTarget.texture;
 
           // Set as scene environment (for diffuse lighting)
           scene.environment = envMap;
 
-          // Store for later use
+          // Track previous map so we can free GPU memory after the swap completes
+          const previousEnvMap = currentEnvMap;
           currentEnvMap = envMap;
           currentHDRI = hdriName;
 
@@ -118,6 +120,14 @@ export function createEnvironment({ renderer, scene, initialHDRI = 'dikhololo_ni
 
           // CRITICAL: Apply the r179 fix - set envMap on all materials!
           applyEnvMapToMaterials(scene, envMap, currentEnvIntensity);
+
+          // Dispose the PMREM render target (keeps texture alive)
+          pmremTarget.dispose();
+
+          // Dispose the previous cube map now that all materials reference the new one
+          if (previousEnvMap && previousEnvMap !== envMap) {
+            previousEnvMap.dispose();
+          }
 
           // Remove any fallback lighting if it exists
           const fallbackLight = scene.getObjectByName('HDRI_Fallback_Light');
