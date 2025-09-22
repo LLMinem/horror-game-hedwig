@@ -32,6 +32,11 @@ export function createEnvironment({ renderer, scene, initialHDRI = 'dikhololo_ni
   // This allows for much wider dynamic range than standard images
   const rgbeLoader = new RGBELoader();
 
+  const resolveAssetUrl = (assetPath) => {
+    const trimmed = assetPath.startsWith('/') ? assetPath.slice(1) : assetPath;
+    return `${import.meta.env.BASE_URL}${trimmed}`;
+  };
+
   // =============== THE THREE.JS r179 FIX
   // CRITICAL: In Three.js r179+, environment maps don't automatically apply
   // We MUST manually set material.envMap = scene.environment for reflections to work
@@ -93,7 +98,7 @@ export function createEnvironment({ renderer, scene, initialHDRI = 'dikhololo_ni
    */
   function loadHDRI(hdriName) {
     return new Promise((resolve, reject) => {
-      const hdriPath = `/assets/hdri/${hdriName}_2k.hdr`;
+      const hdriPath = resolveAssetUrl(`assets/hdri/${hdriName}_2k.hdr`);
       console.log(`Loading HDRI: ${hdriPath}`);
 
       rgbeLoader.load(

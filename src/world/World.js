@@ -14,6 +14,11 @@ import * as THREE from 'three';
 export function createWorld({ scene, constants, defaults }) {
   const DEG2RAD = Math.PI / 180; // Local conversion factor
 
+  const resolveAssetUrl = (assetPath) => {
+    const trimmed = assetPath.startsWith('/') ? assetPath.slice(1) : assetPath;
+    return `${import.meta.env.BASE_URL}${trimmed}`;
+  };
+
   // =============== FOG SETUP
   // FogExp2 creates exponential fog - more realistic than linear fog
   // The density parameter controls how quickly the fog thickens with distance
@@ -79,9 +84,13 @@ export function createWorld({ scene, constants, defaults }) {
 
   // Load grass textures (2K resolution for quality)
   // Color map: The base color/albedo of the surface
-  const grassColorTex = textureLoader.load('/assets/textures/ground/grass_color_2k.jpg');
+  const grassColorTex = textureLoader.load(
+    resolveAssetUrl('assets/textures/ground/grass_color_2k.jpg')
+  );
   // Normal map: Adds surface detail without additional geometry
-  const grassNormalTex = textureLoader.load('/assets/textures/ground/grass_normal_2k.jpg');
+  const grassNormalTex = textureLoader.load(
+    resolveAssetUrl('assets/textures/ground/grass_normal_2k.jpg')
+  );
 
   // Configure texture tiling for seamless repetition
   const groundTiling = defaults.groundTiling;
