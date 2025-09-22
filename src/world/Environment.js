@@ -126,9 +126,6 @@ export function createEnvironment({ renderer, scene, initialHDRI = 'dikhololo_ni
           // CRITICAL: Apply the r179 fix - set envMap on all materials!
           applyEnvMapToMaterials(scene, envMap, currentEnvIntensity);
 
-          // Dispose the PMREM render target (keeps texture alive)
-          pmremTarget.dispose();
-
           // Dispose the previous cube map now that all materials reference the new one
           if (previousEnvMap && previousEnvMap !== envMap) {
             previousEnvMap.dispose();
