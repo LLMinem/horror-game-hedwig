@@ -25,7 +25,7 @@ Michael is a beginner developer with 8 months of programming experience and ZERO
 
 ### 2. USE TODO LIST RELIGIOUSLY
 
-- Track every task with TodoWrite tool
+- Track every task with the plan update tool
 - Mark items complete when done
 - Update if plans change
 - Never work without tracking
@@ -188,7 +188,7 @@ Agents only modify their designated sections. XML-style tags mark managed conten
 - docs/pragmatic-refactor-plan.md - COMPLETE refactor plan (100% done)
 - src/main.js - Ultra-clean 44-line entry point (refactored)
 - All 12 modules successfully created and working
-- CLAUDE.md - This file (project context)
+- AGENTS.md - This file (project context)
 </active-files>
 
 <next-steps>

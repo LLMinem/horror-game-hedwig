@@ -25,8 +25,8 @@ Perform comprehensive audit of all documentation against actual codebase state a
 
 ## Git History Analysis
 
-1. Run `git log -30 --oneline` for activity overview.
-2. Run `git log -15` for detailed recent changes.
+1. Run `git log -30 --oneline --format="%h %s%n%b%n---"` for activity overview.
+2. Run `git log -20 --format="%h %s%n%b%n---"` for detailed recent changes.
 3. Run `git log -20 --name-only --pretty=format:""` to see file modification patterns.
 4. Identify which docs haven't been touched recently.
 
@@ -42,26 +42,31 @@ Perform comprehensive audit of all documentation against actual codebase state a
 For each documentation file:
 
 ### 1. File Reference Validation
+
 - Check all file paths mentioned exist
 - Verify linked documents are present
 - Confirm referenced assets available
 
 ### 2. Status Accuracy
+
 - Compare claimed completion status with git history
 - Check if "current phase" matches recent commits
 - Verify progress percentages align with checklist items
 
 ### 3. Technical Accuracy
+
 - Confirm code examples match actual implementation
 - Verify API/function names still exist
 - Check dependency versions match package.json
 
 ### 4. Frontmatter Health
+
 - Verify `last_verified` dates are reasonable
 - Check `status` field matches content
 - Confirm `owned_by` agent exists
 
 ### 5. Content Relevance
+
 - Flag docs not modified in 30+ days
 - Identify completed plans still marked active
 - Find archived content still referenced
@@ -72,27 +77,33 @@ Create report at `docs/_reports/audit-YYYY-MM-DD.md`:
 
 ```markdown
 # Documentation Audit Report
+
 **Date**: YYYY-MM-DD
 **Commit**: abc123f
 **Files Audited**: N
 
 ## Critical Issues (Fix Immediately)
+
 - [ ] File X references non-existent Y
 - [ ] Plan Z claims active but was completed
 
 ## Warnings (Should Fix Soon)
+
 - [ ] Doc A hasn't been updated in 45 days
 - [ ] CLAUDE.md references old plan B
 
 ## Suggestions (Consider Updating)
+
 - [ ] README could mention new feature C
 - [ ] Guide D could use better examples
 
 ## Frontmatter Issues
+
 - [ ] Missing frontmatter: file1.md, file2.md
 - [ ] Outdated status: file3.md (marked active, seems complete)
 
 ## Statistics
+
 - Docs with issues: X/Y
 - Average days since update: Z
 - Files without frontmatter: N
@@ -101,6 +112,7 @@ Create report at `docs/_reports/audit-YYYY-MM-DD.md`:
 ## Audit Patterns
 
 ### Dead Link Detection
+
 ```bash
 # Extract all markdown links and file references
 # Check each with Glob or Read
@@ -108,6 +120,7 @@ Create report at `docs/_reports/audit-YYYY-MM-DD.md`:
 ```
 
 ### Outdated Status Detection
+
 ```bash
 # Compare "Step N complete" claims with git log
 # Check if mentioned features exist in code
@@ -115,6 +128,7 @@ Create report at `docs/_reports/audit-YYYY-MM-DD.md`:
 ```
 
 ### Stale Content Detection
+
 ```bash
 # Find docs not in git log -30 --name-only
 # Check last_verified dates > 30 days old
@@ -132,6 +146,7 @@ Create report at `docs/_reports/audit-YYYY-MM-DD.md`:
 ## Frequency Recommendation
 
 Run this audit:
+
 - Weekly during active development
 - After major feature completions
 - Before releases or milestones

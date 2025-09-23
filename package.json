@@ -79,7 +79,7 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
+  "type": "module",
   "bugs": {
     "url": "https://github.com/LLMinem/horror-game-hedwig/issues"
   },

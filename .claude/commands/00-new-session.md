@@ -36,8 +36,8 @@ Explore the project to gain a **deep understanding** of it, in order to prepare 
 ## Understand Current State
 
 1. Run `git status` to show the current repository state and any uncommitted changes.
-2. Run `git log -15 --oneline` to show a high-level overview of recent commits.
-3. Run `git log -10` to show detailed information about the 10 most recent commits.
+2. Run `git log -20 --oneline` to show a high-level overview of recent commits.
+3. Run `git log -10 --format="%h %s%n%b%n---"` to show detailed information about the 10 most recent commits.
 4. Run `git branch --show-current` to identify the active branch.
 
 ### Additional Context (if included)
