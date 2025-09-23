@@ -25,7 +25,7 @@ Michael is a beginner developer with 8 months of programming experience and ZERO
 
 ### 2. USE TODO LIST RELIGIOUSLY
 
-- Track every task with TodoWrite tool
+- Track every task with the plan update tool
 - Mark items complete when done
 - Update if plans change
 - Never work without tracking
