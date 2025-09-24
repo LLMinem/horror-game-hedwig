@@ -14,3 +14,4 @@
 - Bounding height (simple variant): ~4.416 m top of lantern, base at ~0.0036 m above ground.
 
 - ✅ Step 4 – Verification: Captured orthographic viewport screenshot for review; confirmed assembled height ≈4.416 m.
+- 💡 Decision: Keep the simple lamp fully opaque for now (no separate glass material); the existing 1K PBR set is acceptable for the dev room and performance-friendly for Three.js.
