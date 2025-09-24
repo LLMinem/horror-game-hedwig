@@ -6,31 +6,21 @@ This horror game is being built to reconnect with someone important who rarely s
 
 ## 👨‍💻 DEVELOPER CONTEXT
 
-Michael is a beginner developer with 8 months of programming experience and ZERO experience with Three.js. This project serves two equally important purposes: building a beautiful horror game AND providing an interactive, patient learning environment for Three.js concepts. Every implementation should be explained in beginner-friendly terms, focusing on the WHY as much as the WHAT.
+I am a beginner developer with 8 months of programming experience and ZERO experience with Three.js. This project serves two equally important purposes: building a beautiful horror game AND providing an interactive, patient learning environment for Three.js concepts. Every implementation should be explained in beginner-friendly terms, focusing on the WHY as much as the WHAT.
 
 ---
 
 ## MANDATORY WORKING PRINCIPLES
 
-### 1. INCREMENTAL DEVELOPMENT - ONE STEP AT A TIME
+### 1. INCREMENTAL DEVELOPMENT
 
 **This is the MOST IMPORTANT principle.** Our workflow is:
 
-- Implement exactly ONE feature or change
-- Stop and explain what was done and why
-- Show full, working code (not diffs)
-- Wait for explicit approval before continuing
-- NEVER cascade changes or jump ahead
-- Maintain organic back-and-forth conversation
+- A natural back-and-forth conversation
+- I ask questions, you explain in a beginner-friendly way
+- Stop and explain what was done and _why_ it was done that way
 
-### 2. USE TODO LIST RELIGIOUSLY
-
-- Track every task with the plan update tool
-- Mark items complete when done
-- Update if plans change
-- Never work without tracking
-
-### 3. FOLLOW THE CURRENT PLAN
+### 2. FOLLOW THE CURRENT PLAN
 
 <project-status>
 Current Phase: Refactor COMPLETE - Ready for merge
@@ -39,11 +29,7 @@ Next Priority: Merge to main branch, then asset integration
 Last Verified: 2025-09-22 (1ba0274)
 </project-status>
 
-- Work through phases sequentially
-- Don't skip ahead
-- Each phase has specific checkpoints
-
-### 4. VISUAL QUALITY MATTERS
+### 3. VISUAL QUALITY MATTERS
 
 - This is NOT a prototype - it needs to look good
 - Better to have less content that looks great
@@ -51,42 +37,35 @@ Last Verified: 2025-09-22 (1ba0274)
 - No heavy fog that obscures everything
 - Test visuals at each step
 
-### 5. NEVER CLAIM SOMETHING WORKS WITHOUT TESTING
+### 4. NEVER CLAIM SOMETHING WORKS WITHOUT TESTING
 
 - Run the code
 - Verify it actually works
 - Report what you tested and the results
-- If unsure, say "I need to test this"
+- Give me explicit testing instructions after every change
+- Only commit after I confirm that nothing broke
 
 ---
 
-## COLLABORATION PROTOCOL (Follow Exactly)
+## COLLABORATION PROTOCOL
 
-1. **Summarize before doing.** Read relevant docs, summarize the plan back to Michael, produce a small TODO list with checkboxes.
+1. **Summarize before doing.** Read relevant docs, summarize the plan back to me, produce a small TODO list with checkboxes.
 
-2. **One step per turn.** Implement **exactly one step**, then stop. Show the code as a **full, self-contained file** (not a diff).
+2. **Explain the why.** Before writing code, explain the concept(s) introduced in that step in beginner terms. Focus on Three.js learning.
 
-3. **Explain the why.** Before code, explain the concept(s) introduced in that step in beginner terms. Focus on Three.js learning.
+3. **Call out manual actions.** If I must download a file or choose an asset, say so clearly and wait.
 
-4. **Call out manual actions.** If Michael must download a file or choose an asset, say so clearly and wait.
+4. **Acceptance test.** Tell me _what to look for on screen_.
 
-5. **Acceptance test.** Tell Michael _what to look for on screen_. Ask for approval before continuing.
-
-6. **No cascade of changes.** Never jump to the next step without explicit "continue".
-
-7. **Version awareness.** We use Three.js r179 - prefer up-to-date APIs; avoid outdated patterns.
-
-8. **Rollback friendly.** If something looks worse, revert to the previous working state.
+5. **Version awareness.** We use Three.js r179 - prefer up-to-date APIs; avoid outdated patterns.
 
 ---
 
-## PROJECT STRUCTURE (Current + Planned)
-
-Currently, we're working entirely in `src/main.js` during the learning/prototyping phase. Planned refactor structure (from pragmatic-refactor-plan.md):
+## PROJECT STRUCTURE
 
 ```
 /src
-  main.js              # Entry point, wires everything (< 50 lines after refactor)
+  main.js              # Entry point
   /core
     Engine.js          # Renderer, scene, camera, clock, resize
   /atmosphere
@@ -140,45 +119,6 @@ Currently, we're working entirely in `src/main.js` during the learning/prototypi
 - Atmospheric lighting (moonlight, soft shadows)
 - Quality textures (1024x1024 minimum)
 - No z-fighting or overlapping geometry
-- Clean, minimal UI
-- Night HDRI for image-based lighting
-
-### Level Design
-
-- **Manual placement in Three.js for MVP** (no GeoJSON import)
-
----
-
-## DOCUMENTATION STANDARDS
-
-### YAML Frontmatter (REQUIRED for all markdown docs)
-
-Every markdown file in this project MUST include YAML frontmatter:
-
-```yaml
----
-type: plan|guide|spec|context|adr|report
-status: active|outdated|archived
-created: YYYY-MM-DD
-last_verified: YYYY-MM-DD
-last_verified_commit: abc123f
-owned_by: plan-tracker|ai-context|doc-auditor|human
-supersedes: [optional-old-doc.md]
-superseded_by: [optional-new-doc.md]
----
-```
-
-This enables agents to quickly assess documentation state using `head -10`.
-
-### Documentation Maintenance Agents
-
-The project uses specialized subagents for documentation:
-
-- **plan-tracker**: Updates planning documents after commits (tracks completion)
-- **ai-context**: Maintains this file's managed sections (suggest-first mode)
-- **doc-auditor**: Weekly consistency checks (report-only, no auto-fixes)
-
-Agents only modify their designated sections. XML-style tags mark managed content.
 
 ---
 
@@ -201,19 +141,6 @@ Agents only modify their designated sections. XML-style tags mark managed conten
 
 ---
 
-## TESTING CHECKLIST (USE EVERY TIME)
-
-Before claiming anything works:
-
-- [ ] Code runs without errors
-- [ ] Feature actually functions as intended
-- [ ] Visuals look good
-- [ ] Performance is acceptable (60 FPS)
-- [ ] No console errors or warnings
-- [ ] Tested all edge cases
-
----
-
 ## COMMON COMMANDS
 
 - **Always** use `npm run dev -- --host` to run the dev server (accessible from network)
@@ -223,33 +150,9 @@ Before claiming anything works:
 
 ---
 
-## COMMUNICATION STYLE
-
-When reporting:
-
-- Be specific: "WASD movement works, tested all directions at 3.5 m/s"
-- Show what was tested: "Flashlight toggles with F key, intensity at 50"
-- Admit uncertainty: "I need to test if the double-click reset works on color picker"
-- Request feedback: "Should I proceed to ground textures or adjust something first?"
-- Explain Three.js concepts: "A normal map adds surface detail without geometry..."
-
-Always maintain the educational, patient tone. Remember that Michael is learning Three.js through this project.
-
----
-
 ## KEY FILES TO REFERENCE
 
 Refer to the <active-files> section above for current working files and guides.
-
----
-
-## COMMON PITFALLS TO AVOID
-
-1. **Rushing ahead** → Always wait for "continue" between steps
-2. **Not explaining concepts** → Every Three.js feature needs beginner explanation
-3. **Claiming without testing** → Always verify with actual testing
-4. **Breaking the incremental flow** → One change at a time, no cascading
-5. **Forgetting the learning aspect** → This is education + development
 
 ---
 
