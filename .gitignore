@@ -120,3 +120,6 @@ temp/
 
 # Private documentation
 docs/private/
+
+# Raw assets
+assets/source/raw/
