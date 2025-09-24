@@ -6,10 +6,11 @@
 ## Plan Progress
 - ✅ Step 1 – Alignment check: Confirmed `lamp_body` and `lamp_light` sit flush with numeric bounding-box verification.
 - ✅ Step 2 – Transform & origin cleanup: Applied identity transforms and parented both meshes under `street_lamp_simple_root` at ground origin.
-- ☐ Step 3 – Naming & visibility pass (pending).
+- ✅ Step 3 – Naming & visibility pass: Renamed meshes to `SM_StreetLamp_*` convention, kept optional variants hidden.
 - ☐ Step 4 – Verification screenshot + measurements (pending).
 
 ## Noteworthy Details
 - Export reminder: glTF export will include only selected/visible meshes (e.g., the simple variant), so hidden parts won’t hit runtime performance.
 - Bounding height (simple variant): ~4.416 m top of lantern, base at ~0.0036 m above ground.
 
+- ✅ Step 4 – Verification: Captured orthographic viewport screenshot for review; confirmed assembled height ≈4.416 m.
