@@ -15,3 +15,5 @@
 
 - ✅ Step 4 – Verification: Captured orthographic viewport screenshot for review; confirmed assembled height ≈4.416 m.
 - 💡 Decision: Keep the simple lamp fully opaque for now (no separate glass material); the existing 1K PBR set is acceptable for the dev room and performance-friendly for Three.js.
+- 📐 Current texture sizes: 2 K for base/metal/roughness/normal, 1 K for emission; no downscaling yet. We'll keep 2 K during asset prep and revisit 1 K + KTX2 once the full set of props is ready.
+- 🔜 Next focus: lighting sanity pass → export prep → Draco GLB export (Selected Objects, tangents) → final documentation.
