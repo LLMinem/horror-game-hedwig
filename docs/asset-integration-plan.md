@@ -40,6 +40,7 @@ Provide a deliberate roadmap for bringing high-quality assets and authentic layo
 1. **Build Asset Pipeline (Learning Focus: loaders, material workflow)**
    - Define folder conventions (`assets/source`, `public/assets/models`, etc.).
    - Establish Blender export preset (GLB + Draco, consistent scale).
+   - Follow the Blender checklist in `docs/assets/pipeline-guide.md` for per-asset prep.
    - Introduce KTX2 texture compression and Three.js loader wiring.
    - Prove the loop end-to-end with one hero asset (e.g., Victorian lamp) plus a tomb.
 2. **Create Dev Room Sandbox (Learning Focus: scene composition, lighting)**
@@ -66,7 +67,7 @@ Provide a deliberate roadmap for bringing high-quality assets and authentic layo
 
 ## 6. Immediate Next Actions
 
-1. Draft the detailed asset pipeline tasks (folder structure, conversion checklist, tooling command snippets).
+1. Keep `docs/assets/pipeline-guide.md` up to date as the canonical asset workflow.
 2. Confirm transfer method from Mac → VPS (suggest git commit from Mac or `scp` uploads).
 3. Implement minimal `assets/Assets.js` + loaders in codebase to accept the first curated asset.
 4. Once the pipeline works, move on to Dev Room implementation.

@@ -17,3 +17,5 @@
 - 💡 Decision: Keep the simple lamp fully opaque for now (no separate glass material); the existing 1K PBR set is acceptable for the dev room and performance-friendly for Three.js.
 - 📐 Current texture sizes: 2 K for base/metal/roughness/normal, 1 K for emission; no downscaling yet. We'll keep 2 K during asset prep and revisit 1 K + KTX2 once the full set of props is ready.
 - 🔜 Next focus: lighting sanity pass → export prep → Draco GLB export (Selected Objects, tangents) → final documentation.
+- 🗂️ Exported `SM_StreetLamp_Simple.glb` with the **Hedwig Draco Export** preset (Selected Objects, Apply Modifiers, UVs/Normals/Tangents, Draco compression). Output: `public/assets/models/props/SM_StreetLamp_Simple.glb`.
+- 📦 Preset saved in Blender’s export panel for reuse across future assets.
