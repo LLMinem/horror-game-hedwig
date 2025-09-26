@@ -8,20 +8,33 @@ import { createEnvironment } from './world/Environment.js';
 import { createPlayerController } from './gameplay/PlayerController.js';
 import { initDebugGui } from './ui/DebugGui.js';
 import { startLoop } from './loop/Loop.js';
+import { initAssetSystem } from './assets/Assets.js';
+import { createDevRoom } from './assets/DevRoom.js';
 
 // Create core systems
 const { scene, renderer, camera, clock, onResize } = createEngine(SCENE_CONSTANTS);
+
+// Prepare shared asset loaders (GLTF + Draco + future KTX2 support)
+initAssetSystem({ renderer });
 
 // Create world systems
 const atmosphere = createAtmosphere({ scene, renderer, camera, constants: SCENE_CONSTANTS, defaults: DEFAULTS });
 const world = createWorld({ scene, constants: SCENE_CONSTANTS, defaults: DEFAULTS });
 const environment = createEnvironment({ renderer, scene, initialHDRI: DEFAULTS.hdri, initialIntensity: DEFAULTS.envIntensity });
 
+// Create the dev room sandbox and place the street lamp hero asset
+const devRoom = createDevRoom({ scene, world });
+devRoom.ready.then(() => {
+  console.log('✓ Dev Room ready – street lamp loaded');
+}).catch((error) => {
+  console.error('Dev Room failed to initialize', error);
+});
+
 // Create player controller
 const player = createPlayerController({ camera, renderer, scene, flashlight: world.flashlight, constants: SCENE_CONSTANTS });
 
 // Setup GUI
-const guiControls = initDebugGui({ renderer, scene, atmosphere, world, environment, player });
+const guiControls = initDebugGui({ renderer, scene, atmosphere, world, environment, player, devRoom });
 
 // Legacy keyboard shortcuts (optional - GUI provides same controls)
 window.addEventListener('keydown', (e) => {

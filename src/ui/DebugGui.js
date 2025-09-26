@@ -26,7 +26,8 @@ function applyState(currentState, components) {
     atmosphere,
     world,
     environment,
-    player
+    player,
+    devRoom
   } = components;
 
   // =============== RENDERER SETTINGS
@@ -170,6 +171,14 @@ function applyState(currentState, components) {
     player.setWalkSpeed(currentState.walkSpeed);
   }
 
+  // =============== DEV ROOM VISIBILITY
+  if (devRoom) {
+    devRoom.setVisible(currentState.showDevRoomLamp);
+  }
+  if (world && typeof world.setTestObjectsVisible === 'function') {
+    world.setTestObjectsVisible(currentState.showLegacyTestSet);
+  }
+
   // =============== UPDATE GUI DISPLAY
   if (gui) {
     gui.controllersRecursive().forEach((controller) => controller.updateDisplay());
@@ -230,6 +239,8 @@ function createPresets() {
     resetToDefaults: () => {
       // Reset all values to defaults
       Object.assign(state, DEFAULTS);
+      state.showDevRoomLamp = true;
+      state.showLegacyTestSet = false;
       applyState(state, sceneComponents);
       console.log('✓ Reset to default values');
     },
@@ -358,11 +369,14 @@ export function initDebugGui(components) {
     atmosphere,
     world,
     environment,
-    player
+    player,
+    devRoom
   } = components;
 
   // Initialize state from defaults
   state = { ...DEFAULTS };
+  state.showDevRoomLamp = true;
+  state.showLegacyTestSet = false;
 
   // Create GUI
   gui = new GUI();
@@ -685,6 +699,20 @@ export function initDebugGui(components) {
   presetsFolder.add(presetsObj, 'horrorAtmosphere').name('Horror Atmosphere');
   presetsFolder.add(presetsObj, 'exportCurrentSettings').name('📥 Export Current Settings');
   presetsFolder.open();
+
+  // =============== DEV ROOM FOLDER
+  if (devRoom) {
+    const devRoomFolder = gui.addFolder('Dev Room');
+    enhanceGuiWithReset(devRoomFolder);
+    devRoomFolder
+      .add(state, 'showDevRoomLamp')
+      .name('Show Street Lamp')
+      .onChange(() => applyState(state, sceneComponents));
+    devRoomFolder
+      .add(state, 'showLegacyTestSet')
+      .name('Show Legacy Test Meshes')
+      .onChange(() => applyState(state, sceneComponents));
+  }
 
   // Apply initial state
   applyState(state, sceneComponents);
