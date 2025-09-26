@@ -19,3 +19,5 @@
 - 🔜 Next focus: lighting sanity pass → export prep → Draco GLB export (Selected Objects, tangents) → final documentation.
 - 🗂️ Exported `SM_StreetLamp_Simple.glb` with the **Hedwig Draco Export** preset (Selected Objects, Apply Modifiers, UVs/Normals/Tangents, Draco compression). Output: `public/assets/models/props/SM_StreetLamp_Simple.glb`.
 - 📦 Preset saved in Blender’s export panel for reuse across future assets.
+- 🕹️ Runtime check (2025-09-26): Street lamp loaded in Dev Room; moonlight shadows show harsh banding/missing center section. Need to revisit lightmap/normal flow before final handoff.
+- ✨ Follow-up: author an emissive pass (or baked point light) for the lantern glass so the top housing glows; currently renders dark in-engine.
