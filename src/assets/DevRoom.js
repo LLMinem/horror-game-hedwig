@@ -5,7 +5,11 @@
 // before building the full cemetery layout.
 
 import * as THREE from 'three';
+const { PointLight, Box3, Vector3 } = THREE;
 import { loadStreetLampInstance } from './Assets.js';
+
+const bounds = new Box3();
+const center = new Vector3();
 
 /**
  * Create the Dev Room container and start loading the lamp asset.
@@ -16,8 +20,26 @@ export function createDevRoom({ scene, world }) {
   root.name = 'DevRoomRoot';
   scene.add(root);
 
+  const lampLight = new PointLight(0xfff2c0, 35, 22, 2.2);
+  lampLight.name = 'DevRoom_LampLight';
+  lampLight.visible = false; // toggled via GUI
+  lampLight.castShadow = true;
+  lampLight.shadow.mapSize.set(512, 512);
+  lampLight.shadow.bias = -0.0005;
+  lampLight.shadow.normalBias = 0.015;
+  root.add(lampLight);
+
   const state = {
     lamp: null,
+    lampLight,
+  };
+
+  const positionLampLight = () => {
+    if (!state.lamp) return;
+    bounds.setFromObject(state.lamp);
+    bounds.getCenter(center);
+    const top = bounds.max.y;
+    lampLight.position.set(center.x, top - 0.15, center.z);
   };
 
   const ready = (async () => {
@@ -38,6 +60,8 @@ export function createDevRoom({ scene, world }) {
       root.add(lampScene);
       state.lamp = lampScene;
 
+      positionLampLight();
+
       // Hide the old placeholder meshes so the scene only shows curated props.
       if (world && typeof world.setTestObjectsVisible === 'function') {
         world.setTestObjectsVisible(false);
@@ -54,6 +78,26 @@ export function createDevRoom({ scene, world }) {
     root,
     ready,
     getLamp: () => state.lamp,
+    getLampLight: () => state.lampLight,
+    refreshLampLightPosition: positionLampLight,
+    setLampLight: ({ enabled, intensity, distance, decay, color }) => {
+      if (enabled !== undefined) {
+        lampLight.visible = enabled;
+      }
+      if (intensity !== undefined) {
+        lampLight.intensity = intensity;
+      }
+      if (distance !== undefined) {
+        lampLight.distance = distance;
+      }
+      if (decay !== undefined) {
+        lampLight.decay = decay;
+      }
+      if (color) {
+        lampLight.color.set(color);
+      }
+      positionLampLight();
+    },
     setVisible: (visible) => { root.visible = visible; },
     dispose: () => {
       root.clear();

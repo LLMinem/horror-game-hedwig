@@ -102,6 +102,13 @@ export const DEFAULTS = {
   // Player controls
   mouseSensitivity: 0.002, // Mouse look sensitivity
   walkSpeed: 3.5, // Walk speed in meters per second
+
+  // Dev Room lamp helper light
+  devRoomLampLightEnabled: true,
+  devRoomLampLightIntensity: 35,
+  devRoomLampLightDistance: 22,
+  devRoomLampLightDecay: 2.2,
+  devRoomLampLightColor: '#fff2c0',
 };
 
 // HDRI options available

@@ -174,6 +174,15 @@ function applyState(currentState, components) {
   // =============== DEV ROOM VISIBILITY
   if (devRoom) {
     devRoom.setVisible(currentState.showDevRoomLamp);
+    if (typeof devRoom.setLampLight === 'function') {
+      devRoom.setLampLight({
+        enabled: currentState.devRoomLampLightEnabled && currentState.showDevRoomLamp,
+        intensity: currentState.devRoomLampLightIntensity,
+        distance: currentState.devRoomLampLightDistance,
+        decay: currentState.devRoomLampLightDecay,
+        color: currentState.devRoomLampLightColor,
+      });
+    }
   }
   if (world && typeof world.setTestObjectsVisible === 'function') {
     world.setTestObjectsVisible(currentState.showLegacyTestSet);
@@ -711,6 +720,26 @@ export function initDebugGui(components) {
     devRoomFolder
       .add(state, 'showLegacyTestSet')
       .name('Show Legacy Test Meshes')
+      .onChange(() => applyState(state, sceneComponents));
+    devRoomFolder
+      .add(state, 'devRoomLampLightEnabled')
+      .name('Enable Lamp Point Light')
+      .onChange(() => applyState(state, sceneComponents));
+    devRoomFolder
+      .add(state, 'devRoomLampLightIntensity', 0, 100, 0.5)
+      .name('Lamp Intensity')
+      .onChange(() => applyState(state, sceneComponents));
+    devRoomFolder
+      .add(state, 'devRoomLampLightDistance', 1, 50, 0.5)
+      .name('Lamp Range')
+      .onChange(() => applyState(state, sceneComponents));
+    devRoomFolder
+      .add(state, 'devRoomLampLightDecay', 0.1, 4, 0.05)
+      .name('Lamp Decay')
+      .onChange(() => applyState(state, sceneComponents));
+    devRoomFolder
+      .addColor(state, 'devRoomLampLightColor')
+      .name('Lamp Color')
       .onChange(() => applyState(state, sceneComponents));
   }
 
