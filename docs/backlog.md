@@ -4,7 +4,7 @@
 - **Visible moon tied to light controls**: create an actual moon asset (billboard or small sphere with texture) that tracks `moonX/moonY/moonZ`, so the sky visually matches the directional light.
 
 ## Important & Not Urgent (Plan Ahead)
-- **Cascaded shadow maps for moonlight**: once the cemetery expands beyond ~30 m view distance, a single directional shadow map will lose detail. Evaluate CSM or player-focused shadow volumes to keep near-field shadows crisp across the full 250 m × 250 m layout.
+- **Cascaded or dynamic moon shadows**: our current moon shadow frustum is deliberately tight (±18 m) for crisp detail, which means shadows disappear once objects fall outside that box. When the cemetery expands to ~250 m, evaluate either cascaded shadow maps or a player-centered dynamic frustum so near ground stays sharp while distant ground still receives shadows.
 
 ## Urgent & Not Important (Delegate / Quick Wins)
 - _None logged yet_
