@@ -46,13 +46,13 @@ export function createWorld({ scene, constants, defaults }) {
 
   // Shadow configuration for soft, realistic shadows
   moon.castShadow = true;
-  moon.shadow.mapSize.set(1024, 1024);  // Shadow map resolution
-  moon.shadow.camera.near = 0.5;        // Shadow camera near plane
-  moon.shadow.camera.far = 120;         // Shadow camera far plane
-  moon.shadow.camera.left = -60;        // Shadow coverage area
-  moon.shadow.camera.right = 60;
-  moon.shadow.camera.top = 60;
-  moon.shadow.camera.bottom = -60;
+  moon.shadow.mapSize.set(4096, 4096);  // Higher resolution for crisper moon shadows
+  moon.shadow.camera.near = 1.0;        // Trim the nearest rendered distance
+  moon.shadow.camera.far = 55;          // Focus on the playable bubble
+  moon.shadow.camera.left = -18;        // Tight orthographic frustum keeps texel density high
+  moon.shadow.camera.right = 18;
+  moon.shadow.camera.top = 18;
+  moon.shadow.camera.bottom = -18;
   moon.shadow.bias = defaults.shadowBias;           // Prevents shadow acne
   moon.shadow.normalBias = defaults.shadowNormalBias; // Prevents peter-panning
 
