@@ -51,8 +51,8 @@ export const DEFAULTS = {
   flashlightDistance: 45,
 
   // Shadows
-  shadowBias: -0.001,
-  shadowNormalBias: 0.02,
+  shadowBias: -0.0008,
+  shadowNormalBias: 0.01,
 
   // Ground texture controls
   groundTiling: SCENE_CONSTANTS.GROUND_TILING,
