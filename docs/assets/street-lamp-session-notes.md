@@ -21,3 +21,20 @@
 - 📦 Preset saved in Blender’s export panel for reuse across future assets.
 - 🕹️ Runtime check (2025-09-26): Street lamp loaded in Dev Room; moonlight shadows show harsh banding/missing center section. Need to revisit lightmap/normal flow before final handoff.
 - ✨ Follow-up: author an emissive pass (or baked point light) for the lantern glass so the top housing glows; currently renders dark in-engine.
+
+## 2025-09-28 Runtime Integration Notes
+- Added a controllable warm point light in the Three.js Dev Room to sell the lamp glow; default settings: intensity 35, range 22  m, decay 2.2, color `#fff2c0`.
+- Point light currently auto-centers via bounding box. A slight Y offset (−0.1  m planned) may be required so the bulb sits inside the glass and stops lighting the metal cap.
+- Moon directional light shadows still show low-resolution artifacts around the pole; scheduled tuning: increase shadow map size, tighten frustum, revisit bias/normal bias.
+- GUI now exposes lamp light toggles plus future room for flicker/breathing effects.
+
+### Blender TODO (hand off to local MCP agent)
+- Darken the lamp head base color/albedo for the “off” state so it doesn’t read as self-lit by default.
+- Author an emissive map (or tweak emissive color/intensity) for the lamp glass; target two states: 0 (off) and ~1–2 (on) to pair with code-side toggles.
+- Ensure the lamp head’s metal housing is double-sided or thick enough to block internal light; add interior shield geometry if needed to prevent light leaking through the top.
+- Confirm the glass and metal are separate materials for runtime control, preserving `SM_` naming.
+- Re-export `SM_StreetLamp_Simple.glb` with these updates and note any new texture files (e.g., `SM_StreetLamp_Glass_Emissive.png`).
+
+### Future Atmosphere Ideas (for gameplay planning)
+- Runtime flicker and intensity modulation (slow breathing, occasional sparks) once emissive channel exists.
+- Consider progressive light degradation tied to gameplay milestones (e.g., graves watered) to heighten tension.
