@@ -39,7 +39,7 @@ export function createDevRoom({ scene, world }) {
     bounds.setFromObject(state.lamp);
     bounds.getCenter(center);
     const top = bounds.max.y;
-    lampLight.position.set(center.x, top - 0.15, center.z);
+    lampLight.position.set(center.x, top - 0.2, center.z);
   };
 
   const ready = (async () => {
