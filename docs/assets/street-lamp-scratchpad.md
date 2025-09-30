@@ -15,6 +15,9 @@
   - `SM_StreetLamp_BaseSmall` — alt base offset at X=2 m
   - `SM_StreetLamp_Support` — optional support arm offset at X=2 m
 - **Triangle budget**: ~1.7 k current (plenty below 5 k target)
+- **Lantern glass anchor measurements** (measure tool, 2025-09-30):
+  - Top hex (ceiling) corner-to-corner: 0.334615 m
+  - Bottom hex (floor) corner-to-corner: 0.116612 m
 
 ## Material Overview
 - **Material**: `MAT_StreetLamp_Master` (Principled BSDF)
@@ -35,7 +38,7 @@
 1. [x] **Phase 1 – Inspect textures & masks**
    - Preview base color/emission maps; confirm glass isolation.
    - Record measurements/normals for lantern interior reference.
-2. [ ] **Phase 2 – Material split using existing texture masks**
+2. [x] **Phase 2 – Material split using existing texture masks**
    - Branch glass vs metal shading in `MAT_StreetLamp_Master`.
    - Add emission control with 0 and ~1.5 presets.
 3. [ ] **Phase 3 – Add interior light blockers**
@@ -57,3 +60,11 @@
 - Lantern vertex z-levels span 27 unique heights; lower rim radius ≈0.08 m, upper rim radius ≈0.22 m — confirms tapered hex profile for cap placement.
 - Face normals check shows many downward-facing facets (as expected for roof panels); no anomalies spotted.
 - Ready to proceed with Phase 2 material split using emission mask.
+
+### Phase 2 Findings (2025-09-30)
+- Added `Glass Mask` color ramp (emission texture in Non-Color) to isolate panes cleanly.
+- Base color now routes through `Glass Multiply` (warm tint ≈[0.35,0.32,0.26]) and `BaseColor Mix`, dimming panes to ~25–30 % brightness while preserving texture detail; metal branch untouched.
+- Metallic and roughness maps mix against constants (0 metal, ~0.12 roughness) so glass is non-metallic and slightly glossy; metal keeps texture-driven values.
+- Emission color driven by mask × warm tint (#fff2c7-ish). A `Value` node labeled “Emission Strength” feeds Principled emission strength (default 0.0). Runtime calibration: 0 = off, 1.5 ≈ on target glow.
+- All supporting texture nodes forced to correct color spaces (Metalness/Roughness/Emission → Non-Color).
+- Ready for viewport check and Phase 3 geometry work.
