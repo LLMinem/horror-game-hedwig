@@ -2,6 +2,7 @@
 
 ## Urgent & Important (Do Now)
 - **Visible moon tied to light controls**: create an actual moon asset (billboard or small sphere with texture) that tracks `moonX/moonY/moonZ`, so the sky visually matches the directional light.
+- **Street lamp emissive binding**: drive `MeshStandardMaterial.emissiveIntensity` from dev-room GUI so runtime slider lerps 0.1 (off baseline) ↔ 1.5 (max glow) to match Blender authoring.
 
 ## Important & Not Urgent (Plan Ahead)
 - **Cascaded or dynamic moon shadows**: our current moon shadow frustum is deliberately tight (±18 m) for crisp detail, which means shadows disappear once objects fall outside that box. When the cemetery expands to ~250 m, evaluate either cascaded shadow maps or a player-centered dynamic frustum so near ground stays sharp while distant ground still receives shadows.

@@ -63,8 +63,10 @@
 
 ### Phase 2 Findings (2025-09-30)
 - Added `Glass Mask` color ramp (emission texture in Non-Color) to isolate panes cleanly.
-- Base color now routes through `Glass Multiply` (warm tint ≈[0.35,0.32,0.26]) and `BaseColor Mix`, dimming panes to ~25–30 % brightness while preserving texture detail; metal branch untouched.
+- Base color now routes through `Glass Multiply` (warm tint ≈[0.25,0.22,0.18]) and `BaseColor Mix`, dimming panes to ~20–25 % brightness while preserving texture detail; metal branch untouched.
 - Metallic and roughness maps mix against constants (0 metal, ~0.12 roughness) so glass is non-metallic and slightly glossy; metal keeps texture-driven values.
-- Emission color driven by mask × warm tint (#fff2c7-ish). A `Value` node labeled “Emission Strength” feeds Principled emission strength (default 0.0). Runtime calibration: 0 = off, 1.5 ≈ on target glow.
+- Emission color driven by mask × warm tint (#fff2c7-ish). A `Value` node labeled “Emission Strength” feeds Principled emission strength (default 0.1). Runtime calibration: 0.1 = off baseline, 1.5 ≈ on target glow (runtime should drive this linearly).
+- Updated `Glass Mask` ramp: constant interpolation with white step at 0.8 to match emissive map values (ensures slider responds visibly).
+- Runtime hook idea: expose emission strength via GLTF emissive factor (`MeshStandardMaterial.emissiveIntensity` in Three.js) so Dev Room GUI slider can lerp 0.1 → 1.5 and stay in sync with in-game brightness.
 - All supporting texture nodes forced to correct color spaces (Metalness/Roughness/Emission → Non-Color).
 - Ready for viewport check and Phase 3 geometry work.
