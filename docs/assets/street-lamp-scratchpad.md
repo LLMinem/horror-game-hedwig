@@ -32,7 +32,7 @@
 - Updated GLB exports cleanly with textures intact.
 
 ## Session Plan – 2025-09-30
-1. [ ] **Phase 1 – Inspect textures & masks**
+1. [x] **Phase 1 – Inspect textures & masks**
    - Preview base color/emission maps; confirm glass isolation.
    - Record measurements/normals for lantern interior reference.
 2. [ ] **Phase 2 – Material split using existing texture masks**
@@ -49,3 +49,11 @@
 
 ## Progress Log
 - 2025-09-30 — Scratchpad created; plan approved by Michael; awaiting Phase 1 execution.
+
+### Phase 1 Findings (2025-09-30)
+- Emission map `lamp_emission.png` is a clean binary mask (0 for metal, 1 for glass); ~4.7% of pixels lit.
+- Base color sampled luminance range ≈0.01–0.72, mean ≈0.14; glass panels are brightest region.
+- Lantern bounding box: 3.4315 m → 4.4158 m (height ≈0.9843 m). Base section: 0.0036 m → 3.4315 m.
+- Lantern vertex z-levels span 27 unique heights; lower rim radius ≈0.08 m, upper rim radius ≈0.22 m — confirms tapered hex profile for cap placement.
+- Face normals check shows many downward-facing facets (as expected for roof panels); no anomalies spotted.
+- Ready to proceed with Phase 2 material split using emission mask.
