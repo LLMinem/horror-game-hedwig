@@ -5,11 +5,12 @@
 // before building the full cemetery layout.
 
 import * as THREE from 'three';
-const { PointLight, Box3, Vector3 } = THREE;
+const { PointLight, PointLightHelper, Box3, Vector3 } = THREE;
 import { loadStreetLampInstance } from './Assets.js';
 
 const bounds = new Box3();
 const center = new Vector3();
+const LAMP_LIGHT_VERTICAL_OFFSET = 0.25; // Keep bulb tucked inside lantern
 
 /**
  * Create the Dev Room container and start loading the lamp asset.
@@ -32,6 +33,7 @@ export function createDevRoom({ scene, world, environment }) {
   const state = {
     lamp: null,
     lampLight,
+    lampLightHelper: null,
   };
 
   const positionLampLight = () => {
@@ -39,7 +41,10 @@ export function createDevRoom({ scene, world, environment }) {
     bounds.setFromObject(state.lamp);
     bounds.getCenter(center);
     const top = bounds.max.y;
-    lampLight.position.set(center.x, top - 0.2, center.z);
+    lampLight.position.set(center.x, top - LAMP_LIGHT_VERTICAL_OFFSET, center.z);
+    if (state.lampLightHelper) {
+      state.lampLightHelper.update();
+    }
   };
 
   const ready = (async () => {
@@ -65,6 +70,10 @@ export function createDevRoom({ scene, world, environment }) {
       }
 
       positionLampLight();
+
+      state.lampLightHelper = new PointLightHelper(lampLight, 0.4, 0xfff2c0);
+      state.lampLightHelper.visible = false;
+      root.add(state.lampLightHelper);
 
       // Hide the old placeholder meshes so the scene only shows curated props.
       if (world && typeof world.setTestObjectsVisible === 'function') {
@@ -102,8 +111,18 @@ export function createDevRoom({ scene, world, environment }) {
       }
       positionLampLight();
     },
+    setLampLightHelperVisible: (visible) => {
+      if (state.lampLightHelper) {
+        state.lampLightHelper.visible = !!visible;
+      }
+    },
     setVisible: (visible) => { root.visible = visible; },
     dispose: () => {
+      if (state.lampLightHelper) {
+        root.remove(state.lampLightHelper);
+        state.lampLightHelper.dispose?.();
+        state.lampLightHelper = null;
+      }
       root.clear();
       scene.remove(root);
       state.lamp = null;

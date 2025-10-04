@@ -183,6 +183,11 @@ function applyState(currentState, components) {
         color: currentState.devRoomLampLightColor,
       });
     }
+    if (typeof devRoom.setLampLightHelperVisible === 'function') {
+      devRoom.setLampLightHelperVisible(
+        currentState.devRoomLampLightHelperVisible && currentState.showDevRoomLamp
+      );
+    }
   }
   if (world && typeof world.setTestObjectsVisible === 'function') {
     world.setTestObjectsVisible(currentState.showLegacyTestSet);
@@ -740,6 +745,10 @@ export function initDebugGui(components) {
     devRoomFolder
       .addColor(state, 'devRoomLampLightColor')
       .name('Lamp Color')
+      .onChange(() => applyState(state, sceneComponents));
+    devRoomFolder
+      .add(state, 'devRoomLampLightHelperVisible')
+      .name('Show Lamp Light Helper')
       .onChange(() => applyState(state, sceneComponents));
   }
 

@@ -109,6 +109,7 @@ export const DEFAULTS = {
   devRoomLampLightDistance: 22,
   devRoomLampLightDecay: 2.2,
   devRoomLampLightColor: '#fff2c0',
+  devRoomLampLightHelperVisible: false,
 };
 
 // HDRI options available
