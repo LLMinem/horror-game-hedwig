@@ -42,6 +42,7 @@ Provide a deliberate roadmap for bringing high-quality assets and authentic layo
    - Establish Blender export preset (GLB + Draco, consistent scale).
    - Follow the Blender checklist in `docs/assets/pipeline-guide.md` for per-asset prep.
    - Introduce KTX2 texture compression and Three.js loader wiring.
+   - When integrating in Three.js, call `environment.registerAsset(assetRoot)` immediately after adding the GLTF root to the scene so the active HDRI env map applies (required in Three.js r179+).
    - Prove the loop end-to-end with one hero asset (e.g., Victorian lamp) plus a tomb.
 2. **Create Dev Room Sandbox (Learning Focus: scene composition, lighting)**
    - Add `assets/DevRoom.js` to spawn a neutral testing arena.
