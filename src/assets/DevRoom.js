@@ -15,7 +15,7 @@ const center = new Vector3();
  * Create the Dev Room container and start loading the lamp asset.
  * Returns control helpers plus a promise that resolves when the lamp is ready.
  */
-export function createDevRoom({ scene, world }) {
+export function createDevRoom({ scene, world, environment }) {
   const root = new THREE.Group();
   root.name = 'DevRoomRoot';
   scene.add(root);
@@ -59,6 +59,10 @@ export function createDevRoom({ scene, world }) {
       lampScene.position.set(0, 0, 0);
       root.add(lampScene);
       state.lamp = lampScene;
+
+      if (environment && typeof environment.registerAsset === 'function') {
+        environment.registerAsset(lampScene);
+      }
 
       positionLampLight();
 

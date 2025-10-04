@@ -26,6 +26,7 @@ export function createEnvironment({ renderer, scene, initialHDRI = 'dikhololo_ni
   let currentEnvMap = null;
   let currentEnvIntensity = initialIntensity;
   let currentHDRI = initialHDRI;
+  const registeredAssets = new Set();
 
   // =============== RGBE LOADER
   // RGBE format stores HDR images with RGB + Exponent encoding
@@ -68,6 +69,22 @@ export function createEnvironment({ renderer, scene, initialHDRI = 'dikhololo_ni
 
     console.log(`Applied envMap to ${count} materials (r179 fix)`);
     return count;
+  }
+
+  /**
+   * Registers an asset so it always receives the active environment map.
+   * If the env map is already loaded we apply it immediately; otherwise the
+   * asset will be processed the next time an HDRI finishes loading.
+   * @param {THREE.Object3D} root - Root object of the loaded asset
+   * @returns {number} Materials updated immediately
+   */
+  function registerAsset(root) {
+    if (!root) return 0;
+    registeredAssets.add(root);
+    if (currentEnvMap) {
+      return applyEnvMapToMaterials(root, currentEnvMap, currentEnvIntensity);
+    }
+    return 0;
   }
 
   /**
@@ -125,6 +142,11 @@ export function createEnvironment({ renderer, scene, initialHDRI = 'dikhololo_ni
 
           // CRITICAL: Apply the r179 fix - set envMap on all materials!
           applyEnvMapToMaterials(scene, envMap, currentEnvIntensity);
+
+          // Ensure every registered asset also picks up the new map
+          registeredAssets.forEach((asset) => {
+            applyEnvMapToMaterials(asset, envMap, currentEnvIntensity);
+          });
 
           // Dispose the previous cube map now that all materials reference the new one
           if (previousEnvMap && previousEnvMap !== envMap) {
@@ -213,6 +235,7 @@ export function createEnvironment({ renderer, scene, initialHDRI = 'dikhololo_ni
       currentEnvMap.dispose();
     }
     pmrem.dispose();
+    registeredAssets.clear();
   }
 
   // =============== INITIALIZE
@@ -228,6 +251,7 @@ export function createEnvironment({ renderer, scene, initialHDRI = 'dikhololo_ni
     setEnvIntensity,
     applyEnvMapToMaterials,
     updateEnvIntensity,
+    registerAsset,
     getSettings,
     dispose,
 

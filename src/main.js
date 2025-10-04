@@ -23,7 +23,7 @@ const world = createWorld({ scene, constants: SCENE_CONSTANTS, defaults: DEFAULT
 const environment = createEnvironment({ renderer, scene, initialHDRI: DEFAULTS.hdri, initialIntensity: DEFAULTS.envIntensity });
 
 // Create the dev room sandbox and place the street lamp hero asset
-const devRoom = createDevRoom({ scene, world });
+const devRoom = createDevRoom({ scene, world, environment });
 devRoom.ready.then(() => {
   console.log('✓ Dev Room ready – street lamp loaded');
 }).catch((error) => {
