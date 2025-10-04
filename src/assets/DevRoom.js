@@ -10,7 +10,7 @@ import { loadStreetLampInstance } from './Assets.js';
 
 const bounds = new Box3();
 const center = new Vector3();
-const LAMP_LIGHT_VERTICAL_OFFSET = 0.25; // Keep bulb tucked inside lantern
+const DEFAULT_LAMP_LIGHT_OFFSET = 0.25; // Keep bulb tucked inside lantern
 
 /**
  * Create the Dev Room container and start loading the lamp asset.
@@ -34,6 +34,7 @@ export function createDevRoom({ scene, world, environment }) {
     lamp: null,
     lampLight,
     lampLightHelper: null,
+    lampLightOffset: DEFAULT_LAMP_LIGHT_OFFSET,
   };
 
   const positionLampLight = () => {
@@ -41,7 +42,7 @@ export function createDevRoom({ scene, world, environment }) {
     bounds.setFromObject(state.lamp);
     bounds.getCenter(center);
     const top = bounds.max.y;
-    lampLight.position.set(center.x, top - LAMP_LIGHT_VERTICAL_OFFSET, center.z);
+    lampLight.position.set(center.x, top - state.lampLightOffset, center.z);
     if (state.lampLightHelper) {
       state.lampLightHelper.update();
     }
@@ -93,7 +94,7 @@ export function createDevRoom({ scene, world, environment }) {
     getLamp: () => state.lamp,
     getLampLight: () => state.lampLight,
     refreshLampLightPosition: positionLampLight,
-    setLampLight: ({ enabled, intensity, distance, decay, color }) => {
+    setLampLight: ({ enabled, intensity, distance, decay, color, heightOffset }) => {
       if (enabled !== undefined) {
         lampLight.visible = enabled;
       }
@@ -108,6 +109,9 @@ export function createDevRoom({ scene, world, environment }) {
       }
       if (color) {
         lampLight.color.set(color);
+      }
+      if (heightOffset !== undefined) {
+        state.lampLightOffset = heightOffset;
       }
       positionLampLight();
     },

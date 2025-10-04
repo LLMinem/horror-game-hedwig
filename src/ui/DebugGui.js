@@ -181,6 +181,7 @@ function applyState(currentState, components) {
         distance: currentState.devRoomLampLightDistance,
         decay: currentState.devRoomLampLightDecay,
         color: currentState.devRoomLampLightColor,
+        heightOffset: currentState.devRoomLampLightOffset,
       });
     }
     if (typeof devRoom.setLampLightHelperVisible === 'function') {
@@ -745,6 +746,10 @@ export function initDebugGui(components) {
     devRoomFolder
       .addColor(state, 'devRoomLampLightColor')
       .name('Lamp Color')
+      .onChange(() => applyState(state, sceneComponents));
+    devRoomFolder
+      .add(state, 'devRoomLampLightOffset', 0.0, 0.6, 0.01)
+      .name('Lamp Height Offset (m)')
       .onChange(() => applyState(state, sceneComponents));
     devRoomFolder
       .add(state, 'devRoomLampLightHelperVisible')
