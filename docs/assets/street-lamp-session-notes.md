@@ -28,13 +28,13 @@
 - Moon directional light shadows still show low-resolution artifacts around the pole; scheduled tuning: increase shadow map size, tighten frustum, revisit bias/normal bias.
 - GUI now exposes lamp light toggles plus future room for flicker/breathing effects.
 
-### Blender TODO (hand off to local MCP agent)
-- Darken the lamp head base color/albedo for the “off” state so it doesn’t read as self-lit by default.
-- Author an emissive map (or tweak emissive color/intensity) for the lamp glass; target two states: 0 (off) and ~1–2 (on) to pair with code-side toggles.
-- Ensure the lamp head’s metal housing is double-sided or thick enough to block internal light; add interior shield geometry if needed to prevent light leaking through the top.
-- Confirm the glass and metal are separate materials for runtime control, preserving `SM_` naming.
-- Re-export `SM_StreetLamp_Simple.glb` with these updates and note any new texture files (e.g., `SM_StreetLamp_Glass_Emissive.png`).
-
 ### Future Atmosphere Ideas (for gameplay planning)
 - Runtime flicker and intensity modulation (slow breathing, occasional sparks) once emissive channel exists.
 - Consider progressive light degradation tied to gameplay milestones (e.g., graves watered) to heighten tension.
+
+## 2025-10-06 Asset Polish Notes
+- ⭐ Completed material split: glass darkens at emissive 0.1 and glows warmly at 1.5; emission strength exposed via Value node (`Emission Strength`).
+- ⭐ Added interior blocker meshes (`SM_StreetLamp_Lantern_TopPane`, `_BottomPane`) to stop light bleed; triangulated + UV projected for tangent-safe export.
+- ⭐ Rebuilt Hedwig Draco export preset and re-exported `public/assets/models/props/SM_StreetLamp_Simple.glb` with updated geometry.
+- 📸 TODO: capture Blender viewport renders (emissive off/on) next session for docs.
+- 🔄 Runtime follow-up: bind Dev Room GUI lamp slider directly to material emissive intensity (0.1 ↔ 1.5) and re-test point-light offset once new GLB lands.

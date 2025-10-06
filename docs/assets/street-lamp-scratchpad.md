@@ -41,14 +41,14 @@
 2. [x] **Phase 2 – Material split using existing texture masks**
    - Branch glass vs metal shading in `MAT_StreetLamp_Master`.
    - Add emission control with 0 and ~1.5 presets.
-3. [ ] **Phase 3 – Add interior light blockers**
-   - Model thin hex caps (top & bottom) within lantern; ensure they share metal shading.
-4. [ ] **Phase 4 – Metal roof opacity check**
-   - Solidify/Backface Culling as needed; verify no light transmission.
-5. [ ] **Phase 5 – Cleanup & export prep**
-   - Recalculate normals, reapply transforms, verify height ≈4.416 m.
-6. [ ] **Phase 6 – Export & documentation**
-   - Overwrite GLB, capture on/off renders, update session notes.
+3. [x] **Phase 3 – Add interior light blockers**
+   - Modeled separate meshes `SM_StreetLamp_Lantern_TopPane` & `_BottomPane`; triangulated and UV-projected from view.
+4. [x] **Phase 4 – Metal roof opacity check**
+   - Added interior caps to block upward/ downward bleed; metal remains opaque, caps share metal shading.
+5. [x] **Phase 5 – Cleanup & export prep**
+   - Applied transforms, recalculated normals, verified overall height ≈4.416 m.
+6. [x] **Phase 6 – Export & documentation**
+   - Re-exported GLB with Hedwig Draco preset; updated notes/screenshots pending; scratchpad + backlog refreshed.
 
 ## Progress Log
 - 2025-09-30 — Scratchpad created; plan approved by Michael; awaiting Phase 1 execution.
@@ -70,3 +70,21 @@
 - Runtime hook idea: expose emission strength via GLTF emissive factor (`MeshStandardMaterial.emissiveIntensity` in Three.js) so Dev Room GUI slider can lerp 0.1 → 1.5 and stay in sync with in-game brightness.
 - All supporting texture nodes forced to correct color spaces (Metalness/Roughness/Emission → Non-Color).
 - Ready for viewport check and Phase 3 geometry work.
+
+### Phase 3 Findings (2025-10-06)
+- Added top and bottom blocker panes as standalone meshes (`SM_StreetLamp_Lantern_TopPane`, `_BottomPane`) parented under `SM_StreetLamp_Simple`.
+- Each pane triangulated and UV mapped via Project From View to satisfy tangent export requirements.
+- Caps sit just inside glass; metal material applied so they read as opaque when emissive is 1.5.
+
+### Phase 4 Findings (2025-10-06)
+- Visual check in dark viewport confirmed caps block upward/downward light bleed while leaving mullion silhouettes intact.
+- Metal roof thickness acceptable without extra Solidify; caps provide backup light-stop.
+
+### Phase 5 Findings (2025-10-06)
+- Applied transforms on base, lantern, caps, and root empty; recalculated normals on all meshes.
+- Verified bounding height unchanged (≈4.416 m) after edits; triangle count still <5 k.
+
+### Phase 6 Findings (2025-10-06)
+- Hedwig Draco Export preset rebuilt (glb, selected objects, tangents, Draco level 6) and reused for final export.
+- Overwrote `public/assets/models/props/SM_StreetLamp_Simple.glb`; runtime test pending but emissive slider ready (0.1 off → 1.5 on).
+- To-do: capture on/off viewport renders during next Blender session.
