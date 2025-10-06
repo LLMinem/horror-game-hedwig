@@ -7,6 +7,10 @@
 ## Important & Not Urgent (Plan Ahead)
 - **Cascaded or dynamic moon shadows**: our current moon shadow frustum is deliberately tight (±18 m) for crisp detail, which means shadows disappear once objects fall outside that box. When the cemetery expands to ~250 m, evaluate either cascaded shadow maps or a player-centered dynamic frustum so near ground stays sharp while distant ground still receives shadows.
 - **Evaluate Biome tooling**: once asset integration and gameplay scaffolding stabilize, test migrating formatting/linting to Biome for a faster single-tool workflow (replaces our absent ESLint/Prettier setup and keeps future projects consistent).
+- **Project-wide KTX2 compression**: add a conversion step plus loader wiring so every shipped prop has `.ktx2` textures (1 K/2 K variants) to keep web download sizes in check.
+- **Loading screen polish**: design a thematic preloader page with art + “Begin” button to distract from large asset loads.
+- **Interactive intro overlay**: show controls, goals, and “press ESC to unlock mouse” guidance while the scene finishes initializing; tap-to-start drops the player into the world.
+- **In-game HUD shell**: add lightweight navigation elements (settings toggle, lil-gui visibility button, etc.) so the game window feels intentional.
 
 ## Urgent & Not Important (Delegate / Quick Wins)
 - _None logged yet_
