@@ -18,3 +18,4 @@
 ## Not Urgent & Not Important (Consider Later / Maybe Never)
 - **Scripted moon path demo**: animate the moon position over time to showcase lighting/shadow changes for friends and family.
 - **esbuild dev-server advisory**: npm audit flags an esbuild dev-server vulnerability; low concern for local-only Vite usage but keep on radar for future dependency bumps.
+- **Individual lamp flicker sequences**: once lamps populate the cemetery, trigger random flicker/blackout patterns per lamp (see issue #9 for architecture sketch).
