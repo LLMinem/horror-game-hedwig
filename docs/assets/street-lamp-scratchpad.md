@@ -91,6 +91,7 @@
 - 🔄 Runtime follow-up: bind Dev Room GUI lamp slider directly to material emissive intensity (0.1 ↔ 1.5) and re-test point-light offset once new GLB lands.
 
 ## Upcoming Blender Fix – Internal Light Blocker (planned 2025-10-07)
+- **Tracking:** GitHub issue #10.
 - **Problem:** With the point light positioned inside the lantern, the outer roof still catches harsh highlights; current blocker panes are single surfaces so light reaches the same triangles that form the roof shell.
 - **Goal:** Add a shallow sealed “cap” inside the lantern so the bulb can sit at physical height (~0.45) without lighting the exterior metal.
 - **Steps to perform in Blender:**
@@ -100,3 +101,6 @@
   4. Inspect for gaps between blocker and roof; close any seams so the point light cannot peek through.
   5. Re-export `SM_StreetLamp_Simple.glb` with the Hedwig Draco preset once satisfied and log results below.
 - **Post-export test checklist:** In the Dev Room set lamp light height to 0.45, intensity 35; confirm roof stays dark while glass + emissive glow remain convincing.
+
+### Temporary Engine Workaround (2025-10-09)
+- Point light height offset is clamped to 0.22 in the Dev Room so the bulb sits above the roof and no longer blows out the metal. This keeps the lamp readable but introduces a mild self-shadow; resolve once issue #10 lands.

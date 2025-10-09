@@ -11,6 +11,7 @@
 - **Loading screen polish**: design a thematic preloader page with art + “Begin” button to distract from large asset loads.
 - **Interactive intro overlay**: show controls, goals, and “press ESC to unlock mouse” guidance while the scene finishes initializing; tap-to-start drops the player into the world.
 - **In-game HUD shell**: add lightweight navigation elements (settings toggle, lil-gui visibility button, etc.) so the game window feels intentional.
+- **Restore lamp light inside lantern**: move the Dev Room lamp light back inside once the internal blocker is modeled (see issue #10).
 
 ## Urgent & Not Important (Delegate / Quick Wins)
 - _None logged yet_

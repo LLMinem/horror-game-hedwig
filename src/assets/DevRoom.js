@@ -11,7 +11,8 @@ import { loadStreetLampInstance } from './Assets.js';
 
 const bounds = new Box3();
 const center = new Vector3();
-const DEFAULT_LAMP_LIGHT_OFFSET = 0.25; // Keep bulb tucked inside lantern
+// TODO(#10): Drop the offset back inside the lantern once we add a sealed blocker in Blender.
+const DEFAULT_LAMP_LIGHT_OFFSET = 0.22; // Quick fix: keep bulb slightly above roof for now
 const MIN_EMISSIVE_INTENSITY = 0.1; // Matches Blender's "lamp off" baseline
 const DEFAULT_LIGHT_INTENSITY = DEFAULTS.devRoomLampLightIntensity; // 35
 const DEFAULT_EMISSIVE_INTENSITY = 1.5; // Lamp glass glow for "on"
