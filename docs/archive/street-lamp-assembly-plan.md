@@ -1,3 +1,14 @@
+---
+type: plan
+status: archived
+created: 2025-09-25
+last_verified: 2025-09-30
+last_verified_commit: b73bdea
+owned_by: human
+supersedes: []
+superseded_by: ["docs/assets/street-lamp-scratchpad.md"]
+---
+
 # Street Lamp Assembly & Export Plan
 
 ## 1. Reference & Scene Prep
@@ -55,4 +66,3 @@
 ## 12. Validation & Handoff
 - Share Blender viewport renders and GLB preview for review.
 - Log asset details (tri count, texture list, compression status) for future reference.
-

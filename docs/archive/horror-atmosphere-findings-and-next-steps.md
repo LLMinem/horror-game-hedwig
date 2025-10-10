@@ -1,9 +1,9 @@
 ---
 type: report
-status: active
+status: archived
 created: 2025-09-13
-last_verified: 2025-09-16
-last_verified_commit: b6a4891
+last_verified: 2025-10-07
+last_verified_commit: 332122c
 owned_by: human
 supersedes: []
 superseded_by: []

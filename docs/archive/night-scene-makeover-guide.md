@@ -1,9 +1,9 @@
 ---
 type: guide
-status: active
+status: archived
 created: 2025-09-05
-last_verified: 2025-09-16
-last_verified_commit: 11ce7af
+last_verified: 2025-09-22
+last_verified_commit: a7d0778
 owned_by: plan-tracker
 superseded_by: [pragmatic-refactor-plan.md]
 ---

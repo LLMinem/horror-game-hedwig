@@ -1,6 +1,6 @@
 ---
 type: spec
-status: outdated
+status: archived
 created: 2025-09-03
 last_verified: 2025-09-16
 last_verified_commit: b6a4891
@@ -10,6 +10,8 @@ superseded_by: []
 ---
 
 # Cemetery Horror Game - Technical Specification
+
+> **Status:** Archived after the October 2025 refactor. Retain for historical context only until a refreshed spec is written.
 
 ## 0. Overview & Scope (MVP)
 

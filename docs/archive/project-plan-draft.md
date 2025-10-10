@@ -1,3 +1,14 @@
+---
+type: plan
+status: archived
+created: 2025-09-01
+last_verified: 2025-09-04
+last_verified_commit: fca6f11
+owned_by: human
+supersedes: []
+superseded_by: ["docs/archive/pragmatic-refactor-plan.md"]
+---
+
 # Project Plan: First Playable Version
 
 ## Quick Start Strategy

@@ -1,12 +1,12 @@
 ---
 type: plan
-status: outdated
+status: archived
 created: 2025-09-03
 last_verified: 2025-09-16
 last_verified_commit: b6a4891
 owned_by: human
 supersedes: []
-superseded_by: []
+superseded_by: ["docs/archive/pragmatic-refactor-plan.md"]
 ---
 
 # Horror Game Development Plan - Methodical Approach

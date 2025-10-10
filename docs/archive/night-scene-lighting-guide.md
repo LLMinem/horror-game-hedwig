@@ -1,3 +1,14 @@
+---
+type: guide
+status: archived
+created: 2025-09-04
+last_verified: 2025-09-13
+last_verified_commit: fca6f11
+owned_by: human
+supersedes: []
+superseded_by: ["docs/archive/pragmatic-refactor-plan.md"]
+---
+
 # Complete Guide to Creating Realistic Night Scenes in Three.js
 
 ## A Beginner's Handbook for Horror Game Lighting
