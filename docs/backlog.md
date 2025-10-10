@@ -11,6 +11,7 @@
 - **Loading screen polish**: design a thematic preloader page with art + “Begin” button to distract from large asset loads.
 - **Interactive intro overlay**: show controls, goals, and “press ESC to unlock mouse” guidance while the scene finishes initializing; tap-to-start drops the player into the world.
 - **In-game HUD shell**: add lightweight navigation elements (settings toggle, lil-gui visibility button, etc.) so the game window feels intentional.
+- **Restore lamp light inside lantern**: move the Dev Room lamp light back inside once the internal blocker is modeled (see issue #10).
 
 ## Urgent & Not Important (Delegate / Quick Wins)
 - _None logged yet_
@@ -18,3 +19,4 @@
 ## Not Urgent & Not Important (Consider Later / Maybe Never)
 - **Scripted moon path demo**: animate the moon position over time to showcase lighting/shadow changes for friends and family.
 - **esbuild dev-server advisory**: npm audit flags an esbuild dev-server vulnerability; low concern for local-only Vite usage but keep on radar for future dependency bumps.
+- **Individual lamp flicker sequences**: once lamps populate the cemetery, trigger random flicker/blackout patterns per lamp (see issue #9 for architecture sketch).

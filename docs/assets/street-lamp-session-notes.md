@@ -38,3 +38,5 @@
 - ⭐ Rebuilt Hedwig Draco export preset and re-exported `public/assets/models/props/SM_StreetLamp_Simple.glb` with updated geometry.
 - 📸 TODO: capture Blender viewport renders (emissive off/on) next session for docs.
 - 🔄 Runtime follow-up: bind Dev Room GUI lamp slider directly to material emissive intensity (0.1 ↔ 1.5) and re-test point-light offset once new GLB lands.
+- 🛠️ New TODO (2025-10-07): create a sealed interior light blocker (thin hexagonal prism) so internal point lights no longer brighten the outer roof; re-export GLB afterwards.
+- 📉 Interim workaround (2025-10-09): Dev Room keeps the lamp light offset at 0.22 (above the roof) to avoid the harsh highlight; revisit when issue #10 is closed.
