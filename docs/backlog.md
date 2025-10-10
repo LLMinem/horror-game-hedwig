@@ -1,3 +1,14 @@
+---
+type: backlog
+status: active
+created: 2025-09-28
+last_verified: 2025-10-10
+last_verified_commit: 5d9a3b4
+owned_by: human
+supersedes: []
+superseded_by: []
+---
+
 # Hedwig Backlog (Eisenhower Matrix)
 
 ## Urgent & Important (Do Now)
@@ -12,6 +23,7 @@
 - **Interactive intro overlay**: show controls, goals, and “press ESC to unlock mouse” guidance while the scene finishes initializing; tap-to-start drops the player into the world.
 - **In-game HUD shell**: add lightweight navigation elements (settings toggle, lil-gui visibility button, etc.) so the game window feels intentional.
 - **Restore lamp light inside lantern**: move the Dev Room lamp light back inside once the internal blocker is modeled (see issue #10).
+- **Decide GeoJSON/DEM integration path**: choose whether to ingest `data/cemetery_final.geojson` + local DEM height data or stay manual; document the chosen pipeline before gameplay scaffolding starts.
 
 ## Urgent & Not Important (Delegate / Quick Wins)
 - _None logged yet_

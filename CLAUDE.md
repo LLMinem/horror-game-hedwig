@@ -33,10 +33,10 @@ Michael is a beginner developer with 8 months of programming experience and ZERO
 ### 3. FOLLOW THE CURRENT PLAN
 
 <project-status>
-Current Phase: Refactor COMPLETE - Ready for merge
-Active Plan: docs/pragmatic-refactor-plan.md (100% complete)
-Next Priority: Merge to main branch, then asset integration
-Last Verified: 2025-09-22 (1ba0274)
+Current Phase: Asset Integration Ramp-Up
+Active Plan: docs/asset-integration-plan.md (active)
+Next Priority: Bench + tree pipeline, lamp blocker fix, gameplay scaffolding
+Last Verified: 2025-10-10 (5d9a3b4)
 </project-status>
 
 - Work through phases sequentially
@@ -80,41 +80,29 @@ Last Verified: 2025-09-22 (1ba0274)
 
 ---
 
-## PROJECT STRUCTURE (Current + Planned)
+## PROJECT STRUCTURE (2025-10-10)
 
-Currently, we're working entirely in `src/main.js` during the learning/prototyping phase. Planned refactor structure (from pragmatic-refactor-plan.md):
+The refactor landed. This is the live layout agents should reference:
 
 ```
 /src
-  main.js              # Entry point, wires everything (< 50 lines after refactor)
-  /core
-    Engine.js          # Renderer, scene, camera, clock, resize
-  /atmosphere
-    Atmosphere.js      # Sky + stars together (one visual system)
-  /world
-    World.js           # Fog, lights, ground, test objects
-    Environment.js     # HDRI loading, envMap fixes for r179
-  /gameplay
-    PlayerController.js # Mouse look + WASD movement + flashlight
-    AIUncle.js         # Future: Uncle pathing AI
-    Gameplay.js        # Future: Game logic, win/lose conditions
-  /assets
-    Assets.js          # Asset loading utilities
-    DevRoom.js         # Future: Asset testing area
-  /ui
-    DebugGui.js        # All lil-gui controls in one place
-  /loop
-    Loop.js            # Animation loop
-  /config
-    Constants.js       # SCENE_CONSTANTS + defaults
+  main.js                # ≤50-line entry point wiring everything
+  config/Constants.js    # Scene defaults + GUI baseline values
+  core/Engine.js         # Renderer, camera, clock, resize hooks
+  atmosphere/Atmosphere.js # Skydome + THREE.Points stars + horror grading
+  world/World.js         # Fog, lights, ground, placeholder props
+  world/Environment.js   # HDRI loading + r179 envMap fixes + asset registration
+  assets/Assets.js       # Shared GLTF/KTX2/Draco loaders
+  assets/DevRoom.js      # Asset sandbox with street lamp + point light helper
+  gameplay/PlayerController.js # Mouse look, WASD, flashlight control
+  ui/DebugGui.js         # lil-gui panels, presets, front-matter-aware state
+  loop/Loop.js           # Animation loop runner
 
-/docs                  # Project documentation (see <active-files> for current files)
-
-/public/assets
-  /hdri                # Night environment maps
-  /textures            # Ground and asset textures
-  /audio               # Sound effects (future)
+/docs                    # Active guidance (asset integration) + /archive for history
+/public/assets           # HDRIs, textures, prepared GLBs
 ```
+
+Future additions: `gameplay/AIUncle.js`, `gameplay/Gameplay.js`, cemetery layout loaders once we decide how to ingest GeoJSON/DEM data.
 
 ---
 
@@ -185,18 +173,19 @@ Agents only modify their designated sections. XML-style tags mark managed conten
 ## CURRENT DEVELOPMENT STATUS
 
 <active-files>
-- docs/pragmatic-refactor-plan.md - COMPLETE refactor plan (100% done)
-- src/main.js - Ultra-clean 44-line entry point (refactored)
-- All 12 modules successfully created and working
-- CLAUDE.md - This file (project context)
+- docs/asset-integration-plan.md — Updated 2025-10-10 with Dev Room status + next asset targets
+- docs/assets/pipeline-guide.md — Canonical Blender → GLB workflow (includes loader + env registration notes)
+- docs/assets/street-lamp-scratchpad.md — Live log for the hero lamp (emissive binding, blocker TODO)
+- src/assets/Assets.js & src/assets/DevRoom.js — Shared loaders + sandbox (always review before asset work)
+- README.md — Repository orientation (snapshot: 2025-10-10)
 </active-files>
 
 <next-steps>
-- Merge refactor/pragmatic to main branch (immediate priority)
-- Begin asset integration phase (post-merge)
-- Consider future features (physical moon, clouds, Uncle AI)
-- All refactor goals achieved (97.5% code reduction)
-- All known issues fixed (HDRI switching, linear fog)
+- Close lamp blocker work so the point light can sit inside the lantern again (issue #10)
+- Run the bench + tree props through the pipeline, updating scratchpads + processing queue
+- Sketch gameplay scaffolding entry points (`gameplay/Gameplay.js`, `gameplay/AIUncle.js`) once assets land
+- Archive old specs/plans (done) and prepare for a fresh design document when gameplay resumes
+- Decisions about GeoJSON/DEM ingestion live in the backlog (“Important & Not Urgent”)—do not tackle ad hoc
 </next-steps>
 
 ---
