@@ -1,3 +1,14 @@
+---
+type: adr
+status: accepted
+created: 2025-09-09
+last_verified: 2025-09-09
+last_verified_commit: 9796184
+owned_by: human
+supersedes: []
+superseded_by: []
+---
+
 # ADR-003: Switch from Fragment Shader to Geometry-Based Stars
 
 ## Status

@@ -2,8 +2,8 @@
 type: plan
 status: active
 created: 2025-09-23
-last_verified: 2025-09-23
-last_verified_commit: d8f1d33
+last_verified: 2025-10-10
+last_verified_commit: 5d9a3b4
 owned_by: human
 supersedes: []
 superseded_by: []
@@ -17,12 +17,12 @@ Provide a deliberate roadmap for bringing high-quality assets and authentic layo
 
 ## 2. Current Snapshot
 
-- **Codebase**: Modular Three.js scene running on Three.js r179.1 via Vite. Scene still uses placeholder tombs/trees/posts and a flat ground plane.
+- **Codebase**: Modular Three.js scene running on Three.js r179.1 via Vite. Shared loaders now live in `src/assets/Assets.js`, `createDevRoom` autoloads the street lamp so the asset loop is proven end-to-end.
 - **Data**:
   - `data/cemetery_final.geojson` – accurate but incomplete map (paths, fences, taps, some hedges/buildings).
   - Government DEM height data (stored locally on MacBook, not yet processed).
   - 90+ reference photos of the real cemetery (local).
-- **Assets**: “The Cemetery Pack” (FBX/OBJ + 1–4 K textures) downloaded locally. Needs curation and optimization before entering the web build.
+- **Assets**: “The Cemetery Pack” (FBX/OBJ + 1–4 K textures) plus a curated street lamp exported to `public/assets/models/props/SM_StreetLamp_Simple.glb`. Shared environment registration ensures HDRI reflections after load.
 - **Infrastructure split**: Blender, raw assets, and geodata live on MacBook; coding happens on the VPS repo.
 
 ## 3. Options Overview
@@ -42,8 +42,8 @@ Provide a deliberate roadmap for bringing high-quality assets and authentic layo
    - Establish Blender export preset (GLB + Draco, consistent scale).
    - Follow the Blender checklist in `docs/assets/pipeline-guide.md` for per-asset prep.
    - Introduce KTX2 texture compression and Three.js loader wiring.
-   - When integrating in Three.js, call `environment.registerAsset(assetRoot)` immediately after adding the GLTF root to the scene so the active HDRI env map applies (required in Three.js r179+).
-   - Prove the loop end-to-end with one hero asset (e.g., Victorian lamp) plus a tomb.
+   - Always call `initAssetSystem({ renderer })` in code and register each GLTF root with `environment.registerAsset(root)` so HDRI reflections apply (Three.js r179 requirement).
+   - Hero street lamp loop is complete; repeatable pattern should now extend to bench, trees, tombs.
 2. **Create Dev Room Sandbox (Learning Focus: scene composition, lighting)**
    - Add `assets/DevRoom.js` to spawn a neutral testing arena.
    - Load curated assets via the new pipeline.
@@ -68,10 +68,10 @@ Provide a deliberate roadmap for bringing high-quality assets and authentic layo
 
 ## 6. Immediate Next Actions
 
-1. Keep `docs/assets/pipeline-guide.md` up to date as the canonical asset workflow.
-2. Confirm transfer method from Mac → VPS (suggest git commit from Mac or `scp` uploads).
-3. Implement minimal `assets/Assets.js` + loaders in codebase to accept the first curated asset.
-4. Once the pipeline works, move on to Dev Room implementation.
+1. Close out the Blender blocker work (sealed interior cap) and re-export the lamp so we can drop the light back inside.
+2. Work through the asset processing queue starting with the bench and tree variants; log findings in the scratchpads.
+3. Confirm transfer method from Mac → VPS (suggest git commit from Mac or `scp` uploads).
+4. Keep `docs/assets/pipeline-guide.md` updated as the canonical workflow, especially once KTX2 conversion lands.
 
 ## 7. Session Guidelines
 

@@ -1,3 +1,14 @@
+---
+type: scratchpad
+status: active
+created: 2025-09-30
+last_verified: 2025-10-09
+last_verified_commit: e34e6d4
+owned_by: human
+supersedes: []
+superseded_by: []
+---
+
 # Street Lamp Scratchpad (SM_StreetLamp_Simple)
 
 ## Asset Summary

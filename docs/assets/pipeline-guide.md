@@ -1,6 +1,17 @@
+---
+type: guide
+status: active
+created: 2025-09-25
+last_verified: 2025-10-10
+last_verified_commit: 5d9a3b4
+owned_by: human
+supersedes: []
+superseded_by: []
+---
+
 # Hedwig Asset Pipeline Guide
 
-Use this checklist whenever we curate raw vendor content into web-ready props.
+Use this checklist whenever we curate raw vendor content into web-ready props. Always call `initAssetSystem({ renderer })` in code before loading so the shared GLTF/KTX2/Draco loaders and renderer detection are ready.
 
 ## 1. Gather Inputs
 - Copy relevant vendor FBX/OBJ + texture sets into `assets/source/raw/...` (keep source folder names intact).
@@ -38,6 +49,7 @@ Use this checklist whenever we curate raw vendor content into web-ready props.
 ## 7. Document & Commit
 - Add notes to `docs/assets/<asset>-session-notes.md` (height, textures, export path).
 - Commit GLB + docs (Blend files stay local unless we adopt Git LFS).
+- Register the runtime scene with `environment.registerAsset(scene)` so the active HDRI applies automatically in Three.js r179.
 - Push to remote so the dev environment can pull the asset.
 
 ## 8. Optional Optimizations
