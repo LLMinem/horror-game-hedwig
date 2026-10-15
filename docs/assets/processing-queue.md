@@ -1,34 +1,19 @@
 ---
 type: checklist
 status: active
-created: 2025-10-10
-last_verified: 2025-10-10
-last_verified_commit: 2733f08
-owned_by: human
-supersedes: []
-superseded_by: []
+last_verified: 2026-10-10
 ---
 
-# Asset Processing Queue
+# Asset candidates, not a production order
 
-Use this list to track which raw assets from `assets/source/raw/cemetery-pack` have been curated in Blender and exported to `public/assets/models/`.
+Start with photo location/coverage review in [the active plan](../asset-integration-plan.md), then choose assets for a bounded production brief. Prefer agent-authored site geometry; complex vegetation is a reasonable pack candidate. Additional textures/models may be sourced when needed with licence and fit checks. This is not a pack-conversion backlog.
 
-## Ready / Exported
-- [x] Street lamp (SM_StreetLamp_Simple.glb)
+## Runtime proof
 
-## In Progress / Next Up
-1. Bench (`5111390_bench.fbx` + textures in `5111390_Bench/`)
-2. Trees (select 3 hero variants from `5111390_trees.fbx` in `5111390_Trees/`)
-3. Tombs (export individual picks from `5111390_tombs.fbx` and `5111390_tombs_*.fbx`)
-4. Multi fountain (`5111390_multi_fountain.fbx`; assemble parts, plan water treatment)
-5. Road & fence kit (`5111390_road_fences_kit.fbx` with `5111390_roads_fences_kit/` textures)
-6. Stones (`5111390_stones.fbx` + `5111390_Stones/`)
-7. Plants (`5111390_plants.fbx` + `5111390_Plants/`)
+- `public/assets/models/props/SM_StreetLamp_Simple.glb`: disposable pipeline test with Draco and emissive controls, not a required cemetery asset. Existing lamp Blender files and sample props are not authoritative modelling references. Preserve the working sandbox until deliberately replacing it; do not polish this lamp merely because it already exists. [Historical scratchpad](street-lamp-scratchpad.md).
 
-## Backlog / Nice-to-Have
-- Candles, churches, cliffs, mausoleums, wall fountain, etc. (assess once core set is shipped)
+## Local candidates
 
-## Notes
-- Keep each asset’s working `.blend` in `assets/source/working/` using the naming convention `pack/<asset-name>.blend`.
-- Export GLB with the Hedwig Draco preset (selected objects, tangents, Draco enabled).
-- Record per-asset findings in the corresponding scratchpad under `docs/assets/`.
+The raw inventory is available through [local references](../local-references.md): bench, trees, plants, stones, compatible grave variants, road/fence kit, lamps and fountain parts. These are not yet curated runtime assets. Churches and mausoleums are not substitutes for the cemetery's actual buildings. A pack filename does not prove real-site fit.
+
+Use [the pipeline checklist](pipeline-guide.md) and [explicit Blender commands](blender-workbench.md). Keep a chosen source revision, reference set, dimensions, material treatment, export command and review outcome with each accepted asset. Do not convert the entire pack pre-emptively.

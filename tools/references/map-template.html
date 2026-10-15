@@ -1,0 +1,420 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' file: data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<title>Private Fotoreferenzen · Standortprüfung</title>
+<style>
+:root{color-scheme:dark;--bg:#101512;--panel:#17201d;--ink:#e8eee8;--muted:#afbdaf;--line:#3e5142;--accent:#d5b96b;--low:#81b9ed;--review:#eeaf63;--confirmed:#80cf9a}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 system-ui,-apple-system,Segoe UI,sans-serif}button,input,select,textarea{font:inherit;color:inherit;background:#24302a;border:1px solid #69806e;border-radius:5px}button{padding:7px 10px;cursor:pointer}button:hover:not(:disabled){border-color:var(--accent)}button:disabled{opacity:.45;cursor:default}button[aria-pressed=true],button.primary{background:#51482a;border-color:var(--accent)}button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,canvas:focus-visible{outline:2px solid var(--accent);outline-offset:2px}input,select,textarea{padding:7px;max-width:100%}header{padding:12px 18px;border-bottom:1px solid var(--line)}h1{font-size:19px;margin:0}h2{font-size:16px;margin:0 0 9px}h3{font-size:14px;margin:14px 0 6px}p{margin:6px 0}.muted,.help{color:var(--muted);font-size:12px}.workspace{display:grid;grid-template-columns:minmax(0,1fr) 420px;height:calc(100dvh - 99px);min-height:600px}.map-column{display:flex;flex-direction:column;min-width:0}.toolbar,.legend{display:flex;gap:7px;align-items:center;flex-wrap:wrap;padding:9px 12px;background:var(--panel);border-bottom:1px solid var(--line)}.map-wrap{position:relative;flex:1;min-height:320px;overflow:hidden}#map{display:block;width:100%;height:100%;background:#26332c;touch-action:none;cursor:grab}#map.dragging{cursor:grabbing}#map.placing{cursor:crosshair}.map-caption{position:absolute;left:12px;bottom:12px;pointer-events:none;background:#17201dee;padding:6px 9px;border-radius:5px;font-size:12px}.north{position:absolute;right:16px;top:14px;pointer-events:none;text-align:center;background:#17201ddd;padding:5px 9px}.north b{display:block;font-size:24px}#scale-line{height:5px;border:1px solid var(--ink);border-top:0;margin-top:3px}.legend{font-size:12px}.swatch{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:4px}.low{background:var(--low)}.review{background:var(--review)}.confirmed{background:var(--confirmed)}aside{overflow:auto;padding:12px;border-left:1px solid var(--line);background:var(--panel)}section.block{border-bottom:1px solid var(--line);padding-bottom:14px;margin-bottom:14px}.row{display:flex;gap:7px;align-items:center;flex-wrap:wrap}.row>*{min-width:0}#filter{width:100%}#photo-list{max-height:185px;overflow:auto;display:flex;flex-direction:column;gap:4px;margin:8px 0;padding:2px}#photo-list button{text-align:left;display:block;width:100%;font-size:12px;overflow-wrap:anywhere}#photo-list button[aria-current=true]{border-color:var(--accent);background:#394334}#photo-list small{display:block;color:var(--muted)}#photo-id{overflow-wrap:anywhere;font-size:14px}#preview{display:block;width:100%;height:235px;object-fit:contain;background:#0d120f;border-radius:5px}#preview[hidden]{display:none}#preview-message{padding:12px;background:#101512}dl{display:grid;grid-template-columns:135px minmax(0,1fr);gap:4px 8px;margin:6px 0;font-size:12px}dt{color:var(--muted)}dd{margin:0;overflow-wrap:anywhere}.coordinates{padding:8px;border-left:3px solid var(--line);background:#101512;overflow-wrap:anywhere}.coordinates strong{display:block;font-size:12px}.coordinates span{font-size:13px;font-variant-numeric:tabular-nums}label.field{display:flex;flex-direction:column;gap:4px;margin:9px 0;font-size:12px}textarea{resize:vertical;min-height:64px}.warning{color:#f0cd83}#message{padding:8px 12px;min-height:37px;background:#202b23;border-bottom:1px solid var(--line);overflow-wrap:anywhere}#message[data-error=true]{color:#ffd2bb;background:#482b25}#save-status{font-weight:600}.workflow{padding:10px 12px;border-top:1px solid var(--line);background:var(--panel)}code{overflow-wrap:anywhere;color:var(--accent)}[hidden]{display:none!important}@media(max-width:950px){.workspace{grid-template-columns:minmax(0,1fr) 350px}dl{grid-template-columns:115px minmax(0,1fr)}}@media(max-width:720px){header{padding:10px 12px}.workspace{display:flex;flex-direction:column;height:auto;min-height:0}.map-column{position:relative}.map-wrap{height:47dvh;flex:none;min-height:280px}aside{overflow:visible;border-left:0;border-top:1px solid var(--line)}#photo-list{max-height:150px}#preview{height:270px}.workflow{font-size:12px}}
+</style>
+</head>
+<body>
+<header><h1>Private Fotoreferenzen · Standortprüfung</h1><p class="help">Offline · nur lokale Arbeitskopien · keine Uploads, Kartenkacheln oder externen Bibliotheken. Originale bleiben unverändert.</p><p id="save-status" role="status">Eingebetteten Korrekturstand geladen.</p></header>
+<main class="workspace">
+<div class="map-column">
+<div class="toolbar"><button id="fit" type="button">Friedhof einpassen</button><button id="locate" type="button">Zum Foto</button><button id="zoom-in" type="button" aria-label="Karte vergrößern">+</button><button id="zoom-out" type="button" aria-label="Karte verkleinern">−</button><button id="place" type="button" aria-pressed="false">Standort setzen</button><span class="help">Ziehen: verschieben · Rad: zoomen · ↑ Norden</span></div>
+<div id="message" role="status" aria-live="polite">Foto wählen; Marker zeigen den wirksamen Standort.</div>
+<div class="map-wrap"><canvas id="map" tabindex="0" aria-label="Friedhofskarte mit Fotomarkern. Standort setzen aktivieren und auf die Karte klicken; Ziehen setzt keinen Standort."></canvas><div class="north">N<b>↑</b></div><div class="map-caption"><span id="scale-text"></span><div id="scale-line"></div><div>© OpenStreetMap-Mitwirkende · ODbL</div></div></div>
+<div class="legend"><span><i class="swatch low"></i>Niedriger gemeldeter Fehler, unbestätigt</span><span><i class="swatch review"></i>Standort prüfen</span><span><i class="swatch confirmed"></i>Manuell bestätigt</span><span>Ring: gemeldeter Fehler am Original-GPS · gestrichelter Strahl: ungefähre Richtung</span></div>
+<div class="workflow"><p class="warning">GPS-Fehler ist eine Geräteschätzung, keine garantierte Genauigkeit. Manuelle Bestätigung ist keine Vermessung. Höhe ist kein Geländemodell; Richtung ist keine kalibrierte Kamerapose oder Sichtfeldmessung.</p><p class="help">Änderungen bleiben im Arbeitsspeicher. JSON herunterladen und lokal aufbewahren; der Browser kann diese HTML-Datei nicht überschreiben. Zum dauerhaften Übernehmen die heruntergeladene Datei mit dem Python-CLI importieren und die Karte neu erzeugen (Befehl rechts).</p></div>
+</div>
+<aside aria-label="Fotoauswahl und Korrekturen">
+<section class="block"><h2>Fotos <span id="photo-count"></span></h2><label class="field" for="filter">Standortstatus<select id="filter"><option value="all">Alle Fotos</option><option value="low">Niedriger gemeldeter Fehler (unbestätigt)</option><option value="review">Standort prüfen</option><option value="confirmed">Manuell bestätigt</option></select></label><p id="filter-summary" class="help"></p><div id="photo-list" aria-label="Fotoliste"></div><div class="row"><button id="previous" type="button">← Vorheriges</button><button id="next" type="button">Nächstes →</button><span class="help">Tasten ← / →</span></div></section>
+<section id="photo-detail" class="block">
+<h2 id="photo-id">Kein Foto ausgewählt</h2><p id="photo-status" class="help"></p>
+<a id="preview-open" target="_blank" rel="noopener noreferrer" aria-label="Fotoreferenz in voller Arbeitskopie-Größe öffnen"><img id="preview" alt="Lokale Fotoreferenz" hidden></a>
+<p id="preview-message" class="help">Keine Vorschau ausgewählt.</p><p class="help">Foto anklicken: Arbeitskopie in einem neuen Tab öffnen.</p>
+<h3>Unveränderte Originalmetadaten</h3><div class="coordinates"><strong>Original-GPS · Längengrad, Breitengrad</strong><span id="original-coordinates">—</span></div><dl id="metadata"></dl>
+<h3>Wirksame Platzierung</h3><div class="coordinates"><strong>Wirksamer Standort · Längengrad, Breitengrad</strong><span id="effective-coordinates">—</span></div><dl id="effective-metadata"></dl><p id="selection-warning" class="help warning"></p>
+</section>
+<section class="block"><h2>Manuelle Korrektur</h2><p class="help">„Standort setzen“ aktivieren, dann einmal klicken. Ein Ziehen verschiebt nur die Karte. Zulässig: Karten-Ausdehnung plus 100 m Rand.</p><label class="field" for="heading">Optionale Richtungs-Korrektur (0 bis &lt;360° ab Karten-Nord)<input id="heading" type="number" min="0" max="359.999999" step="any" placeholder="Leer = Originalrichtung beibehalten"></label><p class="help">Leeres Feld erhält Originalrichtung und deren Referenz (T = geografisch, M = magnetisch). Der Strahl ist unkalibriert: keine magnetische Deklinationskorrektur; unbekannte Referenz bleibt unsicher. Auch eine Korrektur bleibt eine ungefähre Richtung.</p><label class="field" for="note">Notiz<textarea id="note" placeholder="Begründung / Unsicherheit"></textarea></label><div class="row"><button id="apply" type="button">Wirksamen Standort bestätigen + Angaben übernehmen</button><button id="confirm-original" type="button">Original-GPS bestätigen</button><button id="undo" type="button">Letzte Änderung dieses Fotos zurück</button><button id="reset" type="button">Korrektur dieses Fotos entfernen</button><button id="discard-draft" type="button">Feldeingaben verwerfen</button></div><p class="help">Bestätigen speichert einen ausdrücklich geprüften Standort im Korrekturstand. Fehlendes GPS wird nur durch manuelles Platzieren ergänzt. „Entfernen“ stellt unveränderte Metadaten wieder her.</p></section>
+<section class="block"><h2>Korrekturstand sichern / laden</h2><div class="row"><button id="export" class="primary" type="button">Gesamten Stand als JSON herunterladen</button><button id="acknowledge-download" type="button" disabled>Download sicher abgelegt</button></div><p id="download-status" class="help">Ein Download sichert alle bestätigten Korrekturen, nicht nur den aktuellen Filter.</p><label class="field" for="import-file">Lokale Korrekturdatei auswählen<input id="import-file" type="file" accept="application/json,.json"></label><p id="import-status" class="help">Import ersetzt ausdrücklich den gesamten aktuellen Korrekturstand, kein Zusammenführen. Erst nach vollständiger Prüfung und Bestätigung.</p><button id="replace-import" type="button" disabled>Gesamten Korrekturstand ersetzen</button><p class="help">Im Projektverzeichnis dauerhaft übernehmen:</p><code id="persist-command">python3 tools/references/references.py import-positions /pfad/zur/foto-korrekturen.json</code><p class="help">Danach die lokale Karte neu erzeugen:</p><code>python3 tools/references/references.py map</code><p class="help">JSON, HTML und Vorschauen bleiben privat unter <code>.local/</code>; nicht veröffentlichen oder hochladen. Originalpfade werden hier nicht angezeigt.</p></section>
+</aside>
+</main>
+<script id="reference-data" type="application/json">__REFERENCE_DATA_JSON__</script>
+<script>
+'use strict';
+(() => {
+  const $ = id => document.getElementById(id);
+  const canvas = $('map'), ctx = canvas.getContext('2d');
+  let data;
+  try { data = JSON.parse($('reference-data').textContent); }
+  catch (error) { $('message').textContent = 'Kartendaten konnten nicht geladen werden: ' + error.message; $('message').dataset.error = 'true'; return; }
+  const photos = data.photos;
+  const byId = new Map(photos.map(photo => [photo.id, photo]));
+  const features = data.geojson.features;
+  const points = [];
+  function collectCoordinates(value) {
+    if (!Array.isArray(value)) return;
+    if (typeof value[0] === 'number' && typeof value[1] === 'number') points.push(value);
+    else value.forEach(collectCoordinates);
+  }
+  function collectGeometry(geometry) {
+    if (!geometry) return;
+    if (geometry.type === 'GeometryCollection') geometry.geometries.forEach(collectGeometry);
+    else collectCoordinates(geometry.coordinates);
+  }
+  features.forEach(feature => collectGeometry(feature.geometry));
+  const minX = Math.min(...points.map(p => p[0])), maxX = Math.max(...points.map(p => p[0]));
+  const minY = Math.min(...points.map(p => p[1])), maxY = Math.max(...points.map(p => p[1]));
+  const lat0 = (minY + maxY) / 2;
+  const mPerLon = 111320 * Math.cos(lat0 * Math.PI / 180), mPerLat = 110574;
+  const center = [(minX + maxX) / 2, lat0];
+  const threshold = data.threshold_m;
+  const finite = value => typeof value === 'number' && Number.isFinite(value);
+  const wgs84 = (lon, lat) => finite(lon) && finite(lat) && lon >= -180 && lon <= 180 && lat >= -90 && lat <= 90;
+  const inBounds = (lon, lat) => wgs84(lon, lat) && lon >= minX - 100 / mPerLon && lon <= maxX + 100 / mPerLon && lat >= minY - 100 / 111320 && lat <= maxY + 100 / 111320;
+  function validateCorrections(value) {
+    if (!value || Array.isArray(value) || typeof value !== 'object' || value.version !== 1 || !Array.isArray(value.photos)) throw new Error('Erwartet: {version: 1, photos: [...]}');
+    if (Object.keys(value).some(key => !['version', 'photos'].includes(key))) throw new Error('Unbekannte Felder im Korrekturstand.');
+    const result = new Map();
+    for (const row of value.photos) {
+      if (!row || Array.isArray(row) || typeof row !== 'object') throw new Error('Jede Korrektur muss ein Objekt sein.');
+      if (Object.keys(row).some(key => !['id', 'longitude', 'latitude', 'confirmed', 'heading_deg', 'note'].includes(key))) throw new Error('Unbekannte Felder in einer Korrektur.');
+      if (typeof row.id !== 'string' || !byId.has(row.id)) throw new Error('Unbekannte oder ungültige Foto-ID.');
+      if (result.has(row.id)) throw new Error('Doppelte Foto-ID: ' + row.id);
+      if (row.confirmed !== true) throw new Error('Bestätigung fehlt: ' + row.id);
+      if (!inBounds(row.longitude, row.latitude)) throw new Error('Koordinaten ungültig oder außerhalb des Kartenbereichs: ' + row.id);
+      if (row.heading_deg !== undefined && row.heading_deg !== null && (!finite(row.heading_deg) || row.heading_deg < 0 || row.heading_deg >= 360)) throw new Error('Richtung muss null oder eine Zahl von 0 bis <360 sein: ' + row.id);
+      if (typeof row.note !== 'string') throw new Error('Notiz muss Text sein: ' + row.id);
+      result.set(row.id, {id: row.id, longitude: row.longitude, latitude: row.latitude, confirmed: true, heading_deg: row.heading_deg ?? null, note: row.note});
+    }
+    return result;
+  }
+  let corrections;
+  try { corrections = validateCorrections(data.overrides); }
+  catch (error) { $('message').textContent = 'Eingebettete Korrekturen ungültig: ' + error.message; $('message').dataset.error = 'true'; return; }
+  let selectedId = photos[0]?.id ?? null, placing = false, pendingImport = null, importSequence = 0;
+  let W = 0, H = 0, zoom = 1, pan = [0, 0], drag = null;
+  const history = new Map();
+  function snapshot() { return JSON.stringify({version: 1, photos: photos.filter(p => corrections.has(p.id)).map(p => corrections.get(p.id))}); }
+  let savedSnapshot = snapshot(), downloadedSnapshot = null;
+  const selected = () => byId.get(selectedId);
+  const metadata = photo => photo?.metadata || {};
+  function originalPoint(photo) {
+    const m = metadata(photo);
+    return wgs84(m.GPSLongitude, m.GPSLatitude) ? [m.GPSLongitude, m.GPSLatitude] : null;
+  }
+  function effectivePoint(photo) {
+    const row = corrections.get(photo.id);
+    return row ? [row.longitude, row.latitude] : originalPoint(photo);
+  }
+  function status(photo) {
+    if (corrections.has(photo.id)) return 'confirmed';
+    const error = metadata(photo).GPSHPositioningError, point = originalPoint(photo);
+    return point && inBounds(...point) && finite(error) && error >= 0 && error <= threshold ? 'low' : 'review';
+  }
+  const statusLabels = {low: 'Niedriger gemeldeter Fehler (unbestätigt)', review: 'Standort prüfen', confirmed: 'Manuell bestätigt (keine Vermessung)'};
+  const colors = {low: '#81b9ed', review: '#eeaf63', confirmed: '#80cf9a'};
+  function filteredPhotos() { return photos.filter(p => $('filter').value === 'all' || status(p) === $('filter').value); }
+  function message(text, error = false) { $('message').textContent = text; $('message').dataset.error = String(error); }
+  function draftChanged() {
+    const row = corrections.get(selectedId);
+    return $('heading').validity.badInput || $('heading').value !== (row?.heading_deg == null ? '' : String(row.heading_deg)) || $('note').value !== (row?.note || '');
+  }
+  function dirty() { return snapshot() !== savedSnapshot || draftChanged(); }
+  function updateSaveStatus() {
+    $('save-status').textContent = dirty() ? 'Ungesicherte Änderungen / Feldeingaben im Browser – JSON sichern.' : 'Aktueller Stand geladen oder Download als abgelegt bestätigt; HTML unverändert.';
+    $('save-status').classList.toggle('warning', dirty());
+    $('acknowledge-download').disabled = downloadedSnapshot === null || downloadedSnapshot !== snapshot() || draftChanged();
+    $('discard-draft').disabled = !draftChanged();
+  }
+  function draftValues() {
+    const value = $('heading').value.trim();
+    if ($('heading').validity.badInput) throw new Error('Richtung muss eine Zahl sein.');
+    const heading = value === '' ? null : Number(value);
+    if (heading !== null && (!finite(heading) || heading < 0 || heading >= 360)) throw new Error('Richtung muss zwischen 0 und <360° liegen.');
+    return {heading_deg: heading, note: $('note').value};
+  }
+  function loadDraft() {
+    const row = corrections.get(selectedId);
+    $('heading').value = row?.heading_deg == null ? '' : String(row.heading_deg);
+    $('note').value = row?.note || '';
+  }
+  function canLeaveDraft() { return !draftChanged() || window.confirm('Noch nicht übernommene Richtungs-/Notizfelder verwerfen?'); }
+  function setPlacing(value) {
+    placing = value;
+    $('place').setAttribute('aria-pressed', String(value));
+    $('place').textContent = value ? 'Setzen abbrechen (Esc)' : 'Standort setzen';
+    canvas.classList.toggle('placing', value);
+  }
+  function renderList() {
+    const visible = filteredPhotos();
+    $('photo-count').textContent = '(' + photos.length + ')';
+    $('filter-summary').textContent = visible.length + ' von ' + photos.length + ' Fotos · Grenzwert ' + threshold + ' m, nur Geräteschätzung. Ohne GPS/Fehler immer prüfen.';
+    const fragment = document.createDocumentFragment();
+    for (const photo of visible) {
+      const button = document.createElement('button');
+      button.type = 'button'; button.dataset.photoId = photo.id;
+      button.setAttribute('aria-current', String(photo.id === selectedId));
+      const name = document.createElement('span'); name.textContent = photo.id;
+      const label = document.createElement('small'); label.textContent = statusLabels[status(photo)];
+      button.append(name, label); button.addEventListener('click', () => selectPhoto(photo.id)); fragment.append(button);
+    }
+    $('photo-list').replaceChildren(fragment);
+    $('previous').disabled = $('next').disabled = visible.length === 0;
+  }
+  const valueText = value => value === undefined || value === null || value === '' ? 'Nicht vorhanden' : typeof value === 'object' ? JSON.stringify(value) : String(value);
+  const unitText = (value, unit) => finite(value) ? value + ' ' + unit : valueText(value);
+  const coordinatesText = point => point ? point[0].toFixed(7) + ', ' + point[1].toFixed(7) : 'Kein gültiges GPS vorhanden';
+  function addDetail(target, label, value) {
+    const dt = document.createElement('dt'), dd = document.createElement('dd');
+    dt.textContent = label; dd.textContent = value; target.append(dt, dd);
+  }
+  function headingFor(photo) {
+    const correction = corrections.get(photo.id), m = metadata(photo);
+    if (correction?.heading_deg != null) return {value: correction.heading_deg, ref: 'manuell, ab Karten-Nord'};
+    return finite(m.GPSImgDirection) && m.GPSImgDirection >= 0 && m.GPSImgDirection < 360 ? {value: m.GPSImgDirection, ref: valueText(m.GPSImgDirectionRef)} : null;
+  }
+  function renderDetails(updatePreview = false) {
+    const photo = selected(), row = corrections.get(selectedId), m = metadata(photo);
+    $('photo-id').textContent = photo?.id || 'Kein Foto ausgewählt';
+    $('photo-status').textContent = photo ? statusLabels[status(photo)] + ' · Quelle: ' + valueText(photo.status) : 'Keine Fotos vorhanden.';
+    $('original-coordinates').textContent = coordinatesText(photo ? originalPoint(photo) : null);
+    $('effective-coordinates').textContent = coordinatesText(photo ? effectivePoint(photo) : null);
+    const details = $('metadata'); details.replaceChildren();
+    for (const [label, value] of [
+      ['Aufnahmezeit', valueText(m.DateTimeOriginal)], ['Zeitzonenoffset', valueText(m.OffsetTimeOriginal)],
+      ['Gemeldeter GPS-Fehler', unitText(m.GPSHPositioningError, 'm')],
+      ['Richtung / Referenz', unitText(m.GPSImgDirection, '°') + ' / ' + valueText(m.GPSImgDirectionRef)],
+      ['Höhe / Referenz', unitText(m.GPSAltitude, 'm') + ' / ' + valueText(m.GPSAltitudeRef)],
+      ['Höhenreferenz erklärt', '0 = über, 1 = unter Meeresspiegel; fehlend = unbekannt. Nicht Geländehöhe.'],
+      ['Kamera', [m.Make, m.Model].filter(Boolean).join(' ') || 'Nicht vorhanden'],
+      ['Objektiv', valueText(m.LensModel)], ['Brennweite', unitText(m.FocalLength, 'mm')],
+      ['KB-äquiv. Brennweite', unitText(m.FocalLengthIn35mmFormat, 'mm')],
+      ['Blende', valueText(m.FNumber)], ['Bildgröße', valueText(m.ImageWidth) + ' × ' + valueText(m.ImageHeight)],
+      ['EXIF-Ausrichtung', valueText(m.Orientation)]
+    ]) addDetail(details, label, value);
+    const effective = $('effective-metadata'); effective.replaceChildren();
+    const heading = photo ? headingFor(photo) : null;
+    addDetail(effective, 'Standortquelle', row ? 'Manuell bestätigt; Korrekturdatei' : 'Original-GPS, nicht manuell bestätigt');
+    addDetail(effective, 'Richtung / Referenz', heading ? heading.value + '° / ' + heading.ref : 'Nicht vorhanden');
+    addDetail(effective, 'Höhe', 'Unverändert aus Originalmetadaten; kein DGM');
+    addDetail(effective, 'Notiz', row?.note || '—');
+    $('selection-warning').textContent = photo && !filteredPhotos().some(p => p.id === photo.id) ? 'Ausgewähltes Foto liegt nach Änderung außerhalb des aktiven Filters.' : 'Dezimalstellen sind keine Genauigkeitsangabe. Der Fehlerring bleibt am Original-GPS, nicht am korrigierten Standort.';
+    $('apply').disabled = !photo || !effectivePoint(photo) || !inBounds(...effectivePoint(photo));
+    $('confirm-original').disabled = !photo || !originalPoint(photo) || !inBounds(...originalPoint(photo));
+    $('place').disabled = $('heading').disabled = $('note').disabled = !photo;
+    $('locate').disabled = !photo || !effectivePoint(photo);
+    $('reset').disabled = !row;
+    $('undo').disabled = !(history.get(selectedId)?.length);
+    if (updatePreview) {
+      $('preview').hidden = true; $('preview-message').hidden = false;
+      $('preview-message').textContent = photo ? 'Lokale Vorschau wird geladen …' : 'Keine Vorschau ausgewählt.';
+      if (photo) {
+        $('preview').alt = 'Lokale Fotoreferenz ' + photo.id;
+        $('preview').src = 'proxies/' + encodeURIComponent(photo.id) + '.jpg';
+        $('preview-open').href = $('preview').src;
+      } else {
+        $('preview').removeAttribute('src');
+        $('preview-open').removeAttribute('href');
+      }
+    }
+    updateSaveStatus();
+  }
+  $('preview').addEventListener('load', () => { $('preview').hidden = false; $('preview-message').hidden = true; });
+  $('preview').addEventListener('error', () => { $('preview').hidden = true; $('preview-message').hidden = false; $('preview-message').textContent = 'Keine lesbare lokale Proxy-Vorschau. Metadaten und Standort können trotzdem bearbeitet werden.'; });
+  function selectPhoto(id) {
+    if (id === selectedId || !canLeaveDraft()) return;
+    selectedId = id; setPlacing(false); loadDraft(); renderList(); renderDetails(true); draw();
+    const active = Array.from($('photo-list').children).find(element => element.dataset.photoId === id);
+    active?.scrollIntoView({block: 'nearest'});
+  }
+  function navigate(direction) {
+    const visible = filteredPhotos(); if (!visible.length) return;
+    const index = visible.findIndex(photo => photo.id === selectedId);
+    const nextIndex = index < 0 ? (direction > 0 ? 0 : visible.length - 1) : (index + direction + visible.length) % visible.length;
+    selectPhoto(visible[nextIndex].id);
+  }
+  function remember() {
+    if (!history.has(selectedId)) history.set(selectedId, []);
+    history.get(selectedId).push(corrections.get(selectedId) || null);
+  }
+  function afterEdit() { setPlacing(false); loadDraft(); renderList(); renderDetails(); draw(); }
+  function commitPoint(point) {
+    if (!selectedId) return;
+    try {
+      if (!point || !inBounds(...point)) throw new Error('Standort außerhalb der zulässigen Karten-Ausdehnung plus 100 m.');
+      const draft = draftValues();
+      remember(); corrections.set(selectedId, {id: selectedId, longitude: point[0], latitude: point[1], confirmed: true, ...draft});
+      afterEdit(); message('Standort manuell bestätigt. Keine Aussage über Vermessungsgenauigkeit; JSON herunterladen.');
+    } catch (error) { message(error.message, true); }
+  }
+  $('place').addEventListener('click', () => { setPlacing(!placing); message(placing ? 'Setzmodus: einmal klicken bestätigt den Standort mit den aktuellen Feldern. Ziehen setzt nichts; Esc bricht ab.' : 'Setzmodus beendet.'); });
+  $('apply').addEventListener('click', () => commitPoint(effectivePoint(selected())));
+  $('confirm-original').addEventListener('click', () => commitPoint(originalPoint(selected())));
+  $('undo').addEventListener('click', () => {
+    if (!canLeaveDraft()) return;
+    const stack = history.get(selectedId); if (!stack?.length) return;
+    const row = stack.pop(); if (row) corrections.set(selectedId, row); else corrections.delete(selectedId);
+    afterEdit(); message('Letzte Änderung dieses Fotos rückgängig gemacht.');
+  });
+  $('reset').addEventListener('click', () => {
+    if (!canLeaveDraft() || !corrections.has(selectedId)) return;
+    remember(); corrections.delete(selectedId); afterEdit(); message('Korrektur entfernt. Unverändertes Original-GPS ist wieder wirksam und unbestätigt.');
+  });
+  $('discard-draft').addEventListener('click', () => { loadDraft(); updateSaveStatus(); });
+  $('heading').addEventListener('input', updateSaveStatus); $('note').addEventListener('input', updateSaveStatus);
+  $('previous').addEventListener('click', () => navigate(-1)); $('next').addEventListener('click', () => navigate(1));
+  $('filter').addEventListener('change', () => { renderList(); renderDetails(); draw(); });
+  window.addEventListener('keydown', event => {
+    if (event.key === 'Escape') { setPlacing(false); message('Setzmodus beendet.'); }
+    if (event.altKey || event.ctrlKey || event.metaKey || event.target.closest('input,textarea,select') || event.target.isContentEditable) return;
+    if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') { event.preventDefault(); navigate(event.key === 'ArrowLeft' ? -1 : 1); }
+  });
+  window.addEventListener('beforeunload', event => { if (dirty()) { event.preventDefault(); event.returnValue = ''; } });
+  $('export').addEventListener('click', () => {
+    if (draftChanged()) { message('Richtungs-/Notizfelder zuerst übernehmen oder verwerfen; danach den vollständigen Stand herunterladen.', true); return; }
+    const value = snapshot(), blob = new Blob([JSON.stringify(JSON.parse(value), null, 2) + '\n'], {type: 'application/json'});
+    const url = URL.createObjectURL(blob), link = document.createElement('a');
+    link.href = url; link.download = 'foto-korrekturen.json'; document.body.append(link); link.click(); link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 60000);
+    downloadedSnapshot = value;
+    $('download-status').textContent = 'Download angefordert. Prüfen, ob die JSON-Datei lokal abgelegt wurde, dann „Download sicher abgelegt“ bestätigen. HTML und Originale bleiben unverändert.';
+    updateSaveStatus();
+  });
+  $('acknowledge-download').addEventListener('click', () => {
+    if (downloadedSnapshot !== snapshot() || draftChanged()) return;
+    savedSnapshot = downloadedSnapshot; updateSaveStatus();
+    $('download-status').textContent = 'Lokale Ablage von dir bestätigt. Für den nächsten Kartenaufruf JSON über das CLI importieren und Karte neu erzeugen.';
+  });
+  $('import-file').addEventListener('change', async event => {
+    const sequence = ++importSequence, file = event.target.files[0];
+    pendingImport = null; $('replace-import').disabled = true;
+    if (!file) { $('import-status').textContent = 'Keine Datei ausgewählt; aktueller Stand unverändert.'; return; }
+    try {
+      const parsed = validateCorrections(JSON.parse(await file.text()));
+      if (sequence !== importSequence) return;
+      pendingImport = parsed; $('replace-import').disabled = false;
+      $('import-status').textContent = parsed.size + ' Korrekturen vollständig geprüft. „Ersetzen“ entfernt alle aktuellen Korrekturen, die nicht in dieser Datei stehen; keine Zusammenführung.';
+    } catch (error) {
+      if (sequence !== importSequence) return;
+      $('import-status').textContent = 'Import abgelehnt; aktueller Stand unverändert. ' + error.message;
+      message('Importdatei ungültig: ' + error.message, true);
+    }
+  });
+  $('replace-import').addEventListener('click', () => {
+    if (!pendingImport || !window.confirm('Gesamten Korrekturstand durch ' + pendingImport.size + ' importierte Korrekturen ersetzen? Aktuelle Änderungen und nicht übernommene Feldeingaben werden verworfen.')) return;
+    corrections = pendingImport; pendingImport = null; history.clear(); downloadedSnapshot = null;
+    $('replace-import').disabled = true; $('import-file').value = '';
+    $('import-status').textContent = 'Vollständiger Korrekturstand ersetzt. Keine Originalmetadaten verändert.';
+    afterEdit(); message('Import übernommen. Zum dauerhaften Übernehmen die JSON-Datei über das CLI importieren; Browseränderungen erneut herunterladen.');
+  });
+  function xy(point) { return [W / 2 + (point[0] - center[0]) * mPerLon * zoom + pan[0], H / 2 - (point[1] - center[1]) * mPerLat * zoom + pan[1]]; }
+  function world(point) { return [(point[0] - W / 2 - pan[0]) / zoom / mPerLon + center[0], -(point[1] - H / 2 - pan[1]) / zoom / mPerLat + center[1]]; }
+  function fit() {
+    zoom = Math.max(.02, Math.min((W - 70) / Math.max(1, (maxX - minX) * mPerLon), (H - 70) / Math.max(1, (maxY - minY) * mPerLat)));
+    pan = [0, 0]; draw();
+  }
+  function zoomAt(point, factor) {
+    const before = world(point); zoom = Math.max(.02, Math.min(100, zoom * factor));
+    const after = xy(before); pan[0] += point[0] - after[0]; pan[1] += point[1] - after[1]; draw();
+  }
+  function category(feature) {
+    const p = feature.properties || {};
+    if (p.landuse === 'cemetery') return 'boundary';
+    if (p.highway) return 'paths'; if (p.barrier === 'hedge') return 'hedges';
+    if (p.barrier === 'fence') return 'fences'; if (p.building || p.man_made === 'storage') return 'buildings';
+    if (p.barrier === 'gate') return 'gates'; if (p.cemetery === 'columbarium') return 'columbaria';
+    return feature.geometry?.type === 'Point' ? 'pois' : 'other';
+  }
+  const mapColors = {boundary:'#d8d08a', paths:'#d5a85c', hedges:'#4ca45e', fences:'#b7c0c3', buildings:'#a97762', gates:'#ee6b58', pois:'#64bfdd', columbaria:'#bd7dd2', other:'#c9d4cd'};
+  const mapFeatures = features.map(feature => ({geometry: feature.geometry, category: category(feature)})).sort((a, b) => Number(b.category === 'boundary') - Number(a.category === 'boundary'));
+  function line(coordinates, close = false) {
+    coordinates.forEach((point, index) => { const p = xy(point); if (index) ctx.lineTo(...p); else ctx.moveTo(...p); });
+    if (close) ctx.closePath();
+  }
+  function drawGeometry(geometry, categoryName) {
+    if (!geometry) return;
+    const coordinates = geometry.coordinates;
+    if (geometry.type === 'GeometryCollection') { geometry.geometries.forEach(g => drawGeometry(g, categoryName)); return; }
+    if (geometry.type === 'MultiPolygon' || geometry.type === 'MultiLineString' || geometry.type === 'MultiPoint') {
+      const type = {MultiPolygon: 'Polygon', MultiLineString: 'LineString', MultiPoint: 'Point'}[geometry.type];
+      coordinates.forEach(c => drawGeometry({type, coordinates: c}, categoryName)); return;
+    }
+    const color = mapColors[categoryName]; ctx.strokeStyle = color; ctx.fillStyle = categoryName === 'boundary' ? '#556448' : color + 'aa';
+    ctx.lineWidth = categoryName === 'hedges' ? 3 : categoryName === 'boundary' ? 2 : 1.5;
+    ctx.setLineDash(categoryName === 'fences' ? [5, 3] : categoryName === 'columbaria' ? [2, 2] : []); ctx.beginPath();
+    if (geometry.type === 'Polygon') { coordinates.forEach(ring => line(ring, true)); ctx.fill('evenodd'); ctx.stroke(); }
+    else if (geometry.type === 'LineString') { line(coordinates); ctx.stroke(); }
+    else if (geometry.type === 'Point') { const p = xy(coordinates); ctx.arc(...p, 3, 0, Math.PI * 2); ctx.fill(); }
+    ctx.setLineDash([]);
+  }
+  function draw() {
+    if (!W || !H) return;
+    ctx.clearRect(0, 0, W, H); ctx.fillStyle = '#26332c'; ctx.fillRect(0, 0, W, H);
+    mapFeatures.forEach(feature => drawGeometry(feature.geometry, feature.category));
+    const photo = selected(), origin = photo ? originalPoint(photo) : null, effective = photo ? effectivePoint(photo) : null;
+    const error = metadata(photo).GPSHPositioningError;
+    if (origin) {
+      const p = xy(origin);
+      if (finite(error) && error >= 0) {
+        ctx.beginPath(); ctx.arc(...p, Math.min(error * zoom, 1e7), 0, Math.PI * 2);
+        ctx.fillStyle = '#81b9ed19'; ctx.fill(); ctx.strokeStyle = '#a6d4ff'; ctx.lineWidth = 1.5; ctx.setLineDash([4, 4]); ctx.stroke(); ctx.setLineDash([]);
+      }
+      ctx.strokeStyle = '#dae6f0'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(p[0] - 5, p[1]); ctx.lineTo(p[0] + 5, p[1]); ctx.moveTo(p[0], p[1] - 5); ctx.lineTo(p[0], p[1] + 5); ctx.stroke();
+      if (corrections.has(photo.id)) { ctx.beginPath(); ctx.moveTo(...p); ctx.lineTo(...xy(effective)); ctx.strokeStyle = '#ffffff80'; ctx.setLineDash([2, 4]); ctx.stroke(); ctx.setLineDash([]); }
+    }
+    const heading = photo ? headingFor(photo) : null;
+    if (heading && effective) {
+      const p = xy(effective), radians = heading.value * Math.PI / 180, length = 25 * zoom;
+      ctx.beginPath(); ctx.moveTo(...p); ctx.lineTo(p[0] + Math.sin(radians) * length, p[1] - Math.cos(radians) * length);
+      ctx.strokeStyle = '#f8df92'; ctx.lineWidth = 2; ctx.setLineDash([7, 5]); ctx.stroke(); ctx.setLineDash([]);
+    }
+    const visible = filteredPhotos();
+    if (photo && !visible.some(p => p.id === photo.id)) visible.push(photo);
+    visible.sort((a, b) => Number(a.id === selectedId) - Number(b.id === selectedId));
+    for (const item of visible) {
+      const point = effectivePoint(item); if (!point) continue;
+      const p = xy(point); if (p[0] < -15 || p[0] > W + 15 || p[1] < -15 || p[1] > H + 15) continue;
+      ctx.beginPath(); ctx.arc(...p, item.id === selectedId ? 7 : 4.5, 0, Math.PI * 2);
+      ctx.fillStyle = colors[status(item)]; ctx.fill(); ctx.strokeStyle = item.id === selectedId ? '#fff4c4' : '#17201d'; ctx.lineWidth = item.id === selectedId ? 3 : 1.5; ctx.stroke();
+    }
+    const target = 100 / zoom, power = Math.pow(10, Math.floor(Math.log10(target)));
+    const nice = [1, 2, 5, 10].map(n => n * power).filter(n => n <= target).pop() || power;
+    $('scale-text').textContent = Number(nice.toPrecision(3)) + ' m · lokale Näherungsprojektion'; $('scale-line').style.width = nice * zoom + 'px';
+  }
+  const screenPoint = event => { const rect = canvas.getBoundingClientRect(); return [event.clientX - rect.left, event.clientY - rect.top]; };
+  canvas.addEventListener('pointerdown', event => {
+    if (!event.isPrimary || event.button !== 0 || drag) return;
+    const point = screenPoint(event); drag = {id: event.pointerId, start: point, previous: point, moved: false};
+    canvas.setPointerCapture(event.pointerId); canvas.classList.add('dragging');
+  });
+  canvas.addEventListener('pointermove', event => {
+    if (!drag || event.pointerId !== drag.id) return;
+    const point = screenPoint(event);
+    if (Math.hypot(point[0] - drag.start[0], point[1] - drag.start[1]) > 5) drag.moved = true;
+    if (drag.moved) { pan[0] += point[0] - drag.previous[0]; pan[1] += point[1] - drag.previous[1]; draw(); }
+    drag.previous = point;
+  });
+  function endDrag() { drag = null; canvas.classList.remove('dragging'); }
+  canvas.addEventListener('pointerup', event => {
+    if (!drag || event.pointerId !== drag.id) return;
+    const point = screenPoint(event), moved = drag.moved || Math.hypot(point[0] - drag.start[0], point[1] - drag.start[1]) > 5;
+    endDrag(); if (canvas.hasPointerCapture(event.pointerId)) canvas.releasePointerCapture(event.pointerId);
+    if (moved) return;
+    if (placing) { commitPoint(world(point)); return; }
+    let nearest = null, distance = 12;
+    for (const photo of filteredPhotos()) {
+      const position = effectivePoint(photo); if (!position) continue;
+      const p = xy(position), d = Math.hypot(p[0] - point[0], p[1] - point[1]);
+      if (d < distance) { nearest = photo; distance = d; }
+    }
+    if (nearest) selectPhoto(nearest.id);
+  });
+  canvas.addEventListener('pointercancel', endDrag); canvas.addEventListener('lostpointercapture', endDrag);
+  canvas.addEventListener('wheel', event => { event.preventDefault(); zoomAt(screenPoint(event), Math.exp(-Math.max(-500, Math.min(500, event.deltaY)) * .001)); }, {passive: false});
+  $('fit').addEventListener('click', fit);
+  $('zoom-in').addEventListener('click', () => zoomAt([W / 2, H / 2], 1.4)); $('zoom-out').addEventListener('click', () => zoomAt([W / 2, H / 2], 1 / 1.4));
+  $('locate').addEventListener('click', () => { const point = effectivePoint(selected()); if (!point) return; const p = xy(point); pan[0] += W / 2 - p[0]; pan[1] += H / 2 - p[1]; draw(); });
+  const observer = new ResizeObserver(() => {
+    const rect = canvas.getBoundingClientRect(), first = W === 0, dpr = window.devicePixelRatio || 1;
+    W = rect.width; H = rect.height; canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    if (first) fit(); else draw();
+  });
+  loadDraft(); renderList(); renderDetails(true); observer.observe(canvas);
+})();
+</script>
+</body>
+</html>

@@ -1,5 +1,7 @@
 # Hedwig Street Lamp – Blender Polish Checklist (2025-09-28)
 
+Historical 2025 prompt, not an executable current brief. Read `AGENTS.md`, `docs/assets/blender-workbench.md` and the lamp scratchpad first. The source path and global preset below are outdated; never overwrite sources or the shipped lamp on the authority of this prompt.
+
 Context summary for the Blender MCP agent:
 - Current exported asset lives at `public/assets/models/props/SM_StreetLamp_Simple.glb`.
 - Game runtime now adds a warm point light inside the lantern and exposes emissive controls; we still need the source `.blend` updated so the asset reacts correctly when “off” vs. “on”.

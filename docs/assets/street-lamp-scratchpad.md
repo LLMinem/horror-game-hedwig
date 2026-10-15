@@ -1,6 +1,6 @@
 ---
 type: scratchpad
-status: active
+status: historical
 created: 2025-09-30
 last_verified: 2025-10-09
 last_verified_commit: e34e6d4
@@ -11,11 +11,13 @@ superseded_by: []
 
 # Street Lamp Scratchpad (SM_StreetLamp_Simple)
 
+Historical observations, not an active task list. Runtime emissive binding now exists; the light-offset workaround remains. Inspect current source copies with the [Blender workbench](blender-workbench.md) before acting on any old export instruction. Source materials may differ from the shipped GLB.
+
 ## Asset Summary
 - **Source blend**: `assets/source/working/cemetery-pack/street-lamp-simple.blend`
 - **Export target**: `public/assets/models/props/SM_StreetLamp_Simple.glb`
 - **Associated preset**: Hedwig Draco Export (glTF Binary, selected objects, tangents, Draco compression)
-- **Related docs**: `docs/assets/street-lamp-assembly-plan.md`, `docs/assets/pipeline-guide.md`, `docs/assets/street-lamp-session-notes.md`
+- **Related docs**: `docs/archive/street-lamp-assembly-plan.md`, `docs/assets/pipeline-guide.md`, `docs/archive/street-lamp-session-notes.md`
 
 ## Scene Structure (2025-09-30)
 - **Root empty**: `SM_StreetLamp_Simple` (origin at ground level, 0/0/0)

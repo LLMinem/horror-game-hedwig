@@ -1,110 +1,23 @@
-# Cemetery GeoJSON (Neuer Friedhof, Bruchköbel) — Line-Based Map Data
+# Neuer Friedhof source GeoJSON
 
-This directory contains line-based GeoJSON data for runtime geometry generation in Three.js.
+Read the root `AGENTS.md` and `docs/asset-integration-plan.md`. `cemetery_final.geojson` is an unchanged WGS84 `[longitude, latitude]` source map, **not yet consumed by the game**. Use `tools/map/index.html` for offline inspection; that viewer embeds a 2026-10-04 snapshot and is not a live importer.
 
-## Files
+## Verified inventory
 
-- `cemetery_final.geojson` — **The production map file** (69KB)
-  - Contains lines with width metadata (not polygons)
-  - Includes cemetery boundary, paths, hedges, buildings, and POIs
-  - All coordinates verified to be within cemetery bounds
+140 features: 119 LineStrings, six Polygons and 15 Points. Semantic counts: one cemetery boundary; 96 path/service/footway segments; five building/storage footprints; 17 hedges; four fences; four gates; two columbarium lines; eleven other points (seven water taps, bell tower, green waste, bicycle parking, toilet).
 
-## Data Structure
+The boundary envelope is approximately 220 × 234 m; all features span approximately 227 × 243 m. These are local linear estimates, not surveyed dimensions. Historical 171 × 173 m / 89 paths / six buildings statements are not the measured inventory.
 
-### Path/Road Lines
+## Interpretation limits
 
-- **Type:** `LineString`
-- **Properties:**
-  - `highway`: "path" | "footway" | "service"
-  - `surface`: "gravel" | "asphalt" | "sett" (optional)
-  - Recommended widths for runtime generation:
-    - Gravel paths: 2.0m
-    - Paved paths: 2.5m
-    - Service roads: 3.5m
+- Path lines are centre lines, not surfaces or a ready-made connected navigation graph. Only one path has a width tag. Gravel 2 m / paving 2.5 m / service 3.5 m were old modelling suggestions, not measurements.
+- All 17 hedges carry authored width 1 m and height 1.5 m; photo/field validation is outstanding.
+- Individual graves, most trees, terrain relief, roof shapes and most building/fence heights are absent.
+- Preserve `@id`, tags and original coordinates. Keep uncertainties in derived data; do not silently modify the source to fit a scene.
+- A single site-frame contract must align map, terrain, Blender and Three.js. EPSG:25832 is the researched planar CRS; DHHN2016_NH is the proposed official-terrain datum. Origin, axes and transforms are not implemented. Test axes with known anchors; do not mistake Blender Z-up → glTF Y-up for a geospatial alignment.
 
-### Hedge Lines
-
-- **Type:** `LineString`
-- **Properties:**
-  - `barrier`: "hedge"
-  - `type`: "hedge"
-  - `width`: 1.0 (meters)
-  - `height`: 1.5 (meters)
-  - Positioned parallel to paths with 0.3-0.5m offset
-
-### Buildings
-
-- **Type:** `Polygon`
-- Buildings remain as polygons (funeral hall, garages, storage)
-- Properties include `building` and/or `amenity` tags
-
-### Points of Interest
-
-- **Type:** `Point`
-- Water taps: `man_made=water_tap` (7 total)
-- Other POIs: toilets, bicycle parking, recycling, bell tower
-
-### Cemetery Boundary
-
-- **Type:** `Polygon`
-- Properties: `landuse=cemetery`, `name=Neuer Friedhof`
-- Defines playable area (~171×173m)
-
-## Coordinate System
-
-- **Format:** WGS84 (longitude, latitude)
-- **Center:** 8.935045°E, 50.172849°N
-- **Bounds:** Tight rectangle around cemetery only
-
-## Runtime Geometry Generation
-
-Instead of pre-generated polygons, generate geometry at runtime:
-
-```javascript
-// Example: Generate path geometry from line + width
-function createPathGeometry(lineCoords, width) {
-  const curve = new THREE.CatmullRomCurve3(
-    lineCoords.map((coord) => latLonToLocal(coord)),
-  );
-
-  const shape = new THREE.Shape();
-  shape.moveTo(-width / 2, 0);
-  shape.lineTo(width / 2, 0);
-  shape.lineTo(width / 2, 0.02);
-  shape.lineTo(-width / 2, 0.02);
-
-  return new THREE.ExtrudeGeometry(shape, {
-    extrudePath: curve,
-    steps: lineCoords.length * 2,
-  });
-}
-```
-
-## Why Lines Instead of Polygons?
-
-1. **No overlaps:** Geometry generated with proper constraints
-2. **Consistent widths:** Features maintain uniform width
-3. **Smaller file:** 69KB vs 475KB
-4. **Dynamic adjustment:** Change widths without regenerating data
-5. **Clean intersections:** Path junctions handled properly
-
-## Navigation Graph
-
-Build AI pathfinding from path centerlines:
-
-- Sample points every 8-10m along lines
-- Connect at intersections
-- Block edges at closed gates
-
-## Feature Counts
-
-- **Paths:** 89 lines (various types)
-- **Hedges:** 17 lines (manually positioned)
-- **Water taps:** 7 points
-- **Buildings:** 6 polygons
-- **Gates:** 4 points
-- **Fences:** 4 lines
+Source SHA-256: `faa0de398279fca13e7c4946a1991db14257dda8082053c3a63a363020eddfca`.
 
 ## Attribution
 
-Data derived from OpenStreetMap (ODbL). Please attribute OSM contributors in credits.
+© [OpenStreetMap contributors](https://www.openstreetmap.org/copyright), ODbL. Exact original extract date/query is not established. Preserve provenance and assess database redistribution obligations before release. The standalone viewer contains only this map, not private photo coordinates.

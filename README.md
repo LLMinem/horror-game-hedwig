@@ -1,91 +1,70 @@
-# Horror Game — “Hedwig”
+# Hedwig
 
-Desktop-first Three.js horror project set in the real “Neuer Friedhof” cemetery. We are currently in the **asset integration** phase: the refactored r179 scene runs at 60 FPS, the Dev Room proves the GLTF pipeline with a curated street lamp, and the next milestones revolve around bringing more props in and preparing gameplay scaffolding.
+A Three.js project aiming to reconstruct **Neuer Friedhof, Bruchköbel**, faithfully at dusk/night. The next milestone is a beautiful, walkable environment, not the former gameplay MVP.
 
----
+**Current app:** a working look-development sandbox with sky/stars/fog, HDRI lighting, first-person inspection, debug GUI, flat grass and one Draco street lamp. The map, terrain and collisions are not implemented in the scene yet. See [the active plan](docs/asset-integration-plan.md) for accepted scope and [readiness](docs/readiness.md) for preparation evidence and gaps.
 
-## Snapshot — 10 Oct 2025 (`5d9a3b4`)
-- **Codebase:** `src/main.js` stays under 50 lines and wires eleven focused modules (Engine, Atmosphere, World, Environment, PlayerController, Assets, DevRoom, Debug GUI, Loop, Constants).
-- **Assets:** Shared GLTF/KTX2/Draco loaders live in `src/assets/Assets.js`; `createDevRoom` auto-loads `SM_StreetLamp_Simple.glb` so we can study lighting and emissive behaviour before populating the cemetery.
-- **Docs:** Active guidance is in `docs/asset-integration-plan.md`, `docs/assets/pipeline-guide.md`, and `docs/assets/street-lamp-scratchpad.md`. Older specs and plans moved to `docs/archive/` pending a fresh design pass.
+## Start from the repo root
 
----
+Use Node 22.12+ or Node 24+ as declared in `package.json` (verified here with Node 24.15.0 / npm 11.20.0).
 
-## Repository Tour
-- `docs/asset-integration-plan.md` — current roadmap for asset ingestion and world-building.
-- `docs/assets/` — living workflow docs (pipeline checklist, scratchpads, processing queue).
-- `docs/archive/` — historical plans/specs; consult only for context.
-- `data/cemetery_final.geojson` — raw OSM lines + metadata (layout approach TBD; see backlog).
-- `public/assets/` — HDRIs and prepared textures/models.
-- `src/` — production modules (see “Architecture” below).
-
----
-
-## Architecture (r179.1)
-```
-src/
-  main.js                # Entry point + wiring (≤50 lines)
-  config/Constants.js    # Scene defaults + GUI baseline values
-  core/Engine.js         # Renderer, camera, clock, resize hooks
-  atmosphere/Atmosphere.js # Skydome + THREE.Points stars + horror grading
-  world/World.js         # Fog, lights, ground, placeholder props
-  world/Environment.js   # HDRI loading + r179 envMap fix + asset registration
-  assets/Assets.js       # Shared GLTF/KTX2/Draco loaders and cache helpers
-  assets/DevRoom.js      # Neutral asset sandbox with lamp+light helper
-  gameplay/PlayerController.js # Mouse look, WASD, flashlight control loop
-  ui/DebugGui.js         # lil-gui panels, presets, state management
-  loop/Loop.js           # Animation loop runner
+```sh
+npm ci
+npm run dev
 ```
 
----
+Open <http://127.0.0.1:3000>. The server is loopback-only, uses a fixed port and does not automatically open a browser. Stop it with Ctrl+C. `npm run build` creates `dist/`; `npm run preview` serves that build at <http://127.0.0.1:4173>. Neither command deploys anything.
 
-## Controls (current build)
-- **WASD:** move
-- **Shift:** sprint (1.5× walk speed)
-- **F:** toggle flashlight (spot light + emissive binding)
-- **Esc:** release pointer lock
+Click the scene for mouse capture; WASD moves, Shift sprints, F toggles the flashlight and Esc releases the mouse. The GUI supplies lighting presets and lamp controls. Use the coding agent's available native browser tooling for inspection.
 
-Gameplay systems beyond the Dev Room sandbox are still under construction; numbers from the archived spec are treated as placeholders until the new design is written.
+For a reproducible Chrome/CDP input check, start `npm run preview` after building, then run `npm run browser:smoke` in another terminal. For the dev server, use `npm run browser:smoke -- http://127.0.0.1:3000/`. It checks asset loading, mouse capture, trusted mouse movement and Escape at a 1280 × 720 render buffer, and saves screenshots/report under `.local/browser-smoke-*`.
+The check starts an isolated visible Chrome with a temporary profile and closes both afterward; it never uses personal browser profiles. `CHROME_BIN` overrides the default macOS Chrome executable. The caller owns the dev/preview server. The check does not prove all WASD speeds or full-level performance.
 
----
+## References and Blender
 
-## Asset Pipeline Highlights
-1. Prepare meshes in Blender (see `docs/assets/pipeline-guide.md`).
-2. Export Draco-compressed GLBs to `public/assets/models/...`.
-3. Register the asset in code via `initAssetSystem({ renderer })`, `loadStreetLampInstance()` (or similar), and `environment.registerAsset(root)` so HDRI reflections apply in r179.
-4. Log findings in the relevant scratchpad and tick items in `docs/assets/processing-queue.md`.
-
-The Dev Room (`src/assets/DevRoom.js`) is the proving ground for scale, lighting, and emissive tuning before dropping props into the main world.
-
----
-
-## Setup & Run
-```bash
-npm install
-npm run dev -- --host   # exposes Vite dev server for remote testing
+```sh
+open tools/map/index.html                # offline map; no external tiles
+npm run references -- status             # local photo/source availability
+npm run references -- inventory          # raw, working and runtime file inventory
+open .local/references/index.html        # private local photo gallery on this Mac
+npm run references -- map                # private photo map with metadata and corrections
+open .local/references/map.html
+npm run blender:version
+npm run blender:smoke                    # disposable CPU render + Draco round trip
 ```
 
-- The modular build assumes Vite; use the dev server for hot reloads and remote device checks.
-- When deploying, run `npm run build` and serve the `dist/` folder with any static host.
+The source map is included in Git. This prepared Mac also has **98 JPEG proxies plus their GPS, heading, altitude and camera metadata in ID-linked private JSON sidecars** under `.local/references/`; the HEIC originals stay unchanged in Photos. The JPEGs themselves omit embedded metadata, not the reference dataset. The private photo map supports reviewing and correcting positions without overwriting original measurements. **A fresh clone does not contain these private files or the purchased raw pack.** [Local references](docs/local-references.md) explains commands, correction import, source paths, accuracy limits and missing terrain/aerial inputs. [Blender workbench](docs/assets/blender-workbench.md) documents executable discovery, read-only source inspection and explicit collection export. No MCP service, add-on, Python virtual environment or VPS is required.
 
----
+## Where things belong
 
-## Performance & Testing Targets
-- 60 FPS on a mid-range desktop GPU
-- ≤400 draw calls in dense views (use instancing for repeated graves/props)
-- Fog far plane ≈50 m; keep materials lean and avoid unnecessary dynamic shadows
-- Before pushing changes: verify the Dev Room lamp controls (emissive slider + point light offset), run through GUI presets, and watch the browser console for warnings.
+| Path | Role |
+| --- | --- |
+| `src/main.js` | Composition root for the current runtime modules. |
+| `src/core/`, `src/atmosphere/`, `src/world/` | Renderer, sky/grading, lighting/flat ground and HDRI management. |
+| `src/assets/` | Shared loaders and street-lamp Dev Room. |
+| `src/gameplay/PlayerController.js` | Inspection movement/flashlight, not a gameplay system. |
+| `src/ui/`, `src/config/`, `src/loop/` | Debug controls, defaults and animation loop. |
+| `data/cemetery_final.geojson` | Unchanged OSM-derived source; [interpretation contract](data/CLAUDE.md). |
+| `tools/` | Offline map, private-reference commands and Blender scripts. |
+| `assets/source/raw/`, `assets/source/working/` | Ignored local marketplace and Blender sources; not runtime assets or a backup. |
+| `.local/` | Ignored private references, derived previews/exports and smoke evidence. |
+| `public/` | Redistributable runtime files; copied wholesale into the production build. |
 
----
+The Vite dev server denies `.local/`, `.cache/`, source directories, private docs and Photos-library paths. Do not serve the entire repo with a generic HTTP server, put private references in `public/`, or assume `.gitignore` protects HTTP access.
 
-## Data & Attribution
-- Map data derived from **OpenStreetMap** (ODbL) — credit contributors in-game.
-- Additional height data (official DEM) is available locally; integration approach is still pending (see backlog).
+## Documentation entry points
 
----
+- [AGENTS.md](AGENTS.md): single policy entry for coding agents; `CLAUDE.md` points there.
+- [Active plan](docs/asset-integration-plan.md): direction, implementation sequence and human decisions.
+- [Readiness](docs/readiness.md): analysis, changes, exercised checks and known limits.
+- [Source/reference access](docs/local-references.md) and [asset pipeline](docs/assets/pipeline-guide.md): use for reference and content work.
+- [Backlog](docs/backlog.md): secondary risks/deferred work, not a competing roadmap.
+- `docs/archive/`, old lamp notes and lore: historical context, not current production instructions.
 
-## License
-- Code: MIT (to be confirmed before release)
-- Data: © OpenStreetMap contributors (ODbL)
+## Verification and release limits
 
-Need orientation help? Start with `docs/asset-integration-plan.md` and the backlog, then explore the modules listed above.
+After a runtime change, build and inspect the actual browser: assets/decoder requests, console, lamp, ground, presets, input and resize as applicable. After tooling changes, run the affected CLI against disposable outputs and check source safety. `npm audit` covers package advisories, not visual correctness. There is no general unit-test suite or global auto-format hook; the Blender smoke includes a saved-frame export regression check.
+
+60 FPS and ≤400 draw calls are provisional goals. A tiny scene on an M3 Max is not proof of a full cemetery on mid-range hardware. Record device, browser, render-buffer resolution and workload with performance results.
+
+Map data: © [OpenStreetMap contributors](https://www.openstreetmap.org/copyright), ODbL. The owner confirmed the cemetery pack's purchase and commercial permission. Existing grass/HDRI provenance and the intended code licence still need release review (`package.json` retains historical ISC metadata; no code licence grant is established here). Private reference photos and readable personal details are not publication assets.

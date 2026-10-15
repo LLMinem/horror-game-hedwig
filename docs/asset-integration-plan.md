@@ -2,90 +2,56 @@
 type: plan
 status: active
 created: 2025-09-23
-last_verified: 2025-10-10
-last_verified_commit: 5d9a3b4
-owned_by: human
-supersedes: []
-superseded_by: []
+last_verified: 2026-10-10
 ---
 
-# Asset Integration & World-Building Plan
+# Hedwig — evidence-led environment revival
 
-## 1. Purpose
+## Accepted direction
 
-Provide a deliberate roadmap for bringing high-quality assets and authentic layout into the Hedwig horror scene while teaching Three.js fundamentals step by step. This plan aligns remote development (VPS) with local tooling (Mac + Blender/QGIS) and keeps visuals, performance, and learning goals in balance.
+Reconstruct the actual Neuer Friedhof in Bruchköbel as faithfully and in as much visible detail as the evidence and browser performance allow, at dusk or night. The first milestone is an environment prototype: spatial structure, surfaces, assets, atmosphere, walkability, collision and loading. NPCs, watering/objectives, inventory, chase/failure systems and interiors are outside it. Audio is undecided.
 
-## 2. Current Snapshot
+The Mac is the authoritative coding and Blender workstation. VPS deployment, cloud rendering and MCP infrastructure are deferred. Preparation is authorized; this is not an authorization to autonomously build the cemetery or pick its polished route.
 
-- **Codebase**: Modular Three.js scene running on Three.js r179.1 via Vite. Shared loaders now live in `src/assets/Assets.js`, `createDevRoom` autoloads the street lamp so the asset loop is proven end-to-end.
-- **Data**:
-  - `data/cemetery_final.geojson` – accurate but incomplete map (paths, fences, taps, some hedges/buildings).
-  - Government DEM height data (stored locally on MacBook, not yet processed).
-  - 90+ reference photos of the real cemetery (local).
-- **Assets**: “The Cemetery Pack” (FBX/OBJ + 1–4 K textures) plus a curated street lamp exported to `public/assets/models/props/SM_StreetLamp_Simple.glb`. Shared environment registration ensures HDRI reflections after load.
-- **Infrastructure split**: Blender, raw assets, and geodata live on MacBook; coding happens on the VPS repo.
+Micha's follow-up prioritizes photo location review before choosing a polished section: retain original metadata, distinguish device-reported accuracy from verified positions, and let him correct uncertain camera locations on the map. Prefer agent-built, reference-backed models of the cemetery itself. Complex assets such as trees may use the existing pack; additional textures/models remain an option when needed after fit and licence checks. The existing lamp, Blender lamp sources and sample props are pipeline experiments, not authoritative references or required production content.
 
-## 3. Options Overview
+## Current implementation
 
-| Option                         | Pros                                                                 | Cons                                                                            | Notes                                           |
-| ------------------------------ | -------------------------------------------------------------------- | ------------------------------------------------------------------------------- | ----------------------------------------------- |
-| Use GeoJSON directly           | Fast baseline layout, real-world scale, reuse existing data          | Sparse hedges/trees/props; requires width heuristics; still needs artistic pass | Good for skeleton once asset workflow is proven |
-| Manual layout (Blender/QGIS)   | Highest visual fidelity; leverages photos; supports artistic choices | Tooling learning curve; time-intensive; risk of scope creep                     | Works best after we know which assets run well  |
-| Height-field integration (DEM) | Realistic ground undulation                                          | Requires QGIS workflow, additional Three.js shader/mesh work                    | Do after layout decisions                       |
-| Asset pack dev-room            | Lets us vet assets, control performance, craft lil-gui presets       | Needs Blender → GLB → compression pipeline; requires selective curation         | Recommended starting point                      |
-| Gameplay-first                 | Immediate mechanics work                                             | Visuals remain placeholder, harder to judge tone                                | Defer until world feels believable              |
+`src/main.js` composes an operational Three.js sandbox: renderer, custom sky/stars/fog/grading, HDRI environment, lights, flat grass plane, first-person inspection, debug GUI and a Draco street-lamp GLB. The GeoJSON has no runtime consumer. Terrain, site collisions, data-driven placement, loading UI and a reconstructed route do not exist yet.
 
-## 4. Recommended Sequence
+Keep the renderer/atmosphere/asset-loader foundation. Replace sandbox assumptions incrementally when implementing real world layers; a framework migration or whole-app rewrite is not a prerequisite. See [readiness](readiness.md) for code risks and practical evidence.
 
-1. **Build Asset Pipeline (Learning Focus: loaders, material workflow)**
-   - Define folder conventions (`assets/source`, `public/assets/models`, etc.).
-   - Establish Blender export preset (GLB + Draco, consistent scale).
-   - Follow the Blender checklist in `docs/assets/pipeline-guide.md` for per-asset prep.
-   - Introduce KTX2 texture compression and Three.js loader wiring.
-   - Always call `initAssetSystem({ renderer })` in code and register each GLTF root with `environment.registerAsset(root)` so HDRI reflections apply (Three.js r179 requirement).
-   - Hero street lamp loop is complete; repeatable pattern should now extend to bench, trees, tombs.
-2. **Create Dev Room Sandbox (Learning Focus: scene composition, lighting)**
-   - Add `assets/DevRoom.js` to spawn a neutral testing arena.
-   - Load curated assets via the new pipeline.
-   - Wire lil-gui groups for lighting/exposure/fog presets; capture export workflow for preset JSON.
-3. **Decide on World Layout Approach (Learning Focus: data-driven vs manual authoring)**
-   - Parse GeoJSON for boundary, paths, key POIs.
-   - Evaluate complementing with manual placement using photo references.
-   - Document chosen hybrid approach before implementation.
-4. **Integrate Height Data (Learning Focus: terrain meshes, displacement)**
-   - Clip DEM in QGIS, export heightmap.
+## Evidence and authority
 
-- Implement height-modulated ground plane in Three.js.
+This repo plan condenses Micha's accepted direction from the local Vault, rather than requiring future sessions to rediscover it:
 
-5. **Gameplay Scaffolding (Learning Focus: state management, controllers)**
-   - Introduce `gameplay/Gameplay.js` once the environment supports meaningful interactions.
+- `~/vaults/meeq-vault/2026-09-30-Arbeitsstraenge/04-Hedwig.md` (2026-10-04).
+- `~/vaults/meeq-vault/03-Projects/Hedwig-and-Creative-Portfolio/Handoff-Hedwig-Revival.md` (2026-10-04).
+- In that project folder: `Handoff-Hedwig-Readiness-2026-10-02.md` and `Research/06-neuer-friedhof-reconstruction-inputs.md` contain measured evidence and limits; `Research/05-astra-blender-threejs-workbench.md` contains workflow rationale.
 
-## 5. Cross-Machine Workflow
+The newer handoff supersedes the September research proposals: 12–20 minutes, artistic route compression, a VPS-first split, six buildings and an already available DEM are **not accepted current facts**. The 2026-10-04 inspection counts 140 map objects, 96 path segments and five building/storage footprints. The identified photo set is 98 originals with GPS and true-north heading, not proof of exhaustive coverage or calibrated camera poses.
 
-- **Local (MacBook)**: Use Blender to curate assets; export compressed GLB + KTX2 packs; upload results to the repo (via git, rsync, or scp).
-- **Remote (VPS)**: Integrate assets, run Vite, develop Three.js modules.
-- Maintain a simple manifest (e.g., `docs/assets-import-log.md`) noting what was exported, polygon counts, texture sizes, and decisions. (To be created during pipeline work.)
+Read [local references](local-references.md) for actual source paths, commands, map access and gaps. Photos stay private. OSM supplies plan structure; photos establish visible appearance. DGM1/TrueDOP clips, their metadata and an independent source backup still need to be established.
 
-## 6. Immediate Next Actions
+## Next work, in order
 
-1. Close out the Blender blocker work (sealed interior cap) and re-export the lamp so we can drop the light back inside.
-2. Work through the asset processing queue starting with the bench and tree variants; log findings in the scratchpads.
-3. Confirm transfer method from Mac → VPS (suggest git commit from Mac or `scp` uploads).
-4. Keep `docs/assets/pipeline-guide.md` updated as the canonical workflow, especially once KTX2 conversion lands.
+1. **Locate and review references.** Use the private photo map and metadata sidecars to inspect camera positions, reported GPS uncertainty, headings and coverage. Micha can confirm or correct locations; original measurements remain alongside corrections. Low reported error is a triage hint, not verified accuracy. Establish landmarks, surface families and gaps before proposing a bounded production brief; choosing a short polished section is not a prerequisite for this review. Prefer authored geometry of the actual site, using pack assets only where appropriate.
+2. **One coordinate contract and spatial skeleton.** Preserve source GeoJSON. Establish a shared local-metre frame for map, terrain, Blender exports and runtime placement. The research proposes EPSG:25832 and DHHN2016_NH; origin, vertical offset and concrete axis transform still need a tested contract. Validate at least three independent anchors. Do not confuse geodetic height with phone altitude or silently mirror the site when moving between Z-up Blender and Y-up glTF/Three.js.
+3. **Connected site and movement.** Build boundary, path network, exterior building masses and hedge/gate logic from evidence. Ground sampling, object placement and player movement must share the same height model. Test a continuous entrance → main path → side path → evidence-selected destination → return route; major boundaries/buildings must be non-traversable.
+4. **Polish one supported section.** Match recognizable silhouettes, surfaces, vegetation and details. Simple geometry is useful for layout checks, not the final artistic style. Use instancing for repeated assets and authored, evidence-backed forms for distinctive buildings/props. Classify important claims as observed, estimated or representative.
+5. **Accept Blender and runtime separately.** Produce a neutral photo-comparison view, dusk/night view and the same section in Three.js. Measure frame times/draw calls/loading on stated hardware, browser, resolution and quality. Agree the performance tier before calling it accepted. The old 60 FPS / ≤400 draw-call goals are provisional budgets.
 
-## 7. Session Guidelines
+A full spatial skeleton and one polished continuous route are the first milestone, not a demand to detail every grave before showing a useful section.
 
-- Treat each phase as a teaching opportunity: explain Three.js APIs, Blender steps, and performance considerations before executing.
-- End every session with a recap, testing instructions, and explicit next-step options.
-- Revisit this plan whenever scope questions arise; update the document as decisions evolve.
+## Before modifying sources
 
-## 8. Open Questions for Later
+Keep raw pack files and existing `.blend` revisions immutable. Work in new revisions/copies and use the explicit [Blender workbench](assets/blender-workbench.md), not a remembered global export preset. The [pipeline checklist](assets/pipeline-guide.md) covers materials and browser reception. Local backups or Photos originals on the same Mac are not an independently restored backup.
 
-- Which gravestone styles best match the real cemetery, and can we photo-reference sintered textures if the pack lacks suitable variants?
-- How far should we push asset instancing vs. unique hero pieces before performance tanks?
-- Do we need a separate nighttime LUT/post-processing stack or just lil-gui presets?
-- What is the minimal viable set of props necessary to evoke the cemetery before expanding further?
+## Human decisions still needed
 
----
+- Photo location confirmations/corrections first; first visible section, polished route and destination later, based on reviewed coverage.
+- Target desktop/browser/resolution and quality tier.
+- Independent backup destination and restore proof before valuable source edits.
+- Whether environmental audio belongs in this milestone.
 
-Keep this plan alongside `AGENTS.md` to anchor future agent sessions.
+These do not block repo preparation or read-only reference work. Missing heights, texture families and unseen facades should be recorded, not guessed away.

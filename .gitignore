@@ -122,3 +122,10 @@ docs/private/
 
 # Raw assets
 assets/source/raw/
+
+# Local authoring/reference workspace: never publish through Git or Vite.
+.local/
+assets/source/working/
+.claude/settings.local.json
+__pycache__/
+*.pyc

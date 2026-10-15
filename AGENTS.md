@@ -1,59 +1,34 @@
-# HORROR GAME “HEDWIG” — CODEX BRIEF
+# Hedwig — agent entry
 
-## WHY THIS MATTERS
-- Personal passion project meant to spark enthusiasm for someone important. One disappointing build can kill momentum.
-- Visual polish is equal to gameplay. Lighting, shadows, textures, and atmosphere need to feel intentional at every step.
+## Direction
 
-## WHO I’M WORKING WITH
-- Michael (owner): 8 months of programming experience, brand-new to Three.js.
-- Goal for each session: ship a tangible improvement **and** leave Michael with a clearer mental model of the Three.js concepts involved.
+Build a faithful, beautiful, walkable **Neuer Friedhof, Bruchköbel** at dusk/night. The current milestone is an **environment prototype**, not the former game MVP. Read [the active plan](docs/asset-integration-plan.md) before planning production work. It captures the accepted 2026-10-04 direction; older material under `docs/archive/` and the lore are history, not an implementation mandate.
 
-## CURRENT STATE (2025-10-10, commit 5d9a3b4)
-- Refactor work is complete and stable; `src/main.js` wires eleven focused modules (Engine, Atmosphere, World, Environment, Assets, DevRoom, PlayerController, Debug GUI, Loop, Constants).
-- Shared GLTF/KTX2/Draco loaders and the Dev Room street lamp prove the asset pipeline end-to-end; lamp emissive binding is live with a temporary light-offset workaround.
-- Gameplay scaffolding plus the next batch of props (bench, tree variants, tombs) are the upcoming priorities.
-- Cemetery GeoJSON + DEM height data integration remains **deferred**; decisions live in the backlog under “Important & Not Urgent.”
+The executable app is still a Three.js look-development sandbox: flat grass, atmosphere, first-person inspection, debug controls and one street lamp. GeoJSON is not rendered; terrain and collision are not implemented. Preserve that working baseline while adding evidence-backed features.
 
-## FOLDER SNAPSHOT
-```
-src/
-  main.js
-  config/Constants.js
-  core/Engine.js
-  atmosphere/Atmosphere.js
-  world/World.js
-  world/Environment.js
-  assets/Assets.js
-  assets/DevRoom.js
-  gameplay/PlayerController.js
-  ui/DebugGui.js
-  loop/Loop.js
-```
-Planned but not yet created: `gameplay/AIUncle.js`, `gameplay/Gameplay.js`, plus additional asset utilities as the library expands.
+The lamp and sample props are disposable pipeline tests, not production references or mandatory assets. Prefer agent-authored, photo-backed geometry for the actual site; reusable complex vegetation may come from the local pack. Additional models/textures may be acquired when needed, with fit and licence checks.
 
-Public assets already available:
-- `public/assets/hdri/*_{1k,2k}.hdr`
-- `public/assets/textures/ground/grass_{color,normal}_{1k,2k}.jpg`
-- `public/assets/models/props/SM_StreetLamp_Simple.glb`
+## Start a session
 
-## TECH & QUALITY GUARDRAILS
-- Three.js r179.1 + Vite + vanilla JS.
-- Target ≥60 FPS on mid-range desktop, ≤400 draw calls, use instancing for repeats.
-- Fog around 50–60 m; don’t hide poor visuals with heavy haze.
-- All lighting should feel deliberate: moon shadows, subtle ambient/hemisphere fill, flashlight clarity.
+1. Read `README.md`, `package.json` and the active plan; inspect existing working-tree changes before editing.
+2. For photos, map, source assets or texture work, read `docs/local-references.md`. For Blender work, read `docs/assets/blender-workbench.md` and `docs/assets/pipeline-guide.md`.
+3. Read only the modules needed for the task; `src/main.js` is the composition root. `docs/readiness.md` records verified preparation and remaining gaps.
+4. State the bounded task and verification. Follow the user's authorization: autonomous preparation may proceed end-to-end; scene production and art-direction choices need a specific brief. Explain new Three.js concepts briefly to Michael.
 
-## HOW WE WORK TOGETHER
-1. **Explore & Summarize** — Start every session by reading the repo, stating the project status, and listing a short TODO with checkboxes.
-2. **Plan First** — Before changing code, explain the intended change, the Three.js ideas behind it, and why this approach makes sense.
-3. **Wait for Approval** — Don’t execute until Michael signs off on the plan.
-4. **Implement with Teaching** — Write the code, narrating key decisions and pointing out beginner-friendly takeaways.
-5. **Testing Guidance** — Run relevant checks yourself, report results honestly, and give Michael exact steps to verify visually in the browser.
-6. **Pause for Confirmation** — Stop after each major step until Michael confirms everything looks good. Only then consider commits or moving on.
+## Sources and safety
 
-## COMMUNICATION STYLE
-- Keep tone collaborative and encouraging; ask clarifying questions when assumptions pop up.
-- Surface trade-offs (visual vs. performance, short-term vs. long-term) so Michael can learn decision-making.
-- Offer logical next steps, but let Michael pick the path.
+- The Mac is the development and authoring workstation. No VPS, MCP server or Blender add-on is required.
+- `assets/source/raw/` and `assets/source/working/` are local source material. Keep originals unchanged; author new revisions/copies. Independent backup restoration remains unverified.
+- `.local/` holds private reference manifests, photo proxies, exports and smoke evidence. It is ignored by Git and denied by the Vite dev server. Keep private material out of `public/`, `src/` and tracked docs. Ignoring a file is not a backup.
+- `public/` is shipped wholesale. Only reviewed, redistributable runtime artifacts belong there. Raw marketplace content and private photos/GPS/inscriptions do not.
+- The owner confirmed purchase and commercial permission for the cemetery pack. Select assets for visual fit; generic churches/mausoleums do not replace the real site's buildings.
+- Preserve `data/cemetery_final.geojson` and its feature IDs. Read `data/CLAUDE.md` before interpreting geometry. Missing heights, widths and photo coverage are uncertainty, not permission to invent measured facts.
 
-## REMEMBER
-We’re building something beautiful together. Every improvement should balance atmospheric quality, technical soundness, and clear teaching.
+## Engineering and acceptance
+
+- Vanilla JavaScript, Three.js r179.1 and Vite. Reuse the existing module seams; no framework/ECS rewrite ahead of an actual need.
+- Blender sources produce GLB runtime assets, not vice versa. Base colour/emission are colour data; roughness/metalness/normal maps are non-colour data. Blender renders do not prove browser material fidelity or performance.
+- Run the relevant commands and exercise changed behavior in the actual browser/CLI. Record failures and limits; a build is not visual acceptance. Use the coding agent's available native browser tooling. `npm run browser:smoke` provides an optional verified Chrome/CDP input check against a running local server.
+- Preserve source look and browser look as separate human art gates. For the first reference-backed section, provide neutral comparison, dusk/night view and measured browser performance.
+- 60 FPS and at most 400 draw calls are provisional targets, not achieved full-level guarantees. State hardware, browser and render resolution with measurements. Use instancing for repeated content; keep fog intentional rather than hiding unfinished work.
+- Update the existing authoritative doc when scope or a workflow changes. `CLAUDE.md` is only an entry pointer, not a second copy of project policy. No automatic commits, deployment or publication.

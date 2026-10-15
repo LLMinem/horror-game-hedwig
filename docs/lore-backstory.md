@@ -1,6 +1,6 @@
 ---
 type: context
-status: active
+status: archived
 created: 2025-09-03
 last_verified: 2025-09-16
 last_verified_commit: b6a4891
@@ -10,6 +10,8 @@ superseded_by: []
 ---
 
 # Game Lore & Backstory: The Uncle and The Lady
+
+Historical creative context, preserved unchanged below. It does not define the current environment milestone; see [the active plan](asset-integration-plan.md).
 
 ## Character Relationships
 
