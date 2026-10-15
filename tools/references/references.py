@@ -21,6 +21,7 @@ LOCAL = REPO / ".local" / "references"
 MANIFEST = LOCAL / "photos.json"
 CACHED_EXIF = LOCAL / "cached-exif.json"
 POSITIONS = LOCAL / "positions.json"
+REVIEWS = LOCAL / "reviews.json"
 CANONICAL_MAP = REPO / "data" / "cemetery_final.geojson"
 MAP_TEMPLATE = Path(__file__).with_name("map-template.html")
 SELECTION = {
@@ -186,6 +187,7 @@ def index(args):
         raise ValueError("Duplicate photo identifiers in source metadata.")
     # Refuse a reindex that would orphan corrections; never reset positions.json.
     load_positions(photos, load_json(CANONICAL_MAP))
+    load_reviews(photos, load_json(CANONICAL_MAP))
     save_json(CACHED_EXIF, cached_records)
     save_json(MANIFEST, {"version": 1, "recorded_at": datetime.now(timezone.utc).isoformat(),
                          "selection": SELECTION, "provenance": provenance,
@@ -318,10 +320,81 @@ def import_positions(args):
     return 0
 
 
+def validate_reviews(value, photos, geojson):
+    """Agent estimates are not human confirmations; validate each component."""
+    if (not isinstance(value, dict) or set(value) != {"version", "photos"}
+            or type(value["version"]) is not int or value["version"] != 1
+            or not isinstance(value["photos"], list)):
+        raise ValueError("Reviews must be {version: 1, photos: [...]}.")
+    known = {row["id"] for row in photos}
+    seen = set()
+    west, south, east, north = map_bounds(geojson)
+    for row in value["photos"]:
+        if not isinstance(row, dict) or set(row) != {"id", "number", "position", "heading", "needs_review", "evidence"}:
+            raise ValueError("Invalid review fields.")
+        photo_id = row["id"]
+        if not isinstance(photo_id, str) or photo_id not in known or photo_id in seen:
+            raise ValueError(f"Unknown or duplicate review ID: {photo_id}")
+        seen.add(photo_id)
+        if type(row["number"]) is not int or row["number"] < 1:
+            raise ValueError(f"Invalid review photo number: {photo_id}")
+        pending = row["needs_review"]
+        if (not isinstance(pending, list) or any(v not in ("position", "heading") for v in pending)
+                or len(set(pending)) != len(pending)):
+            raise ValueError(f"Invalid review components: {photo_id}")
+        if not isinstance(row["evidence"], list) or not row["evidence"] or any(not isinstance(v, str) or not v.strip() for v in row["evidence"]):
+            raise ValueError(f"Review evidence is required: {photo_id}")
+        for component, field in (("position", "coordinates"), ("heading", "degrees")):
+            assessment = row[component]
+            if not isinstance(assessment, dict) or set(assessment) != {"status", field, "confidence", "reason"}:
+                raise ValueError(f"Invalid {component} assessment: {photo_id}")
+            status = assessment["status"]
+            if status not in ("adjusted", "plausible", "uncertain") or assessment["confidence"] not in ("high", "medium", "low"):
+                raise ValueError(f"Invalid assessment status/confidence: {photo_id}")
+            if not isinstance(assessment["reason"], str) or not assessment["reason"].strip():
+                raise ValueError(f"Assessment reason is required: {photo_id}")
+            if status == "uncertain" and component not in pending:
+                raise ValueError(f"Uncertain {component} must remain flagged: {photo_id}")
+            estimate = assessment[field]
+            if status != "adjusted":
+                if estimate is not None:
+                    raise ValueError(f"Only adjusted assessments may replace observations: {photo_id}")
+            elif assessment["confidence"] == "low":
+                raise ValueError(f"Low-confidence estimates must not be applied: {photo_id}")
+            elif component == "position":
+                if (not isinstance(estimate, list) or len(estimate) != 2
+                        or not all(finite_number(v) for v in estimate)
+                        or not west <= estimate[0] <= east or not south <= estimate[1] <= north):
+                    raise ValueError(f"Invalid estimated position: {photo_id}")
+            elif not finite_number(estimate) or not 0 <= estimate < 360:
+                raise ValueError(f"Invalid estimated heading: {photo_id}")
+    return value
+
+
+def load_reviews(photos, geojson):
+    if REVIEWS.is_symlink():
+        raise ValueError(f"Refusing symlink review file: {REVIEWS}")
+    try:
+        value = load_json(REVIEWS)
+    except FileNotFoundError:
+        return {"version": 1, "photos": []}
+    return validate_reviews(value, photos, geojson)
+
+
+def import_reviews(args):
+    photos, geojson = load_manifest()["photos"], load_json(CANONICAL_MAP)
+    load_reviews(photos, geojson)
+    value = validate_reviews(load_json(Path(args.path).expanduser()), photos, geojson)
+    save_json(REVIEWS, value)
+    print(json.dumps({"reviewed_photos": len(value["photos"]), "reviews": str(REVIEWS.relative_to(REPO))}))
+    return 0
+
+
 def refresh_metadata(args):
     manifest = load_manifest()
     geojson = load_json(CANONICAL_MAP)
     load_positions(manifest["photos"], geojson)
+    load_reviews(manifest["photos"], geojson)
     photos = [{**row, **availability(Path(row["source"]))} for row in manifest["photos"]]
     records = read_exif([Path(row["source"]) for row in photos if row["status"] == "available"])
     fresh = {row["SourceFile"]: row for row in records}
@@ -356,8 +429,9 @@ def accuracy_group(metadata, threshold):
     return "reported_low_error_unconfirmed" if error <= threshold else "review_location"
 
 
-def placements(photos, overrides, threshold):
+def placements(photos, overrides, threshold, reviews):
     corrected = {row["id"]: row for row in overrides["photos"]}
+    assessed = {row["id"]: row for row in reviews["photos"]}
     features = []
     for row in photos:
         metadata = row["metadata"]
@@ -365,13 +439,19 @@ def placements(photos, overrides, threshold):
         observed = ([longitude, latitude] if finite_number(longitude) and finite_number(latitude)
                     and -180 <= longitude <= 180 and -90 <= latitude <= 90 else None)
         correction = corrected.get(row["id"])
-        effective = [correction["longitude"], correction["latitude"]] if correction else observed
+        review = assessed.get(row["id"])
+        estimate = review["position"]["coordinates"] if review else None
+        effective = [correction["longitude"], correction["latitude"]] if correction else (estimate or observed)
         original_heading = metadata.get("GPSImgDirection")
         heading = original_heading if finite_number(original_heading) and 0 <= original_heading < 360 else None
         heading_source = "observed_exif" if heading is not None else "unavailable_or_invalid"
         heading_ref = metadata.get("GPSImgDirectionRef") if heading is not None else None
+        if review and not correction and review["heading"]["degrees"] is not None:
+            heading, heading_source, heading_ref = review["heading"]["degrees"], "agent_estimate", "T"
         if correction and correction.get("heading_deg") is not None:
             heading, heading_source, heading_ref = correction["heading_deg"], "user_confirmed", "T"
+        pending = [component for component in review["needs_review"]
+                   if not correction or (component == "heading" and correction.get("heading_deg") is None)] if review else []
         group = accuracy_group(metadata, threshold)
         features.append({
             "type": "Feature", "id": row["id"],
@@ -382,8 +462,9 @@ def placements(photos, overrides, threshold):
                 "observed_gps": observed, "accuracy_group": group,
                 "reported_low_error_unconfirmed": group == "reported_low_error_unconfirmed",
                 "user_confirmed": correction is not None,
-                "position_source": "user_confirmed" if correction else ("observed_gps" if observed else "unavailable_or_invalid"),
+                "position_source": "user_confirmed" if correction else ("agent_estimate" if estimate else ("observed_gps" if observed else "unavailable_or_invalid")),
                 "correction": correction,
+                "review": review, "pending_review": pending,
                 "effective_heading_deg": heading, "effective_heading_source": heading_source,
                 "effective_heading_ref": heading_ref,
             },
@@ -414,17 +495,26 @@ def reference_map(args):
     photos = load_manifest()["photos"]
     geojson = load_json(CANONICAL_MAP)
     overrides = load_positions(photos, geojson)
+    reviews = load_reviews(photos, geojson)
     template = MAP_TEMPLATE.read_text(encoding="utf-8")
     token = "__REFERENCE_DATA_JSON__"
     if template.count(token) != 1:
         raise ValueError("Map template must contain exactly one reference-data token.")
     payload = {"photos": photos, "geojson": geojson, "threshold_m": args.threshold,
-               "overrides": overrides}
+               "overrides": overrides, "reviews": reviews}
     # Safe both in a JSON script element and as a JavaScript expression.
     encoded = json.dumps(payload, ensure_ascii=True, allow_nan=False)
     encoded = encoded.replace("&", "\\u0026").replace("<", "\\u003c").replace(">", "\\u003e")
-    effective = placements(photos, overrides, args.threshold)
+    effective = placements(photos, overrides, args.threshold, reviews)
     summary = metadata_statistics(photos, args.threshold)
+    summary["visual_review"] = {
+        "reviewed": len(reviews["photos"]),
+        "position_adjusted": sum(r["position"]["status"] == "adjusted" for r in reviews["photos"]),
+        "heading_adjusted": sum(r["heading"]["status"] == "adjusted" for r in reviews["photos"]),
+        "pending_photos": sum(bool(f["properties"]["pending_review"]) for f in effective["features"]),
+        "pending_position": sum("position" in f["properties"]["pending_review"] for f in effective["features"]),
+        "pending_heading": sum("heading" in f["properties"]["pending_review"] for f in effective["features"]),
+    }
     summary.update({"confirmed_positions": len(overrides["photos"]),
                     "missing_or_invalid_observed_gps": sum(feature["properties"]["observed_gps"] is None
                                                            for feature in effective["features"]),
@@ -496,6 +586,17 @@ def proxies(args):
             with tempfile.TemporaryDirectory(dir=destination) as scratch:
                 temporary = Path(scratch) / "proxy.jpg"
                 run([sips, "-s", "format", "jpeg", "-s", "formatOptions", "85", "-Z", str(args.size), str(source), "--out", str(temporary)])
+                # Bake EXIF orientation into pixels before removing metadata.
+                orientation_text = run([exiftool, "-n", "-s3", "-Orientation", str(temporary)]).strip()
+                orientation = int(orientation_text) if orientation_text else 1
+                transforms = {1: [], 2: [("-f", "horizontal")], 3: [("-r", "180")],
+                              4: [("-f", "vertical")], 5: [("-r", "90"), ("-f", "horizontal")],
+                              6: [("-r", "90")], 7: [("-r", "90"), ("-f", "vertical")],
+                              8: [("-r", "270")]}
+                if orientation not in transforms:
+                    raise ValueError(f"Unsupported EXIF orientation: {orientation}")
+                for option, value in transforms[orientation]:
+                    run([sips, option, value, str(temporary)])
                 run([exiftool, "-overwrite_original", "-all=", str(temporary)])
                 if not temporary.is_file() or temporary.stat().st_size == 0:
                     raise ValueError("Image conversion produced no data.")
@@ -567,6 +668,9 @@ def main():
     command = commands.add_parser("import-positions", help="Validate an entire correction export and atomically save positions.json.")
     command.add_argument("path", help="Private JSON export with version 1 and confirmed photo positions.")
     command.set_defaults(action=import_positions)
+    command = commands.add_parser("import-reviews", help="Validate private visual assessments; never marks them human-confirmed.")
+    command.add_argument("path", help="Private version-1 review JSON.")
+    command.set_defaults(action=import_reviews)
     command = commands.add_parser("proxies", help="Create private JPEGs linked by ID to rich metadata sidecars; preserve originals.")
     command.add_argument("--id", action="append", help="Only this manifest ID; repeat to select several.")
     command.add_argument("--limit", type=positive, help="Only the first N selected originals.")

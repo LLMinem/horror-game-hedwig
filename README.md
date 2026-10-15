@@ -35,6 +35,8 @@ npm run blender:smoke                    # disposable CPU render + Draco round t
 
 The source map is included in Git. This prepared Mac also has **98 JPEG proxies plus their GPS, heading, altitude and camera metadata in ID-linked private JSON sidecars** under `.local/references/`; the HEIC originals stay unchanged in Photos. The JPEGs themselves omit embedded metadata, not the reference dataset. The private photo map supports reviewing and correcting positions without overwriting original measurements. **A fresh clone does not contain these private files or the purchased raw pack.** [Local references](docs/local-references.md) explains commands, correction import, source paths, accuracy limits and missing terrain/aerial inputs. [Blender workbench](docs/assets/blender-workbench.md) documents executable discovery, read-only source inspection and explicit collection export. No MCP service, add-on, Python virtual environment or VPS is required.
 
+The authorized visual review now records an assessment for every photo. The map separates agent estimates from your confirmations and provides **Für Micha offen**, position and heading filters. See [visual review and follow-up](docs/local-references.md#visual-review-and-owner-follow-up). All review data remain private under `.local/`; they are not included in Git.
+
 ## Where things belong
 
 | Path | Role |

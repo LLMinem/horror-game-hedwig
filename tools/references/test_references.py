@@ -1,14 +1,20 @@
 """Synthetic-only reference workflow checks; never accesses the real photo library."""
 
 import argparse
+import copy
+import hashlib
 from contextlib import redirect_stdout
 import importlib.util
 import io
 import json
 from pathlib import Path
+import shutil
+import struct
+import subprocess
 import tempfile
 import unittest
 from unittest.mock import patch
+import zlib
 
 SPEC = importlib.util.spec_from_file_location("references", Path(__file__).with_name("references.py"))
 references = importlib.util.module_from_spec(SPEC)
@@ -25,6 +31,7 @@ class ReferenceWorkflowTests(unittest.TestCase):
         self.paths = {
             "REPO": root, "LOCAL": local, "MANIFEST": local / "photos.json",
             "CACHED_EXIF": local / "cached-exif.json", "POSITIONS": local / "positions.json",
+            "REVIEWS": local / "reviews.json",
             "CANONICAL_MAP": root / "canonical.geojson", "MAP_TEMPLATE": root / "template.html",
         }
         self.patcher = patch.multiple(references, **self.paths)
@@ -98,7 +105,7 @@ class ReferenceWorkflowTests(unittest.TestCase):
         self.assertFalse((references.LOCAL / "map.html").exists())
 
     def test_effective_placement_keeps_observations_and_heading_reference(self):
-        result = references.placements(self.photos, self.corrections(), 5)
+        result = references.placements(self.photos, self.corrections(), 5, {"version": 1, "photos": []})
         first, second = result["features"]
         self.assertEqual(first["geometry"]["coordinates"], [8.9351, 50.1731])
         props = first["properties"]
@@ -109,7 +116,7 @@ class ReferenceWorkflowTests(unittest.TestCase):
         self.assertEqual(props["effective_heading_source"], "observed_exif")
         self.assertEqual(props["effective_heading_ref"], "M")
         self.assertIsNone(second["geometry"])
-        heading = references.placements(self.photos, self.corrections({**self.correction, "heading_deg": 90}), 5)
+        heading = references.placements(self.photos, self.corrections({**self.correction, "heading_deg": 90}), 5, {"version": 1, "photos": []})
         self.assertEqual(heading["features"][0]["properties"]["effective_heading_source"], "user_confirmed")
         self.assertEqual(heading["features"][0]["properties"]["effective_heading_ref"], "T")
 
@@ -171,6 +178,106 @@ class ReferenceWorkflowTests(unittest.TestCase):
             references.index(args)
         self.assertEqual(references.MANIFEST.read_bytes(), manifest_before)
         self.assertEqual(references.POSITIONS.read_bytes(), positions_before)
+
+    def review(self):
+        return {"id": "photo-a", "number": 1,
+                "position": {"status": "adjusted", "coordinates": [8.9352, 50.1732],
+                             "confidence": "medium", "reason": "Visible junction; distance uncertain."},
+                "heading": {"status": "adjusted", "degrees": 120,
+                            "confidence": "medium", "reason": "Path vanishing point."},
+                "needs_review": ["position", "heading"], "evidence": ["photo:1", "map:test"]}
+
+    def test_review_components_and_human_precedence(self):
+        review = self.review()
+        reviews = {"version": 1, "photos": [review]}
+        empty = {"version": 1, "photos": []}
+        first = references.placements(self.photos, empty, 5, reviews)["features"][0]
+        self.assertEqual(first["geometry"]["coordinates"], [8.9352, 50.1732])
+        self.assertFalse(first["properties"]["user_confirmed"])
+        self.assertEqual(first["properties"]["effective_heading_deg"], 120)
+        self.assertEqual(first["properties"]["pending_review"], ["position", "heading"])
+        human = references.placements(self.photos, self.corrections(), 5, reviews)["features"][0]
+        self.assertEqual(human["geometry"]["coordinates"], [8.9351, 50.1731])
+        self.assertEqual(human["properties"]["effective_heading_deg"], 42)
+        self.assertEqual(human["properties"]["effective_heading_ref"], "M")
+        self.assertEqual(human["properties"]["pending_review"], ["heading"])
+        complete = references.placements(self.photos, self.corrections({**self.correction, "heading_deg": 90}), 5, reviews)["features"][0]
+        self.assertEqual(complete["properties"]["effective_heading_deg"], 90)
+        self.assertEqual(complete["properties"]["pending_review"], [])
+        review["position"].update(status="uncertain", coordinates=None, confidence="low")
+        partial = references.placements(self.photos, empty, 5, reviews)["features"][0]
+        self.assertEqual(partial["geometry"]["coordinates"], [8.935, 50.173])
+        self.assertEqual(partial["properties"]["effective_heading_deg"], 120)
+
+    def test_review_import_rejects_unjustified_changes_without_overwriting(self):
+        valid = {"version": 1, "photos": [self.review()]}
+        references.save_json(references.REVIEWS, valid)
+        before = references.REVIEWS.read_bytes()
+        variants = []
+        for component, changes in (
+                ("position", {"coordinates": [9, 50.173]}),
+                ("position", {"coordinates": [True, 50.173]}),
+                ("position", {"confidence": "low"}),
+                ("position", {"status": "plausible"}),
+                ("heading", {"degrees": 360}),
+                ("heading", {"degrees": float("inf")})):
+            variant = copy.deepcopy(valid)
+            variant["photos"][0][component].update(changes)
+            variants.append(variant)
+        uncertain = copy.deepcopy(valid)
+        uncertain["photos"][0]["position"].update(status="uncertain", coordinates=None)
+        uncertain["photos"][0]["needs_review"] = []
+        variants.append(uncertain)
+        variants.append({"version": 1, "photos": [self.review(), self.review()]})
+        unknown = copy.deepcopy(valid)
+        unknown["photos"][0]["id"] = "not-in-manifest"
+        variants.append(unknown)
+        incoming = references.LOCAL / "incoming reviews.json"
+        for value in variants:
+            incoming.write_text(json.dumps(value))
+            with self.subTest(value=value), self.assertRaises(ValueError):
+                references.import_reviews(argparse.Namespace(path=str(incoming)))
+            self.assertEqual(references.REVIEWS.read_bytes(), before)
+        with self.assertRaises(ValueError):
+            references.load_reviews(self.photos[1:], self.geojson)
+
+    def test_review_survives_generation_and_malformed_file_fails_closed(self):
+        reviews = {"version": 1, "photos": [self.review()]}
+        references.save_json(references.REVIEWS, reviews)
+        with redirect_stdout(io.StringIO()):
+            references.reference_map(argparse.Namespace(threshold=5))
+        generated = references.load_json(references.LOCAL / "placements.geojson")
+        self.assertEqual(generated["features"][0]["properties"]["review"], self.review())
+        self.assertEqual(references.load_json(references.REVIEWS), reviews)
+        before = (references.LOCAL / "map.html").read_bytes()
+        references.REVIEWS.write_text("{broken")
+        with self.assertRaises(ValueError):
+            references.reference_map(argparse.Namespace(threshold=5))
+        self.assertEqual((references.LOCAL / "map.html").read_bytes(), before)
+
+    @unittest.skipUnless(shutil.which("sips") and shutil.which("exiftool"), "macOS image tools required")
+    def test_portrait_proxy_bakes_orientation_before_stripping_metadata(self):
+        def chunk(kind, data):
+            return struct.pack("!I", len(data)) + kind + data + struct.pack("!I", zlib.crc32(kind + data) & 0xffffffff)
+        png = references.LOCAL / "synthetic.png"
+        png.write_bytes(b"\x89PNG\r\n\x1a\n" +
+                        chunk(b"IHDR", struct.pack("!2I5B", 80, 40, 8, 2, 0, 0, 0)) +
+                        chunk(b"IDAT", zlib.compress((b"\0" + bytes([30, 80, 130]) * 80) * 40)) +
+                        chunk(b"IEND", b""))
+        source = Path(self.photos[0]["source"]).with_suffix(".jpg")
+        self.photos[0]["source"] = str(source)
+        references.save_json(references.MANIFEST, {"version": 1, "photos": self.photos})
+        subprocess.run(["sips", "-s", "format", "jpeg", str(png), "--out", str(source)], check=True, capture_output=True)
+        subprocess.run(["exiftool", "-overwrite_original", "-Orientation#=6", str(source)], check=True, capture_output=True)
+        before = hashlib.sha256(source.read_bytes()).digest()
+        with redirect_stdout(io.StringIO()):
+            references.proxies(argparse.Namespace(id=["photo-a"], limit=None, size=80))
+        target = references.LOCAL / "proxies/photo-a.jpg"
+        result = json.loads(subprocess.run(["exiftool", "-json", "-n", "-ImageWidth", "-ImageHeight", "-Orientation", str(target)],
+                                          check=True, capture_output=True, text=True).stdout)[0]
+        self.assertEqual((result["ImageWidth"], result["ImageHeight"]), (40, 80))
+        self.assertNotIn("Orientation", result)
+        self.assertEqual(hashlib.sha256(source.read_bytes()).digest(), before)
 
 
 if __name__ == "__main__":

@@ -93,3 +93,11 @@ The live dataset has 98 metadata-linked photos: 50 with reported horizontal erro
 Photo positioning/coverage review now precedes section selection. Site geometry should preferably be authored from references; complex vegetation may reuse the pack, and additional suitable textures/models remain an option. Existing lamp sources and sample props are disposable experiments, not production requirements. The working runtime has not been changed or stripped prematurely.
 
 Browser choice belongs to the coding agent's native environment. The existing direct Chrome/CDP smoke remains optional and unchanged. Repository-local browser-product recommendations were removed; no corresponding repo-local skill installation or skills lockfile was present to uninstall. Global installations/settings were left untouched.
+
+## Authorized visual review, 2026-10-15
+
+Micha requested visual review of every private photo against the map and capture sequence. All 98 were inspected individually. The private review layer applies five estimated camera positions and seven estimated headings, and leaves nineteen photos flagged for owner review. Original measurements and human corrections remain separate from those estimates.
+
+The map now identifies the pending component and shows a reason for each assessment. Twelve Python tests passed, and the actual Chrome page decoded all 98 previews with the expected review filters. Synthetic browser export/import and regeneration preserved human precedence and unresolved flags. Five sideways portrait proxies were also corrected by baking image orientation before metadata removal.
+
+All original HEIC files, the metadata manifest/cache and canonical GeoJSON retain their pre-review SHA-256 values. No human confirmation was fabricated. The [reference workflow](local-references.md#visual-review-and-owner-follow-up) describes the schema and remaining owner work. No scene production or canonical map corrections were performed.

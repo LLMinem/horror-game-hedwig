@@ -16,19 +16,20 @@
 <div class="toolbar"><button id="fit" type="button">Friedhof einpassen</button><button id="locate" type="button">Zum Foto</button><button id="zoom-in" type="button" aria-label="Karte vergrößern">+</button><button id="zoom-out" type="button" aria-label="Karte verkleinern">−</button><button id="place" type="button" aria-pressed="false">Standort setzen</button><span class="help">Ziehen: verschieben · Rad: zoomen · ↑ Norden</span></div>
 <div id="message" role="status" aria-live="polite">Foto wählen; Marker zeigen den wirksamen Standort.</div>
 <div class="map-wrap"><canvas id="map" tabindex="0" aria-label="Friedhofskarte mit Fotomarkern. Standort setzen aktivieren und auf die Karte klicken; Ziehen setzt keinen Standort."></canvas><div class="north">N<b>↑</b></div><div class="map-caption"><span id="scale-text"></span><div id="scale-line"></div><div>© OpenStreetMap-Mitwirkende · ODbL</div></div></div>
-<div class="legend"><span><i class="swatch low"></i>Niedriger gemeldeter Fehler, unbestätigt</span><span><i class="swatch review"></i>Standort prüfen</span><span><i class="swatch confirmed"></i>Manuell bestätigt</span><span>Ring: gemeldeter Fehler am Original-GPS · gestrichelter Strahl: ungefähre Richtung</span></div>
+<div class="legend"><span><i class="swatch low"></i>Agent-geprüft / Roh-GPS</span><span><i class="swatch review"></i>Für Micha offen</span><span><i class="swatch confirmed"></i>Manuell bestätigt</span><span>Ring: ursprünglicher GPS-Fehler · gelber Strahl: wirksame Richtung · grau: ursprüngliche Richtung</span></div>
 <div class="workflow"><p class="warning">GPS-Fehler ist eine Geräteschätzung, keine garantierte Genauigkeit. Manuelle Bestätigung ist keine Vermessung. Höhe ist kein Geländemodell; Richtung ist keine kalibrierte Kamerapose oder Sichtfeldmessung.</p><p class="help">Änderungen bleiben im Arbeitsspeicher. JSON herunterladen und lokal aufbewahren; der Browser kann diese HTML-Datei nicht überschreiben. Zum dauerhaften Übernehmen die heruntergeladene Datei mit dem Python-CLI importieren und die Karte neu erzeugen (Befehl rechts).</p></div>
 </div>
 <aside aria-label="Fotoauswahl und Korrekturen">
-<section class="block"><h2>Fotos <span id="photo-count"></span></h2><label class="field" for="filter">Standortstatus<select id="filter"><option value="all">Alle Fotos</option><option value="low">Niedriger gemeldeter Fehler (unbestätigt)</option><option value="review">Standort prüfen</option><option value="confirmed">Manuell bestätigt</option></select></label><p id="filter-summary" class="help"></p><div id="photo-list" aria-label="Fotoliste"></div><div class="row"><button id="previous" type="button">← Vorheriges</button><button id="next" type="button">Nächstes →</button><span class="help">Tasten ← / →</span></div></section>
+<section class="block"><h2>Fotos <span id="photo-count"></span></h2><label class="field" for="filter">Prüfstatus<select id="filter"><option value="all">Alle Fotos</option><option value="review">Für Micha offen</option><option value="position">Position nachprüfen</option><option value="heading">Richtung nachprüfen</option><option value="adjusted">Agent-Korrekturen</option><option value="assessed">Alle visuell geprüften Fotos</option><option value="confirmed">Manuell bestätigte Positionen</option><option value="low">Ursprünglicher GPS-Fehler ≤ Grenzwert</option></select></label><p id="filter-summary" class="help"></p><div id="photo-list" aria-label="Fotoliste"></div><div class="row"><button id="previous" type="button">← Vorheriges</button><button id="next" type="button">Nächstes →</button><span class="help">Tasten ← / →</span></div></section>
 <section id="photo-detail" class="block">
 <h2 id="photo-id">Kein Foto ausgewählt</h2><p id="photo-status" class="help"></p>
 <a id="preview-open" target="_blank" rel="noopener noreferrer" aria-label="Fotoreferenz in voller Arbeitskopie-Größe öffnen"><img id="preview" alt="Lokale Fotoreferenz" hidden></a>
 <p id="preview-message" class="help">Keine Vorschau ausgewählt.</p><p class="help">Foto anklicken: Arbeitskopie in einem neuen Tab öffnen.</p>
+<h3>Visuelle Agent-Einschätzung</h3><p id="review-pending" class="warning"></p><dl id="review-details"></dl><p class="help">Schätzungen aus Foto, Aufnahmefolge und Karte; keine Vermessung und nicht von dir bestätigt. Bei offenen Richtungen einen Zahlenwert eintragen und übernehmen. Leeres Richtungsfeld verwendet ausdrücklich das Original-EXIF.</p>
 <h3>Unveränderte Originalmetadaten</h3><div class="coordinates"><strong>Original-GPS · Längengrad, Breitengrad</strong><span id="original-coordinates">—</span></div><dl id="metadata"></dl>
 <h3>Wirksame Platzierung</h3><div class="coordinates"><strong>Wirksamer Standort · Längengrad, Breitengrad</strong><span id="effective-coordinates">—</span></div><dl id="effective-metadata"></dl><p id="selection-warning" class="help warning"></p>
 </section>
-<section class="block"><h2>Manuelle Korrektur</h2><p class="help">„Standort setzen“ aktivieren, dann einmal klicken. Ein Ziehen verschiebt nur die Karte. Zulässig: Karten-Ausdehnung plus 100 m Rand.</p><label class="field" for="heading">Optionale Richtungs-Korrektur (0 bis &lt;360° ab Karten-Nord)<input id="heading" type="number" min="0" max="359.999999" step="any" placeholder="Leer = Originalrichtung beibehalten"></label><p class="help">Leeres Feld erhält Originalrichtung und deren Referenz (T = geografisch, M = magnetisch). Der Strahl ist unkalibriert: keine magnetische Deklinationskorrektur; unbekannte Referenz bleibt unsicher. Auch eine Korrektur bleibt eine ungefähre Richtung.</p><label class="field" for="note">Notiz<textarea id="note" placeholder="Begründung / Unsicherheit"></textarea></label><div class="row"><button id="apply" type="button">Wirksamen Standort bestätigen + Angaben übernehmen</button><button id="confirm-original" type="button">Original-GPS bestätigen</button><button id="undo" type="button">Letzte Änderung dieses Fotos zurück</button><button id="reset" type="button">Korrektur dieses Fotos entfernen</button><button id="discard-draft" type="button">Feldeingaben verwerfen</button></div><p class="help">Bestätigen speichert einen ausdrücklich geprüften Standort im Korrekturstand. Fehlendes GPS wird nur durch manuelles Platzieren ergänzt. „Entfernen“ stellt unveränderte Metadaten wieder her.</p></section>
+<section class="block"><h2>Manuelle Korrektur</h2><p class="help">Kamera-/Aufnahmestandort setzen, nicht das fotografierte Objekt. „Standort setzen“ aktivieren, dann einmal klicken. Ein Ziehen verschiebt nur die Karte. Zulässig: Karten-Ausdehnung plus 100 m Rand.</p><label class="field" for="heading">Richtung prüfen / korrigieren (0 bis &lt;360° ab Karten-Nord)<input id="heading" type="number" min="0" max="359.999999" step="any" placeholder="Leer = Original-EXIF verwenden"></label><p class="help">Eine Agent-Richtung ist vorbelegt, bis du sie übernimmst oder änderst. Leeres Feld verwendet ausdrücklich die Originalrichtung samt Referenz (T = geografisch, M = magnetisch), nicht die Agent-Schätzung; ein offener Richtungsprüfpunkt bleibt dann offen. Zum Bestätigen einer unveränderten Richtung ihren Zahlenwert eintragen. Der Strahl bleibt unkalibriert, ohne magnetische Deklinationskorrektur.</p><label class="field" for="note">Notiz<textarea id="note" placeholder="Begründung / Unsicherheit"></textarea></label><div class="row"><button id="apply" type="button">Standort und eingetragene Richtung übernehmen</button><button id="confirm-original" type="button">Original-GPS + eingetragene Richtung übernehmen</button><button id="undo" type="button">Letzte Änderung dieses Fotos zurück</button><button id="reset" type="button">Manuelle Korrektur entfernen</button><button id="discard-draft" type="button">Feldeingaben verwerfen</button></div><p class="help">Deine Korrekturen haben Vorrang. Entfernen stellt die Agent-Einschätzung bzw. das Original wieder her, einschließlich offener Prüfpunkte. Agent-Befunde bleiben getrennt in reviews.json; der Download enthält nur deine manuellen Korrekturen.</p></section>
 <section class="block"><h2>Korrekturstand sichern / laden</h2><div class="row"><button id="export" class="primary" type="button">Gesamten Stand als JSON herunterladen</button><button id="acknowledge-download" type="button" disabled>Download sicher abgelegt</button></div><p id="download-status" class="help">Ein Download sichert alle bestätigten Korrekturen, nicht nur den aktuellen Filter.</p><label class="field" for="import-file">Lokale Korrekturdatei auswählen<input id="import-file" type="file" accept="application/json,.json"></label><p id="import-status" class="help">Import ersetzt ausdrücklich den gesamten aktuellen Korrekturstand, kein Zusammenführen. Erst nach vollständiger Prüfung und Bestätigung.</p><button id="replace-import" type="button" disabled>Gesamten Korrekturstand ersetzen</button><p class="help">Im Projektverzeichnis dauerhaft übernehmen:</p><code id="persist-command">python3 tools/references/references.py import-positions /pfad/zur/foto-korrekturen.json</code><p class="help">Danach die lokale Karte neu erzeugen:</p><code>python3 tools/references/references.py map</code><p class="help">JSON, HTML und Vorschauen bleiben privat unter <code>.local/</code>; nicht veröffentlichen oder hochladen. Originalpfade werden hier nicht angezeigt.</p></section>
 </aside>
 </main>
@@ -43,6 +44,8 @@
   catch (error) { $('message').textContent = 'Kartendaten konnten nicht geladen werden: ' + error.message; $('message').dataset.error = 'true'; return; }
   const photos = data.photos;
   const byId = new Map(photos.map(photo => [photo.id, photo]));
+  const numbers = new Map(photos.map((photo, index) => [photo.id, index + 1]));
+  const reviews = new Map(data.reviews.photos.map(review => [review.id, review]));
   const features = data.geojson.features;
   const points = [];
   function collectCoordinates(value) {
@@ -98,19 +101,40 @@
   }
   function effectivePoint(photo) {
     const row = corrections.get(photo.id);
-    return row ? [row.longitude, row.latitude] : originalPoint(photo);
+    return row ? [row.longitude, row.latitude] : (reviews.get(photo.id)?.position.coordinates || originalPoint(photo));
+  }
+  function pendingFor(photo) {
+    const row = corrections.get(photo.id);
+    return (reviews.get(photo.id)?.needs_review || []).filter(component => !row || (component === 'heading' && row.heading_deg == null));
   }
   function status(photo) {
+    if (pendingFor(photo).length) return 'review';
     if (corrections.has(photo.id)) return 'confirmed';
+    if (reviews.has(photo.id)) return 'assessed';
     const error = metadata(photo).GPSHPositioningError, point = originalPoint(photo);
     return point && inBounds(...point) && finite(error) && error >= 0 && error <= threshold ? 'low' : 'review';
   }
-  const statusLabels = {low: 'Niedriger gemeldeter Fehler (unbestätigt)', review: 'Standort prüfen', confirmed: 'Manuell bestätigt (keine Vermessung)'};
-  const colors = {low: '#81b9ed', review: '#eeaf63', confirmed: '#80cf9a'};
-  function filteredPhotos() { return photos.filter(p => $('filter').value === 'all' || status(p) === $('filter').value); }
+  const statusLabels = {low: 'Niedriger GPS-Fehler, ungeprüft', review: 'Für Micha offen', assessed: 'Agent-geprüft, keine manuelle Bestätigung', confirmed: 'Position manuell bestätigt (keine Vermessung)'};
+  const colors = {low: '#81b9ed', assessed: '#81b9ed', review: '#eeaf63', confirmed: '#80cf9a'};
+  function filteredPhotos() {
+    const filter = $('filter').value;
+    return photos.filter(photo => {
+      const review = reviews.get(photo.id);
+      if (filter === 'all') return true;
+      if (filter === 'position' || filter === 'heading') return pendingFor(photo).includes(filter);
+      if (filter === 'assessed') return Boolean(review);
+      if (filter === 'adjusted') return review && (review.position.status === 'adjusted' || review.heading.status === 'adjusted');
+      if (filter === 'confirmed') return corrections.has(photo.id);
+      if (filter === 'low') { const error = metadata(photo).GPSHPositioningError; return finite(error) && error >= 0 && error <= threshold; }
+      return status(photo) === filter;
+    });
+  }
+  function draftBaseline() {
+    return corrections.get(selectedId) || {heading_deg: reviews.get(selectedId)?.heading.degrees ?? null, note: ''};
+  }
   function message(text, error = false) { $('message').textContent = text; $('message').dataset.error = String(error); }
   function draftChanged() {
-    const row = corrections.get(selectedId);
+    const row = draftBaseline();
     return $('heading').validity.badInput || $('heading').value !== (row?.heading_deg == null ? '' : String(row.heading_deg)) || $('note').value !== (row?.note || '');
   }
   function dirty() { return snapshot() !== savedSnapshot || draftChanged(); }
@@ -128,7 +152,7 @@
     return {heading_deg: heading, note: $('note').value};
   }
   function loadDraft() {
-    const row = corrections.get(selectedId);
+    const row = draftBaseline();
     $('heading').value = row?.heading_deg == null ? '' : String(row.heading_deg);
     $('note').value = row?.note || '';
   }
@@ -142,14 +166,15 @@
   function renderList() {
     const visible = filteredPhotos();
     $('photo-count').textContent = '(' + photos.length + ')';
-    $('filter-summary').textContent = visible.length + ' von ' + photos.length + ' Fotos · Grenzwert ' + threshold + ' m, nur Geräteschätzung. Ohne GPS/Fehler immer prüfen.';
+    const pending = photos.filter(photo => pendingFor(photo).length).length;
+    $('filter-summary').textContent = visible.length + ' von ' + photos.length + ' Fotos · ' + reviews.size + ' visuell geprüft · ' + pending + ' für Micha offen. Original-GPS-Grenzwert: ' + threshold + ' m.';
     const fragment = document.createDocumentFragment();
     for (const photo of visible) {
       const button = document.createElement('button');
       button.type = 'button'; button.dataset.photoId = photo.id;
       button.setAttribute('aria-current', String(photo.id === selectedId));
-      const name = document.createElement('span'); name.textContent = photo.id;
-      const label = document.createElement('small'); label.textContent = statusLabels[status(photo)];
+      const name = document.createElement('span'); name.textContent = '#' + String(numbers.get(photo.id)).padStart(2, '0') + ' · ' + (metadata(photo).DateTimeOriginal || photo.id);
+      const label = document.createElement('small'); label.textContent = statusLabels[status(photo)] + (pendingFor(photo).length ? ' · ' + pendingFor(photo).map(c => c === 'position' ? 'Position' : 'Richtung').join(' + ') : '');
       button.append(name, label); button.addEventListener('click', () => selectPhoto(photo.id)); fragment.append(button);
     }
     $('photo-list').replaceChildren(fragment);
@@ -165,14 +190,30 @@
   function headingFor(photo) {
     const correction = corrections.get(photo.id), m = metadata(photo);
     if (correction?.heading_deg != null) return {value: correction.heading_deg, ref: 'manuell, ab Karten-Nord'};
+    const estimate = reviews.get(photo.id)?.heading.degrees;
+    if (!correction && estimate != null) return {value: estimate, ref: 'Agent-Schätzung, ab Karten-Nord'};
     return finite(m.GPSImgDirection) && m.GPSImgDirection >= 0 && m.GPSImgDirection < 360 ? {value: m.GPSImgDirection, ref: valueText(m.GPSImgDirectionRef)} : null;
   }
   function renderDetails(updatePreview = false) {
     const photo = selected(), row = corrections.get(selectedId), m = metadata(photo);
-    $('photo-id').textContent = photo?.id || 'Kein Foto ausgewählt';
+    $('photo-id').textContent = photo ? '#' + String(numbers.get(photo.id)).padStart(2, '0') + ' · ' + photo.id : 'Kein Foto ausgewählt';
     $('photo-status').textContent = photo ? statusLabels[status(photo)] + ' · Quelle: ' + valueText(photo.status) : 'Keine Fotos vorhanden.';
     $('original-coordinates').textContent = coordinatesText(photo ? originalPoint(photo) : null);
     $('effective-coordinates').textContent = coordinatesText(photo ? effectivePoint(photo) : null);
+    const review = reviews.get(selectedId), reviewDetails = $('review-details');
+    reviewDetails.replaceChildren();
+    const pending = photo ? pendingFor(photo) : [];
+    $('review-pending').textContent = pending.length ? 'Bitte nachprüfen: ' + pending.map(c => c === 'position' ? 'Aufnahmestandort' : 'Blickrichtung').join(' und ') : row ? 'Deine manuellen Angaben sind wirksam; keine offenen Agent-Prüfpunkte. Frühere Befunde bleiben unten nachvollziehbar.' : review ? 'Keine prioritäre Nachprüfung markiert; bleibt eine Agent-Einschätzung.' : 'Noch nicht visuell geprüft.';
+    if (review) {
+      const labels = {adjusted: 'korrigiert', plausible: 'Original plausibel', uncertain: 'unklar, Original beibehalten'};
+      const confidence = {high: 'hoch', medium: 'mittel', low: 'gering'};
+      for (const [component, label] of [['position', 'Position'], ['heading', 'Richtung']]) {
+        const assessment = review[component];
+        addDetail(reviewDetails, label + ' · ' + labels[assessment.status], assessment.reason);
+        addDetail(reviewDetails, 'Sicherheit der Einschätzung', confidence[assessment.confidence]);
+      }
+      addDetail(reviewDetails, 'Belege', review.evidence.join(' · '));
+    }
     const details = $('metadata'); details.replaceChildren();
     for (const [label, value] of [
       ['Aufnahmezeit', valueText(m.DateTimeOriginal)], ['Zeitzonenoffset', valueText(m.OffsetTimeOriginal)],
@@ -188,7 +229,7 @@
     ]) addDetail(details, label, value);
     const effective = $('effective-metadata'); effective.replaceChildren();
     const heading = photo ? headingFor(photo) : null;
-    addDetail(effective, 'Standortquelle', row ? 'Manuell bestätigt; Korrekturdatei' : 'Original-GPS, nicht manuell bestätigt');
+    addDetail(effective, 'Standortquelle', row ? 'Manuell bestätigt; Korrekturdatei' : review?.position.coordinates ? 'Agent-Schätzung; nicht manuell bestätigt' : 'Original-GPS, nicht manuell bestätigt');
     addDetail(effective, 'Richtung / Referenz', heading ? heading.value + '° / ' + heading.ref : 'Nicht vorhanden');
     addDetail(effective, 'Höhe', 'Unverändert aus Originalmetadaten; kein DGM');
     addDetail(effective, 'Notiz', row?.note || '—');
@@ -252,7 +293,7 @@
   });
   $('reset').addEventListener('click', () => {
     if (!canLeaveDraft() || !corrections.has(selectedId)) return;
-    remember(); corrections.delete(selectedId); afterEdit(); message('Korrektur entfernt. Unverändertes Original-GPS ist wieder wirksam und unbestätigt.');
+    remember(); corrections.delete(selectedId); afterEdit(); message('Manuelle Korrektur entfernt. Agent-Einschätzung bzw. Original ist wieder wirksam; offene Prüfpunkte kehren zurück.');
   });
   $('discard-draft').addEventListener('click', () => { loadDraft(); updateSaveStatus(); });
   $('heading').addEventListener('input', updateSaveStatus); $('note').addEventListener('input', updateSaveStatus);
@@ -354,9 +395,15 @@
         ctx.fillStyle = '#81b9ed19'; ctx.fill(); ctx.strokeStyle = '#a6d4ff'; ctx.lineWidth = 1.5; ctx.setLineDash([4, 4]); ctx.stroke(); ctx.setLineDash([]);
       }
       ctx.strokeStyle = '#dae6f0'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(p[0] - 5, p[1]); ctx.lineTo(p[0] + 5, p[1]); ctx.moveTo(p[0], p[1] - 5); ctx.lineTo(p[0], p[1] + 5); ctx.stroke();
-      if (corrections.has(photo.id)) { ctx.beginPath(); ctx.moveTo(...p); ctx.lineTo(...xy(effective)); ctx.strokeStyle = '#ffffff80'; ctx.setLineDash([2, 4]); ctx.stroke(); ctx.setLineDash([]); }
+      if (effective && (effective[0] !== origin[0] || effective[1] !== origin[1])) { ctx.beginPath(); ctx.moveTo(...p); ctx.lineTo(...xy(effective)); ctx.strokeStyle = '#ffffff80'; ctx.setLineDash([2, 4]); ctx.stroke(); ctx.setLineDash([]); }
     }
     const heading = photo ? headingFor(photo) : null;
+    const originalHeading = metadata(photo).GPSImgDirection;
+    if (origin && heading && finite(originalHeading) && originalHeading >= 0 && originalHeading < 360 && heading.value !== originalHeading) {
+      const p = xy(origin), radians = originalHeading * Math.PI / 180;
+      ctx.beginPath(); ctx.moveTo(...p); ctx.lineTo(p[0] + Math.sin(radians) * 25 * zoom, p[1] - Math.cos(radians) * 25 * zoom);
+      ctx.strokeStyle = '#aab4bd'; ctx.lineWidth = 1; ctx.setLineDash([2, 4]); ctx.stroke(); ctx.setLineDash([]);
+    }
     if (heading && effective) {
       const p = xy(effective), radians = heading.value * Math.PI / 180, length = 25 * zoom;
       ctx.beginPath(); ctx.moveTo(...p); ctx.lineTo(p[0] + Math.sin(radians) * length, p[1] - Math.cos(radians) * length);
@@ -370,6 +417,9 @@
       const p = xy(point); if (p[0] < -15 || p[0] > W + 15 || p[1] < -15 || p[1] > H + 15) continue;
       ctx.beginPath(); ctx.arc(...p, item.id === selectedId ? 7 : 4.5, 0, Math.PI * 2);
       ctx.fillStyle = colors[status(item)]; ctx.fill(); ctx.strokeStyle = item.id === selectedId ? '#fff4c4' : '#17201d'; ctx.lineWidth = item.id === selectedId ? 3 : 1.5; ctx.stroke();
+      if (item.id === selectedId || zoom >= 4) {
+        ctx.font = '12px system-ui'; ctx.fillStyle = '#fff4c4'; ctx.fillText(String(numbers.get(item.id)), p[0] + 9, p[1] - 6);
+      }
     }
     const target = 100 / zoom, power = Math.pow(10, Math.floor(Math.log10(target)));
     const nice = [1, 2, 5, 10].map(n => n * power).filter(n => n <= target).pop() || power;
