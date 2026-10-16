@@ -110,10 +110,10 @@ function applyState(currentState, components) {
   amb.intensity = currentState.ambientIntensity;
   if (components.pilot) {
     const neutral = currentState.reviewLighting === 'neutral';
-    moon.color.set(neutral ? '#ffffff' : '#9bb7ff');
-    hemi.color.set(neutral ? '#dce6ed' : '#20324f');
-    hemi.groundColor.set(neutral ? '#aaa398' : '#0a0f18');
-    amb.color.set(neutral ? '#ffffff' : '#1b1e34');
+    moon.color.set(neutral ? '#ffffff' : '#b6c8eb');
+    hemi.color.set(neutral ? '#dce6ed' : '#6c819d');
+    hemi.groundColor.set(neutral ? '#aaa398' : '#303a37');
+    amb.color.set(neutral ? '#ffffff' : '#697989');
   }
 
   // Helper to map exponential-style density slider to linear fog near/far values
@@ -776,7 +776,7 @@ export function initDebugGui(components) {
 
   function setReviewLighting(mode) {
     if (!components.pilot || !['neutral', 'dusk'].includes(mode)) return false;
-    Object.assign(state, DEFAULTS, { reviewLighting: mode });
+    Object.assign(state, DEFAULTS, { reviewLighting: mode, shadowNormalBias: 0.055 });
     if (mode === 'neutral') {
       Object.assign(state, {
         exposure: 1.15, envIntensity: 0.3, moonIntensity: 2.5,
@@ -786,6 +786,17 @@ export function initDebugGui(components) {
         village1Intensity: 0, village2Intensity: 0,
         skyHorizonColor: '#c6d2dc', skyMidLowColor: '#b1c4d5',
         skyMidHighColor: '#93afca', skyZenithColor: '#779bbd',
+      });
+    } else {
+      Object.assign(state, {
+        exposure: 1.2, envIntensity: 0.45, moonIntensity: 1.2,
+        moonX: 12, moonY: 40, moonZ: 16,
+        hemiIntensity: 0.7, ambientIntensity: 0.22,
+        fogDensity: 0.003, fogMax: 0.35, fogColor: '#354052',
+        starBrightness: 0.4, horrorEnabled: false,
+        village1Intensity: 0.05, village2Intensity: 0.02,
+        skyHorizonColor: '#59606d', skyMidLowColor: '#424d63',
+        skyMidHighColor: '#29364e', skyZenithColor: '#121c32',
       });
     }
     applyState(state, sceneComponents);

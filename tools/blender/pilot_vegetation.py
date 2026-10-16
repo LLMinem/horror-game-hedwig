@@ -334,6 +334,23 @@ def build(directory, evidence):
         shrub.card(centre, u, v)
     obj = shrub.object("GableShrub", [leaves], collection)
     fit(obj, (2.6, 2.2, 2.2))
+    # Keep the observed dense shrub silhouette when masked leaf cards minify away.
+    # The inner mass is smaller than the cards, so close views retain their edges.
+    core_material = material("PilotShrubCore", bpy.data.images["broadleaf.png"])
+    bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=2, radius=1)
+    core = bpy.context.object
+    for vertex in core.data.vertices:
+        vertex.co.x *= 1.18
+        vertex.co.y *= .96
+        vertex.co.z = max(0, vertex.co.z * 1.15 + .7)
+    core.data.materials.append(core_material)
+    for polygon in core.data.polygons:
+        polygon.use_smooth = True
+    bpy.ops.object.select_all(action="DESELECT")
+    core.select_set(True)
+    obj.select_set(True)
+    bpy.context.view_layer.objects.active = obj
+    bpy.ops.object.join()
     selected.append(obj)
     hedge = Geometry()
     for _ in range(1400):
@@ -381,7 +398,7 @@ def build(directory, evidence):
         "selection": {
             "AvenueTree": "Narrowed tree_tall_02_lod1; photo 1 supports tall dense avenue silhouettes. Shape/height estimates, not species identification.",
             "RoundedTree": "Rescaled tree_mid_01_lod1 for rounded crowns/visible trunks in photo 17; not an exact clipped maple reconstruction.",
-            "GableShrub": "Authored dense rounded mass; ligustrum_01 rejected after source render as too sparse for photos 13/15. Pack broadleaf texture is not an exact glossy rhododendron match.",
+            "GableShrub": "Authored dense rounded mass with a smaller opaque inner crown to retain the photo 1/13 silhouette under browser minification. Pack broadleaf texture is not an exact glossy rhododendron match.",
             "LowHedge": "Authored dense 2m module using pack foliage; clipped low hedge supported by photos 1,17,26. No pack mesh fitted a clipped boundary.",
             "Conifer": "Authored branch whorls and original needle-spray image; layered evergreen silhouettes in photos 17,21,26. Species and dimensions uncertain.",
         },
@@ -393,7 +410,7 @@ def build(directory, evidence):
             {"file": "bark-normal.png", "source": "5111390_Trees/Bark_Normal.png", "size": 512, "space": "Non-Color", "convention": "OpenGL; NormalDX excluded"},
             {"file": "needle-spray.png", "source": "Original procedural image from pilot_vegetation.py", "size": 256, "space": "sRGB RGB, linear alpha"},
         ],
-        "treatment": "Selected source-map copies downscaled; opacity packed into color alpha, MASK cutoff .5. Constant .87 roughness; only bark uses a normal map. No giant FBX map dump.",
+        "treatment": "Selected source-map copies downscaled; opacity packed into color alpha, MASK cutoff .5 on leaf cards. GableShrub inner crown is opaque using the same colour image. Constant .87 roughness; only bark uses a normal map. No giant FBX map dump.",
         "limits": "Prototype review only. Dimensions estimated; placements supplied by parent. No birch substitute claimed. Source/browser human acceptance outstanding.",
     }
     for obj in selected:

@@ -73,6 +73,9 @@ def add(verts,faces,mat,space='world',uvs=None):
             normal=(b-a).cross(c-a);axis=max(range(3),key=lambda i:abs(normal[i]))
             axes=(0,1) if axis==2 else ((0,2) if axis==1 else (1,2))
             uv=[(verts[index][axes[0]]/metres,verts[index][axes[1]]/metres) for index in face]
+            if mat=='paving':
+                uv=[(((verts[index][0]-origin[0])*u[0]+(verts[index][1]-origin[1])*u[1])/metres,
+                     ((verts[index][0]-origin[0])*v[0]+(verts[index][1]-origin[1])*v[1])/metres) for index in face]
         batch['uv'].append(list(reversed(uv)) if space=='hall' else uv)
 
 
@@ -150,28 +153,35 @@ for left,right in [(start-.22,peak),(peak,W+.22)]:
     slope=math.hypot(right-left,zr-zl);tile=data['textures']['slate']['tile_metres']
     vertices=[(left,-.3,zl),(right,-.3,zr),(right,D+.3,zr),(left,D+.3,zl)]
     add(vertices,[(0,1,2,3)],'slate','hall',
-        [[(0,0),(slope/tile,0),(slope/tile,(D+.6)/tile),(0,(D+.6)/tile)]])
+        [[(0,0),(0,slope/tile),((D+.6)/tile,slope/tile),((D+.6)/tile,0)]])
 for front in [-.32,D+.32]:
     for end in [start-.22,W+.22]:beam((end,front,e),(peak,front,R+.12),.22,.19,'dark-metal')
 beam((peak,-.35,R+.12),(peak,D+.35,R+.12),.18,.16,'dark-metal')
-# Front sloping leaded-glass bands, pale perimeter framing and small irregular dividers.
-for side in [-1,1]:
-    a=Vector((peak+side*.15,-.075,R-1.35));b=Vector((start+.85 if side<0 else W-.85,-.075,e+.8))
-    delta=b-a;normal=Vector((-delta.z,0,delta.x)).normalized()
-    if normal.x*side<0:normal=-normal
-    width=.58
-    quad=[tuple(a),tuple(b),tuple(b+normal*width),tuple(a+normal*width)]
-    add(quad,[(0,1,2,3)],'glass','hall')
-    for shift in [0,width]:beam(tuple(a+normal*shift),tuple(b+normal*shift),.055,.055,'metal')
-    count=23
-    for i in range(count+1):
-        q=a+delta*(i/count);beam(tuple(q),tuple(q+normal*width),.035,.045,'metal')
-        if i<count:
-            q2=a+delta*((i+.45)/count)+normal*width*.5
-            beam(tuple(q2-delta.normalized()*.10),tuple(q2+delta.normalized()*.10),.024,.03,'metal')
-# Apex triangular pane, visible above the two bands.
-add([(peak-.54,-.09,R-1.55),(peak+.54,-.09,R-1.55),(peak,-.09,R-.7)],[(0,1,2)],'glass','hall')
-beam((peak,-.12,R-1.55),(peak,-.12,R-.7),.045,.045,'metal')
+# One framed diamond joins the two sloping window bands, as in the gable photo.
+top=Vector((peak,-.09,R-1.05));bottom=Vector((peak,-.09,R-2.55))
+left=Vector((peak-.55,-.09,R-1.8));right=Vector((peak+.55,-.09,R-1.8))
+diamond=[top,left,bottom,right]
+add([tuple(q) for q in diamond],[(0,1,2,3)],'glass','hall')
+for a,b in zip(diamond,diamond[1:]+diamond[:1]):beam(tuple(a),tuple(b),.06,.06,'metal')
+beam(tuple(top),tuple(bottom),.045,.06,'metal')
+for side,outer_top in [(-1,left),(1,right)]:
+    outer_low=Vector((start+.65 if side<0 else W-.65,-.09,e+.65))
+    inner_low=Vector((start+1.35 if side<0 else W-1.35,-.09,e+.65))
+    quad=[outer_top,outer_low,inner_low,bottom]
+    add([tuple(q) for q in quad],[(0,1,2,3)],'glass','hall')
+    beam(tuple(outer_top),tuple(outer_low),.055,.06,'metal')
+    beam(tuple(bottom),tuple(inner_low),.055,.06,'metal')
+    for i in range(24):
+        t=i/23
+        outer=outer_top.lerp(outer_low,t);inner=bottom.lerp(inner_low,t)
+        beam(tuple(outer),tuple(inner),.035,.05,'metal')
+        if i<23:
+            # A small repeatable irregular lead pattern, not a regular ladder.
+            next_t=(i+(.35 if i%3==0 else .68))/23
+            a=outer_top.lerp(outer_low,next_t).lerp(bottom.lerp(inner_low,next_t),.45)
+            b=outer_top.lerp(outer_low,(i+1)/23).lerp(bottom.lerp(inner_low,(i+1)/23),.6 if i%2 else .35)
+            beam(tuple(a),tuple(b),.022,.04,'metal')
+beam((peak,-.065,.5),(peak,-.065,R-2.55),.012,.015,'dark-metal')
 # Door portal: the exterior has no readable notices or invented inscription.
 doorA,doorB=10.57,14.25;centre=(doorA+doorB)/2
 box('door-shadow',(centre,-1.37,1.4),(doorB-doorA,.1,2.8),'glass')
@@ -194,11 +204,16 @@ for sx in [-1,1]:
 for i in range(31):
     z=2.65+i*.205;half=tw*(1-z/TH)+.10
     for sign in [-1,1]:
-        box('louvre',(tx,ty+sign*half,tz+z),(half*2,.12,.11),'wood','world')
-        box('louvre',(tx+sign*half,ty,tz+z),(.12,half*2,.11),'wood','world')
+        box('louvre',(tx,ty+sign*half,tz+z),(half*2,.16,.24),'wood','world')
+        box('louvre',(tx+sign*half,ty,tz+z),(.16,half*2,.24),'wood','world')
 box('tower-cap',(tx,ty,tz+TH),(.8,.8,.28),'dark-metal','world')
 beam((tx,ty,tz+TH),(tx,ty,tz+TH+1.15),.09,.09,'metal','world')
 beam((tx-.35,ty,tz+TH+.78),(tx+.35,ty,tz+TH+.78),.08,.08,'metal','world')
+# The existing collision bed has a visible soil surface and low stone edging.
+box('tower-bed',(tx,ty,tz+.045),(4,4,.09),'soil','world')
+for side in [-1,1]:
+    beam((tx-2,ty+side*2,tz+.09),(tx+2,ty+side*2,tz+.09),.18,.14,'stone','world')
+    beam((tx+side*2,ty-2,tz+.09),(tx+side*2,ty+2,tz+.09),.18,.14,'stone','world')
 
 # Entrance opening and flanking masonry; gates folded open along the approach.
 gx,gy=data['gate'];ax,ay=data['gateAcross']
@@ -252,11 +267,12 @@ ref.hide_viewport=True
 # Named reference-guided review cameras; pitch/lens are not calibrated photo poses.
 for view in walk['views']:
     cam=bpy.data.cameras.new(view['id']);obj=bpy.data.objects.new(view['id'],cam);review.objects.link(obj)
-    x,y=view['x'],-view['z'];z=view.get('y',ground(x,y)+1.65)
+    x,y=view['x'],-view['z'];z=view.get('y',ground(x,y)+1.7)
     obj.location=(x,y,z);yaw=view['yaw'];pitch=view['pitch']
     direction=Vector((math.sin(yaw)*math.cos(pitch),math.cos(yaw)*math.cos(pitch),math.sin(pitch)))
-    obj.rotation_euler=direction.to_track_quat('-Z','Y').to_euler();cam.lens=24
-    if view.get('inspection'):cam.type='ORTHO';cam.ortho_scale=115
+    obj.rotation_euler=direction.to_track_quat('-Z','Y').to_euler()
+    cam.sensor_fit='VERTICAL';cam.sensor_height=24;cam.lens=24/(2*math.tan(math.radians(55)/2))
+    if view.get('inspection'):cam.type='ORTHO';cam.sensor_fit='HORIZONTAL';cam.ortho_scale=200
 scene.camera=bpy.data.objects['approach']
 worldmat=bpy.data.worlds.new('Review World');worldmat.use_nodes=True;scene.world=worldmat
 bg=worldmat.node_tree.nodes.get('Background');bg.inputs[0].default_value=(.58,.65,.72,1);bg.inputs[1].default_value=.65
@@ -271,7 +287,7 @@ scene['estimates']=json.dumps(p)
 bpy.ops.wm.save_as_mainfile(filepath=str(blend))
 if args.render:
     renders=ROOT/'.local/pilot'/data['revision'];renders.mkdir(parents=True,exist_ok=True)
-    for name in ['approach','gable','entrance','tower','overhead']:
+    for name in ['approach','gable','entrance','tower','gate','overhead']:
         scene.camera=bpy.data.objects[name];scene.render.filepath=str(renders/f'blender-neutral-{name}.png');bpy.ops.render.render(write_still=True)
     scene.camera=bpy.data.objects['approach'];sun.energy=.3;sun.color=(.55,.65,1);bg.inputs[0].default_value=(.12,.18,.3,1);bg.inputs[1].default_value=.24
     scene.render.filepath=str(renders/'blender-dusk-approach.png');bpy.ops.render.render(write_still=True)

@@ -122,6 +122,18 @@ The checkpoint requires:
 
 If essential source disagreements prevent a recognizable hall or connected route, report that specific blocker instead of claiming success from a generic building. Final visual acceptance belongs to Micha.
 
+### Checkpoint handed over for visual review, 2026-10-16
+
+The current source is `assets/source/working/entrance-hall-pilot/r05/entrance-hall.blend`. Open its sibling `entrance-hall-review.blend` to inspect the complete section with vegetation. The reusable vegetation source is `vegetation-r06/vegetation-r06.blend`. Exported derivatives are `public/assets/models/pilot/entrance-hall.glb`, `vegetation.glb` and `walk.json`; original source files and GeoJSON remain unchanged.
+
+The pilot is the default local scene at <http://127.0.0.1:3000/?mode=pilot>. The panel provides approach, gable, hall entrance, tower, cemetery gate and overhead views, plus neutral/dusk lighting. Ground views support walking; overhead is inspection only. The source overhead/aerial comparison is private at `.local/pilot/r05/overhead-source-comparison.png`. Ground-level cameras follow the selected photo directions but are not calibrated photo matches.
+
+Exactly one read-only QA was run with `gpt-6-astra`, high reasoning, using the atlas, photos, source renders and browser evidence. Its five bounded findings were accepted: retain distant shrub mass, join the gable window bands to a framed diamond, align roof/paving textures, close the tower's excessive lamella gaps and make its collision bed visible, and improve dusk readability/shadow artifacts. Those fixes were applied; subsequent checks exercised the fixes, not a second QA. The private report is `.local/pilot/qa-review.md`; [readiness](readiness.md#final-pilot-checkpoint-and-single-qa-2026-10-16) records final measurements, backup and operational limits.
+
+The editable estimates remain explicit: gate paving 6 m, straight approach 5.2 m, bend 6 m, forecourt 5.5 m, west/south/east walks 4.2/4/2.4 m; hall peak 9.8 m, low annex 3.15 m and tower 9.2 m. The canonical hall footprint is retained; path widths, levelled platform, kerbs, roof overhangs, window subdivisions and plant dimensions are authored approximations, not measurements. The aerial alignment retains the hall, entrance axis and selected connected source paths; it deliberately omits surrounding grave fields, unselected paths and a complete tree inventory. Neutral lighting leaves those omissions visible.
+
+Next action is Micha's separate source/browser visual review. No whole-site expansion, interior, deployment or second QA is part of this checkpoint.
+
 ## Iteration across later sessions
 
 These are deliverable stages, not promises that each fits exactly one chat session.

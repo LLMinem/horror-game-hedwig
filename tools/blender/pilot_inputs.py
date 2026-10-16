@@ -179,9 +179,10 @@ def main():
         a=gatep(side*3);b=[a[0]+V[0]*2.7,a[1]+V[1]*2.7]
         barriers.append({'id':f'open-gate-leaf-{side}','a':runtime_ring([a])[0],'b':runtime_ring([b])[0]})
     views=[{'id':'approach','label':'Zuweg','x':-29,'z':-65,'yaw':math.radians(149),'pitch':.03},
-           {'id':'gable','label':'Giebel','x':-10.5,'z':-28.5,'yaw':math.radians(122),'pitch':.45},
+           {'id':'gable','label':'Giebel','x':-10.5,'z':-28.5,'yaw':math.radians(122),'pitch':.58},
            {'id':'entrance','label':'Halleneingang','x':-17.2,'z':-27,'yaw':math.radians(149),'pitch':.1},
            {'id':'tower','label':'Glockenturm','x':-16,'z':-25,'yaw':math.radians(230),'pitch':.12},
+           {'id':'gate','label':'Friedhofstor','x':-27,'z':-61.5,'yaw':math.radians(330),'pitch':0},
            {'id':'overhead','label':'Aufsicht · Inspektion','x':-10,'y':100,'z':-29,'yaw':0,'pitch':-math.pi/2+.0001,'inspection':True}]
     walk={'version':1,'ground':{'x0':-49.5,'z0':-84.5,'step':1,'columns':80,'rows':110,'heights':heights.flatten().tolist()},
           'surfaces':[{'id':f'paving-{i}','polygon':runtime_ring(p),'offset':.025} for i,p in enumerate(paths)],
@@ -195,6 +196,7 @@ def main():
         'GableShrub':[(*xy(s,-.8),1) for s in [16,17.7,19.4,21.1,22.8,24.5,26.2]],
         'LowHedge':[],
     }
+    plants['GableShrub'].extend([(tower[0]-.6,tower[1]-.45,.6),(tower[0]+.65,tower[1]+.5,.5)])
     for i in range(28):
         t=6+i
         plants['LowHedge'].append((gate[0]+.514*t-.858*3.3,gate[1]-.858*t-.514*3.3,1))

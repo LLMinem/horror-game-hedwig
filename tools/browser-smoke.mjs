@@ -106,7 +106,7 @@ try {
   }
   if (isPilot) {
     pilotEvidence = await evaluate(`(${exercisePilot.toString()})()`);
-    for (const view of ['approach', 'gable', 'entrance', 'tower', 'overhead']) {
+    for (const view of ['approach', 'gable', 'entrance', 'tower', 'gate', 'overhead']) {
       await evaluate(`__pilotReview.setView(${JSON.stringify(view)})`);
       await evaluate(twoFrames);
       await screenshot(`pilot-neutral-${view}.png`);

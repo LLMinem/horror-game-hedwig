@@ -9,7 +9,7 @@ import bpy
 
 ROOT=Path(__file__).resolve().parents[2]
 p=argparse.ArgumentParser();p.add_argument('--source',required=True);p.add_argument('--output',required=True)
-p.add_argument('--views',default='approach,gable,entrance,tower,overhead');p.add_argument('--vegetation')
+p.add_argument('--views',default='approach,gable,entrance,tower,gate,overhead');p.add_argument('--vegetation')
 p.add_argument('--save-review',action='store_true',help='Save a new entrance-hall-review.blend beside the source; never overwrite')
 a=p.parse_args(sys.argv[sys.argv.index('--')+1:])
 source=(ROOT/a.source).resolve();out=ROOT/a.output;out.mkdir(parents=True,exist_ok=True)

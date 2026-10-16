@@ -177,3 +177,46 @@ The first build passed with the existing large-chunk warning. The retained produ
 The first source renders are in `.local/pilot/r02/`, and the matching browser views are in `.local/browser-smoke-IqU5Gg/`. The private aerial crop is `.local/pilot/aerial-pilot.png`. Source and browser materials need separate visual acceptance. The initial route timing overlapped source rendering, so it is not the final performance measurement.
 
 No installation, Blender capability smoke, reference regeneration or backup-restore setup was repeated. New source authoring, selected FBX inspection, source renders, GLB export and the changed browser paths were exercised directly.
+
+## Final pilot checkpoint and single QA, 2026-10-16
+
+The review revision is `r05/entrance-hall.blend`, with `r05/entrance-hall-review.blend` for combined inspection and `vegetation-r06/vegetation-r06.blend` as the reusable vegetation source. All paths are under `assets/source/working/entrance-hall-pilot/`. Earlier revisions remain intact. The active plan records the selected scope, paths and unresolved estimates.
+
+One read-only `gpt-6-astra` QA, with high reasoning, inspected the private atlas, nine relevant photos, aerial alignment, source renders and saved browser evidence. It did not perform an independent interactive browser run. Its report is `.local/pilot/qa-review.md`. All five bounded findings were addressed:
+
+- Dense gable shrubs now have a smaller, ground-reaching opaque inner crown; masked leaf cards retain the close silhouette without losing the whole mass at distance.
+- A framed diamond joins the sloping gable window bands, with a central facade joint and varied lead subdivisions.
+- Roof courses follow the eaves; paving UVs follow the approach/hall frame instead of world axes.
+- Tower lamellae overlap rather than leaving large gaps. A visible soil bed, stone edge and shrubs explain the existing tower obstruction.
+- A dedicated dusk preset retains readable architecture. Isolated browser probes left the paving bands unchanged with normal strength zero but removed them when shadow receiving was disabled. Raising the pilot's shadow normal bias to 55 mm resolved that artifact without disabling normal maps or shadows.
+
+The gate comparison view was added, and ground-view source cameras now share the browser's 55-degree vertical field of view. Final source renders and the same-extent aerial/overhead comparison are in `.local/pilot/r05/`; final neutral/dusk browser captures are in `.local/browser-smoke-DoagFO/`. Fix verification was performed by the implementation agent. There was no second QA round and no human art acceptance.
+
+### Exercised runtime and measurements
+
+`npm run build` passed. `npm run browser:smoke -- 'http://127.0.0.1:4173/?mode=pilot'` passed against the final production preview. It exercised 21 route stations, ground contact, 61 decoded terrain comparisons, closed hall collision, angled-wall sliding, gate barriers, supported limits, overhead reset, trusted mouse/WASD/sprint and Escape. The final input windows travelled 3.07 m walking and 4.62 m sprinting; they include acceleration. The maximum decoded-ground/sampler discrepancy remained 0.00272 m. Required assets returned HTTP 200, with no browser warnings or JavaScript errors. The earlier sandbox and blocked-GLB failure checks remain applicable; those paths were not changed by the QA fixes.
+
+The live review panel was also exercised through actual buttons and the view selector: neutral gate view, dusk lighting, overhead forcing neutral inspection, and reset returning to the supported entrance spawn. The only HTTP 404 in the final trace was the browser's automatic `/favicon.ico` request, not an application asset.
+
+Hardware: Apple M3 Max, macOS 25.6, Chrome 155, ANGLE Metal. Both neutral-route measurements ran without concurrent Blender rendering, with 453 frame samples each:
+
+| Render buffer | CSS viewport / DPR | Mean frame interval | p95 frame interval | Maximum draw calls |
+| --- | --- | --- | --- | --- |
+| 1280 × 720 | 1280 × 720 / 1 | 8.33 ms | 9.90 ms | 24 |
+| 3456 × 1838 | 1728 × 919 / 2 | 8.33 ms | 9.90 ms | 24 |
+
+These are browser `requestAnimationFrame` intervals, approximately 120 Hz, not GPU timer-query results. The route uses accelerated bounded spatial steps; trusted walking speed is checked separately. The second run reproduces the initially observed inspection window with explicit CDP metrics; its report is `.local/pilot/inspection-route.json`. The full-resolution dusk capture is `.local/pilot/inspection-dusk.png`. Neither result guarantees full-cemetery performance.
+
+The final production request trace recorded 14,894,464 transferred bytes for the app bundle, shared HDRI, decoder and pilot resources, including browser-reported response overhead. The pilot resources account for 8,423,429 transferred bytes. Their uncompressed GLBs are 6,328,324 bytes for the hall/ground and 2,074,356 bytes for vegetation; images are embedded. The shared HDRI remains the other large download. No new external asset service or texture-compression toolchain was introduced.
+
+### Private backup and operational limits
+
+The final snapshot is `/Users/meeq/.backups/horror-game-hedwig/entrance-hall-r05-2026-10-16-l4gpd73o/`. Its manifest covers 204 files and 284,883,227 bytes: source revisions, textures, inputs, authoring scripts, runtime derivatives and private review evidence. Every copied file was compared by SHA-256. `.local/pilot/backup-r05.json` records the snapshot summary. The pre-pilot and first `r02` snapshots were not overwritten. This is same-filesystem protection, not an off-device backup or a new restore exercise.
+
+No hard operational blocker remained. The following workarounds and warnings are relevant to future sessions:
+
+- The general Python tool environment lacks Pillow. Image/terrain preparation used the existing `.local/blueprint-venv/`; no package installation or repeated setup smoke was needed.
+- Native browser helper viewport requests did not reliably equal the observed viewport, and inspection screenshots may be downscaled by the helper. The issue was reported to the tool provider. Use the existing Chrome/CDP smoke for the fixed buffer; for another size, set CDP metrics and assert CSS size, DPR and renderer buffer within the same session. Direct CDP PNG capture preserves the render resolution.
+- No language server was configured for this repository. Existing module seams and direct source inspection were used; no new tooling dependency was added.
+- Blender 5.2.2 emitted `use_nodes` deprecation warnings for Blender 6 and a shared-image-sampler export warning. Export and browser loading succeeded; the warnings were not suppressed. Vite retained its greater-than-500-kB chunk warning (735.51 kB minified / 205.09 kB gzip).
+- The inspected pack did not supply a faithful birch or the required clipped vegetation forms. Selected broadleaf meshes and authored conifer/shrub/hedge geometry are silhouette approximations, not species-accurate reconstructions. Source and browser look remain separate human review gates.
