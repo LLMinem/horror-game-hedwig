@@ -14,11 +14,13 @@ let loadingManager = null;
 let dracoLoader = null;
 let gltfLoader = null;
 let ktx2Loader = null;
+let jsonLoader = null;
 let initialized = false;
 let ktx2SupportDetected = false;
 
 // Cache GLTF promises so repeated loads reuse the same download.
 const gltfCache = new Map();
+const jsonCache = new Map();
 
 // Resolve paths relative to Vite's base URL so assets work in dev and prod builds.
 const resolvePublicAsset = (assetPath) => {
@@ -41,6 +43,7 @@ export function initAssetSystem({ renderer } = {}) {
   }
 
   loadingManager = new THREE.LoadingManager();
+  jsonLoader = new THREE.FileLoader(loadingManager).setResponseType('json');
 
   dracoLoader = new DRACOLoader(loadingManager);
   dracoLoader.setDecoderConfig({ type: 'js' });
@@ -108,9 +111,26 @@ export async function loadStreetLampInstance() {
   return instance;
 }
 
+export async function loadPilot() {
+  if (!initialized) throw new Error('initAssetSystem() must be called before loading assets.');
+  const path = resolvePublicAsset('assets/models/pilot/walk.json');
+  if (!jsonCache.has(path)) jsonCache.set(path, jsonLoader.loadAsync(path));
+  const [gltf, data] = await Promise.all([
+    loadGltf('assets/models/pilot/entrance-hall.glb'),
+    jsonCache.get(path),
+  ]);
+  return { ...cloneGltfScene(gltf), data };
+}
+
+export async function loadPilotVegetation() {
+  return loadGltf('assets/models/pilot/vegetation.glb');
+}
+
 export const Assets = {
   init: initAssetSystem,
   loadStreetLampInstance,
+  loadPilot,
+  loadPilotVegetation,
 };
 
 export default Assets;

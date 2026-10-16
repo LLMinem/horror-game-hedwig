@@ -108,6 +108,13 @@ function applyState(currentState, components) {
   moon.position.set(currentState.moonX, currentState.moonY, currentState.moonZ);
   hemi.intensity = currentState.hemiIntensity;
   amb.intensity = currentState.ambientIntensity;
+  if (components.pilot) {
+    const neutral = currentState.reviewLighting === 'neutral';
+    moon.color.set(neutral ? '#ffffff' : '#9bb7ff');
+    hemi.color.set(neutral ? '#dce6ed' : '#20324f');
+    hemi.groundColor.set(neutral ? '#aaa398' : '#0a0f18');
+    amb.color.set(neutral ? '#ffffff' : '#1b1e34');
+  }
 
   // Helper to map exponential-style density slider to linear fog near/far values
   const mapDensityToLinearFog = (density) => {
@@ -118,7 +125,13 @@ function applyState(currentState, components) {
   };
 
   // Fog
-  if (currentState.fogType === 'exp2') {
+  if (components.pilot && currentState.reviewLighting === 'neutral') {
+    scene.fog = null;
+    world.fog = null;
+    atmosphere.setFogDensity(0);
+    skyMaterial.uniforms.fogDensity.value = 0;
+    skyMaterial.uniforms.fogMax.value = 0;
+  } else if (currentState.fogType === 'exp2') {
     if (!(scene.fog instanceof THREE.FogExp2)) {
       // Need to recreate fog
       scene.fog = new THREE.FogExp2(currentState.fogColor, currentState.fogDensity);
@@ -154,9 +167,11 @@ function applyState(currentState, components) {
   moon.shadow.normalBias = currentState.shadowNormalBias;
 
   // Ground textures
-  grassColorTex.repeat.set(currentState.groundTiling, currentState.groundTiling);
-  grassNormalTex.repeat.set(currentState.groundTiling, currentState.groundTiling);
-  groundMat.normalScale.set(currentState.normalStrength, currentState.normalStrength);
+  if (groundMat) {
+    grassColorTex.repeat.set(currentState.groundTiling, currentState.groundTiling);
+    grassNormalTex.repeat.set(currentState.groundTiling, currentState.groundTiling);
+    groundMat.normalScale.set(currentState.normalStrength, currentState.normalStrength);
+  }
 
   // =============== ENVIRONMENT SETTINGS
   environment.setEnvIntensity(currentState.envIntensity);
@@ -593,6 +608,7 @@ export function initDebugGui(components) {
     .onChange(() => applyState(state, sceneComponents));
 
   // =============== GROUND TEXTURE FOLDER
+  if (groundMat) {
   const groundFolder = gui.addFolder('Ground Texture');
   enhanceGuiWithReset(groundFolder);
   groundFolder
@@ -603,6 +619,7 @@ export function initDebugGui(components) {
     .add(state, 'normalStrength', 0, 2, 0.01)
     .name('Bump Strength')
     .onChange(() => applyState(state, sceneComponents));
+  }
 
   // =============== LIGHTS FOLDER
   const lightsFolder = gui.addFolder('Lights');
@@ -757,12 +774,39 @@ export function initDebugGui(components) {
       .onChange(() => applyState(state, sceneComponents));
   }
 
+  function setReviewLighting(mode) {
+    if (!components.pilot || !['neutral', 'dusk'].includes(mode)) return false;
+    Object.assign(state, DEFAULTS, { reviewLighting: mode });
+    if (mode === 'neutral') {
+      Object.assign(state, {
+        exposure: 1.15, envIntensity: 0.3, moonIntensity: 2.5,
+        moonX: -30, moonY: 50, moonZ: 10,
+        hemiIntensity: 1, ambientIntensity: 0.15,
+        fogDensity: 0, fogMax: 0, starEnabled: false, horrorEnabled: false,
+        village1Intensity: 0, village2Intensity: 0,
+        skyHorizonColor: '#c6d2dc', skyMidLowColor: '#b1c4d5',
+        skyMidHighColor: '#93afca', skyZenithColor: '#779bbd',
+      });
+    }
+    applyState(state, sceneComponents);
+    return true;
+  }
+
+  if (components.pilot) {
+    state.reviewLighting = 'neutral';
+    const reviewFolder = gui.addFolder('Pilot Review');
+    reviewFolder.add(state, 'reviewLighting', ['neutral', 'dusk'])
+      .name('Lighting').onChange(setReviewLighting);
+    gui.close();
+  }
   // Apply initial state
-  applyState(state, sceneComponents);
+  if (components.pilot) setReviewLighting('neutral');
+  else applyState(state, sceneComponents);
 
   return {
     gui,
     state,
+    setReviewLighting,
     applyState: () => applyState(state, sceneComponents),
     updateGuiController: (property) => {
       // Helper to update a specific controller

@@ -11,7 +11,7 @@ last_verified: 2026-10-16
 
 Reconstruct the actual Neuer Friedhof in Bruchköbel as faithfully and in as much visible detail as the evidence and browser performance allow, at dusk or night. The first milestone is an environment prototype: spatial structure, surfaces, assets, atmosphere, walkability, collision and loading. NPCs, watering/objectives, inventory, chase/failure systems and interiors are outside it. Audio is undecided.
 
-The Mac is the authoritative coding and Blender workstation. On 2026-10-16 Micha explicitly approved the entrance/hall pilot, its plan and the required runtime changes. Implementation begins in the next session. Work autonomously within the bounded brief through the first textured, walkable browser checkpoint, then stop for Micha's visual review. Do not ask for the same scope approval again. Whole-site expansion, deployment and publication are not authorized.
+Micha explicitly approved the entrance/hall pilot, its plan and the required runtime changes on 2026-10-16. The first textured, walkable browser checkpoint now exists on `feat/entrance-hall-pilot`. The session includes one requested heavy-subagent QA and selected fixes, then stops for Micha's visual review. Whole-site expansion, deployment and publication are not authorized.
 
 Micha's follow-up prioritizes photo location review before choosing a polished section: retain original metadata, distinguish device-reported accuracy from verified positions, and let him correct uncertain camera locations on the map. Prefer agent-built, reference-backed models of the cemetery itself. Complex assets such as trees may use the existing pack; additional textures/models remain an option when needed after fit and licence checks. The existing lamp, Blender lamp sources and sample props are pipeline experiments, not authoritative references or required production content.
 
@@ -21,7 +21,7 @@ The 2026-10-15 visual review covered all 98 photos and left nineteen owner check
 
 ## Current implementation
 
-`src/main.js` composes an operational Three.js sandbox: renderer, custom sky/stars/fog/grading, HDRI environment, lights, flat grass plane, first-person inspection, debug GUI and a Draco street-lamp GLB. The GeoJSON has no runtime consumer. Terrain, site collisions, data-driven placement, loading UI and a reconstructed route do not exist yet.
+`src/main.js` now opens the entrance/hall pilot by default. `PilotWorld.js` loads the authored GLBs and movement data through the shared asset system. `PilotMovement.js` samples the authored terrain triangles and enforces the supported area, building outlines and barriers. The pilot has explicit loading/failure state, neutral/dusk controls and fixed walking/overhead views. The previous flat-ground lamp sandbox remains available at `?mode=sandbox`, without being loaded as a silent fallback.
 
 Keep the renderer/atmosphere/asset-loader foundation. Replace sandbox assumptions incrementally when implementing real world layers; a framework migration or whole-app rewrite is not a prerequisite. See [readiness](readiness.md) for code risks and practical evidence.
 
@@ -146,7 +146,7 @@ Before changing valuable source revisions, preserve the current revision and its
 
 ## Human decisions still needed
 
-- The pilot brief, its runtime changes and its stop-for-review checkpoint are approved. The next session starts implementation.
+- The first pilot checkpoint awaits Micha's source and browser review. Correct the same section from that feedback before extending it.
 - The local backup destination is approved. An off-device copy remains a resilience recommendation, not a renewed pilot approval gate.
 - Confirm the eventual target hardware, browser, resolution and quality tier. The local pilot measurement setup above is a starting point, not that product decision.
 

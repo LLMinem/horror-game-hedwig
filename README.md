@@ -2,7 +2,7 @@
 
 A Three.js project aiming to reconstruct **Neuer Friedhof, Bruchköbel**, faithfully at dusk/night. The next milestone is a beautiful, walkable environment, not the former gameplay MVP.
 
-**Current app:** a working look-development sandbox with sky/stars/fog, HDRI lighting, first-person inspection, debug GUI, flat grass and one Draco street lamp. The map, terrain and collisions are not implemented in the scene yet. See [the active plan](docs/asset-integration-plan.md) for accepted scope and [readiness](docs/readiness.md) for preparation evidence and gaps.
+**Current app:** the entrance and funeral-hall pilot is the default review scene. It has a textured hall/tower exterior, a bounded DGM-based ground surface, connected paving, instanced vegetation and ground-following movement with solid barriers. Neutral, dusk and fixed comparison views are available. The original lamp sandbox remains at `?mode=sandbox`. The pilot awaits Micha's visual acceptance. See [the active plan](docs/asset-integration-plan.md) and [verification evidence](docs/readiness.md).
 
 ## Start from the repo root
 
@@ -15,10 +15,10 @@ npm run dev
 
 Open <http://127.0.0.1:3000>. The server is loopback-only, uses a fixed port and does not automatically open a browser. Stop it with Ctrl+C. `npm run build` creates `dist/`; `npm run preview` serves that build at <http://127.0.0.1:4173>. Neither command deploys anything.
 
-Click the scene for mouse capture; WASD moves, Shift sprints, F toggles the flashlight and Esc releases the mouse. The GUI supplies lighting presets and lamp controls. Use the coding agent's available native browser tooling for inspection.
+The default URL and `?mode=pilot` open the pilot. Click the scene for mouse capture; WASD moves, Shift sprints, F toggles the flashlight and Esc releases the mouse. The review panel selects the approach, gable, entrance, tower and overhead views. Overhead is inspection only, so select a ground view or "Walk from entrance" to resume walking. Neutral mode removes fog for comparison. The retained GUI supplies lighting controls, and `?mode=sandbox` opens the lamp scene.
 
-For a reproducible Chrome/CDP input check, start `npm run preview` after building, then run `npm run browser:smoke` in another terminal. For the dev server, use `npm run browser:smoke -- http://127.0.0.1:3000/`. It checks asset loading, mouse capture, trusted mouse movement and Escape at a 1280 × 720 render buffer, and saves screenshots/report under `.local/browser-smoke-*`.
-The check starts an isolated visible Chrome with a temporary profile and closes both afterward; it never uses personal browser profiles. `CHROME_BIN` overrides the default macOS Chrome executable. The caller owns the dev/preview server. The check does not prove all WASD speeds or full-level performance.
+For a reproducible Chrome/CDP walkthrough, start `npm run preview` after building, then run `npm run browser:smoke` in another terminal. For the dev server, use `npm run browser:smoke -- http://127.0.0.1:3000/`. The pilot check covers the connected route, terrain/render agreement, hall barriers, sliding, limits, reset and actual WASD/sprint input at a 1280 × 720 render buffer. It captures neutral/dusk views and route performance under `.local/browser-smoke-*`. Pass a URL ending in `?mode=sandbox` for the retained sandbox input check.
+The check starts an isolated visible Chrome with a temporary profile and closes both afterward; it never uses personal browser profiles. `CHROME_BIN` overrides the default macOS Chrome executable. The caller owns the dev/preview server. The measurements cover the pilot only, not the full cemetery.
 
 ## References and Blender
 
@@ -37,7 +37,7 @@ The source map is included in Git. This prepared Mac also has **98 JPEG proxies 
 
 The individual review covers every photo, and Micha's imported corrections are now authoritative wherever supplied. The private photo map keeps original observations, agent estimates and human corrections separate. See [owner corrections](docs/local-references.md#owner-corrections-and-blueprint-preparation).
 
-For the next modelling session, implement the [approved entrance and hall pilot](docs/asset-integration-plan.md#approved-entrance-and-hall-pilot). Micha approved Blender authoring and the required runtime changes on 2026-10-16, starting next session and stopping at the first textured, walkable browser review. Read [Blueprint preparation](docs/blueprint-preparation.md), the [backup/restore evidence](docs/readiness.md#pilot-approval-and-backup-2026-10-16), and open `.local/blueprint/atlas.html`. No renewed scope approval or repeated setup smoke is needed. The rejected 113 agent interpretations remain excluded; the 13 photo-index groups are navigation aids, not trusted work cards.
+The [approved entrance and hall pilot](docs/asset-integration-plan.md#approved-entrance-and-hall-pilot) has reached its first textured browser checkpoint. The next step is Micha's source/browser visual review, not automatic expansion. Read [Blueprint preparation](docs/blueprint-preparation.md), the current record in [readiness](docs/readiness.md), and open `.local/blueprint/atlas.html` for reference comparison. Existing setup tests need not be repeated. The rejected 113 agent interpretations remain excluded; the 13 photo-index groups are navigation aids, not trusted work cards.
 
 The guide defines the next agent's context package, separate source/browser acceptance gates and the private rejection archive. Rebuilding requires the private `photo-index.json`, acquired rasters and photo inputs, not the rejected traces or old `photo-evidence.json`. Opening the prepared atlas requires only a browser. A fresh clone lacks the private pack, and a Git push does not back it up.
 
@@ -46,11 +46,11 @@ The guide defines the next agent's context package, separate source/browser acce
 | Path | Role |
 | --- | --- |
 | `src/main.js` | Composition root for the current runtime modules. |
-| `src/core/`, `src/atmosphere/`, `src/world/` | Renderer, sky/grading, lighting/flat ground and HDRI management. |
+| `src/core/`, `src/atmosphere/`, `src/world/` | Renderer, atmosphere, shared lighting, pilot loading/movement and retained sandbox ground. |
 | `src/assets/` | Shared loaders and street-lamp Dev Room. |
-| `src/gameplay/PlayerController.js` | Inspection movement/flashlight, not a gameplay system. |
+| `src/gameplay/PlayerController.js` | Grounded first-person movement, view transitions and flashlight. |
 | `src/ui/`, `src/config/`, `src/loop/` | Debug controls, defaults and animation loop. |
-| `data/cemetery_final.geojson` | Unchanged OSM-derived source; [interpretation contract](data/CLAUDE.md). |
+| `data/cemetery_final.geojson` | Unchanged OSM-derived source. The bounded pilot uses its projected derivative; see the [interpretation contract](data/CLAUDE.md). |
 | `tools/` | Offline map, private-reference commands and Blender scripts. |
 | `assets/source/raw/`, `assets/source/working/` | Ignored local marketplace and Blender sources; not runtime assets or a backup. |
 | `.local/` | Ignored private references, derived previews/exports and smoke evidence. |
@@ -73,4 +73,4 @@ After a runtime change, build and inspect the actual browser: assets/decoder req
 
 60 FPS and ≤400 draw calls are provisional goals. A tiny scene on an M3 Max is not proof of a full cemetery on mid-range hardware. Record device, browser, render-buffer resolution and workload with performance results.
 
-Map data: © [OpenStreetMap contributors](https://www.openstreetmap.org/copyright), ODbL. The owner confirmed the cemetery pack's purchase and commercial permission. Existing grass/HDRI provenance and the intended code licence still need release review (`package.json` retains historical ISC metadata; no code licence grant is established here). Private reference photos and readable personal details are not publication assets.
+Map data: © [OpenStreetMap contributors](https://www.openstreetmap.org/copyright), ODbL. Pilot terrain derives from Hessen HVBG DGM1 under [dl-zero-de/2.0](https://www.govdata.de/dl-de/zero-2-0), with a locally levelled hall platform. The owner confirmed the cemetery pack's purchase and commercial permission. Existing sandbox grass/HDRI provenance and the intended code licence still need release review (`package.json` retains historical ISC metadata; no code licence grant is established here). Private reference photos and readable personal details are not publication assets.

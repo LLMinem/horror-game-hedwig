@@ -6,7 +6,7 @@
 
 Build a faithful, beautiful, walkable **Neuer Friedhof, Bruchköbel** at dusk/night. The current milestone is an **environment prototype**, not the former game MVP. Read [the active plan](docs/asset-integration-plan.md) before planning production work. It captures the accepted 2026-10-04 direction; older material under `docs/archive/` and the lore are history, not an implementation mandate.
 
-The executable app is still a Three.js look-development sandbox: flat grass, atmosphere, first-person inspection, debug controls and one street lamp. GeoJSON is not rendered; terrain and collision are not implemented. Preserve that working baseline while adding evidence-backed features.
+The default app is the textured entrance/hall review pilot, with local terrain, connected paths and collision. The original look-development sandbox remains at `?mode=sandbox`. Read the current checkpoint and remaining estimates in the active plan. Source and browser appearance await Micha's review before expansion.
 
 The lamp and sample props are disposable pipeline tests, not production references or mandatory assets. Prefer agent-authored, photo-backed geometry for the actual site; reusable complex vegetation may come from the local pack. Additional models/textures may be acquired when needed, with fit and licence checks.
 

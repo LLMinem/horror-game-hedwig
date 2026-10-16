@@ -11,7 +11,7 @@ import * as THREE from 'three';
  * @param {Object} params.defaults - Default values for fog, lights, etc.
  * @returns {Object} World components for external control
  */
-export function createWorld({ scene, constants, defaults }) {
+export function createWorld({ scene, constants, defaults, sandbox = true }) {
   const DEG2RAD = Math.PI / 180; // Local conversion factor
 
   const resolveAssetUrl = (assetPath) => {
@@ -78,17 +78,23 @@ export function createWorld({ scene, constants, defaults }) {
   );
   scene.add(amb);
 
+  let ground = null;
+  let groundMat = null;
+  let grassColorTex = null;
+  let grassNormalTex = null;
+  const testObjects = [];
+  if (sandbox) {
   // =============== GROUND WITH TEXTURES
   // Load textures using Three.js TextureLoader
   const textureLoader = new THREE.TextureLoader();
 
   // Load grass textures (2K resolution for quality)
   // Color map: The base color/albedo of the surface
-  const grassColorTex = textureLoader.load(
+  grassColorTex = textureLoader.load(
     resolveAssetUrl('assets/textures/ground/grass_color_2k.jpg')
   );
   // Normal map: Adds surface detail without additional geometry
-  const grassNormalTex = textureLoader.load(
+  grassNormalTex = textureLoader.load(
     resolveAssetUrl('assets/textures/ground/grass_normal_2k.jpg')
   );
 
@@ -110,7 +116,7 @@ export function createWorld({ scene, constants, defaults }) {
   );
 
   // Create PBR material with textures
-  const groundMat = new THREE.MeshStandardMaterial({
+  groundMat = new THREE.MeshStandardMaterial({
     map: grassColorTex,           // Color/albedo map
     normalMap: grassNormalTex,     // Normal map for surface detail
     normalScale: new THREE.Vector2(defaults.normalStrength, defaults.normalStrength),
@@ -120,7 +126,7 @@ export function createWorld({ scene, constants, defaults }) {
   });
 
   // Create ground mesh and rotate to horizontal
-  const ground = new THREE.Mesh(groundGeo, groundMat);
+  ground = new THREE.Mesh(groundGeo, groundMat);
   ground.rotation.x = -Math.PI / 2;  // Rotate from vertical to horizontal
   ground.receiveShadow = true;        // Ground receives shadows from objects
   scene.add(ground);
@@ -128,7 +134,6 @@ export function createWorld({ scene, constants, defaults }) {
   // =============== TEST OBJECTS
   // These objects help test lighting, shadows, and materials
 
-  const testObjects = [];  // Keep track for potential cleanup
 
   // TOMBSTONES - Test shadow casting and stone material
   for (let i = 0; i < 5; i++) {
@@ -210,6 +215,7 @@ export function createWorld({ scene, constants, defaults }) {
   sphere.receiveShadow = true;
   scene.add(sphere);
   testObjects.push(sphere);
+  }
 
   // =============== FLASHLIGHT (SpotLight)
   // SpotLight creates a cone of light, perfect for flashlights

@@ -1,8 +1,8 @@
-# Repository readiness, 2026-10-10
+# Repository readiness
 
 ## Assessment
 
-Micha approved the [entrance and hall pilot](asset-integration-plan.md#approved-entrance-and-hall-pilot), including Blender authoring and runtime changes, on 2026-10-16. Implementation begins next session and stops at the first textured, walkable browser checkpoint for his visual review. The owner-selected local backup and restore evidence are recorded below. [Blueprint preparation](blueprint-preparation.md) owns the source contract. The rejected 113 agent interpretations remain excluded. No cemetery model or runtime integration was created during planning or session closure.
+The approved entrance and hall pilot now has a textured, walkable browser checkpoint on `feat/entrance-hall-pilot`. The first implementation checks are recorded below, separately from the historical preparation evidence. Micha's source and browser visual acceptance remains outstanding. [Blueprint preparation](blueprint-preparation.md) owns the source contract, and the rejected 113 agent interpretations remain excluded.
 
 The historical October 10 assessment below started from `main` at `3ec81deef975981d46279e4be8480308638905b2`. It used the October 4 strand note, revival handoff, technical readiness report and linked map/photo/material research. That preparation made no changes to `src/`, the canonical GeoJSON, existing Blender sources or the shipped lamp, and performed no commit, upload or deployment. Those statements describe that historical task, not later integration activity.
 
@@ -163,3 +163,17 @@ The initial session closure changed only documentation and private backup/eviden
 ### Version-control handoff
 
 Micha subsequently requested commits and a push of the completed preparation, an annotated pre-implementation checkpoint, and a separate implementation branch. The checkpoint is named `checkpoint/pre-entrance-hall-pilot`; implementation belongs on `feat/entrance-hall-pilot`. Root `AGENTS.md` owns the Git workflow, and root `CLAUDE.md` is its symlink rather than a second policy file. The private backup above remains immutable and predates this Git handoff; Git does not replace snapshots of private sources.
+
+## Initial pilot implementation check, 2026-10-16
+
+The first source checkpoint is `r02/entrance-hall.blend` under `assets/source/working/entrance-hall-pilot/`. Its separate `entrance-hall-review.blend` includes vegetation for Blender inspection. The reusable vegetation source is `vegetation-r04/vegetation-r04.blend`. Sources, packed private reference planes, texture copies and authoring inputs remain ignored. The runtime contains only the two selected GLBs and `walk.json` under `public/assets/models/pilot/`.
+
+The source authoring scripts preserved the canonical hall footprint and site frame. They use the actual DGM sample centres and one standard Blender-to-glTF axis conversion. The authored hall platform and paving share their ground calculation with movement. The pilot includes the approach, forecourt and a connected walk around the hall. It does not reconstruct the surrounding grave fields or interior.
+
+The first actual Chrome route check passed in `.local/browser-smoke-IqU5Gg/report.json`. It crossed 21 route stations and compared 61 decoded terrain samples with the movement sampler, with a maximum discrepancy of 0.00272 m. The check exercised hall collision, sliding, supported limits, overhead-to-walk reset, trusted WASD and sprint input, mouse look and Escape. Walk and sprint travelled 3.10 m and 4.61 m respectively during one-second input windows, including acceleration.
+
+The first build passed with the existing large-chunk warning. The retained production-preview sandbox passed its input check in `.local/browser-smoke-cLfxMQ/`. Blocking the hall GLB request in the production preview produced a visible failure message, disabled the player and added no pilot or substitute scene. The private failure evidence is `.local/pilot/loading-error.json`.
+
+The first source renders are in `.local/pilot/r02/`, and the matching browser views are in `.local/browser-smoke-IqU5Gg/`. The private aerial crop is `.local/pilot/aerial-pilot.png`. Source and browser materials need separate visual acceptance. The initial route timing overlapped source rendering, so it is not the final performance measurement.
+
+No installation, Blender capability smoke, reference regeneration or backup-restore setup was repeated. New source authoring, selected FBX inspection, source renders, GLB export and the changed browser paths were exercised directly.
