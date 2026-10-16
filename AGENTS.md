@@ -11,7 +11,7 @@ The lamp and sample props are disposable pipeline tests, not production referenc
 ## Start a session
 
 1. Read `README.md`, `package.json` and the active plan; inspect existing working-tree changes before editing.
-2. For photos, map, source assets or texture work, read `docs/local-references.md`. For Blender work, read `docs/assets/blender-workbench.md` and `docs/assets/pipeline-guide.md`.
+2. For photos, map, source assets or texture work, read `docs/local-references.md`. For terrain, site layout or Blender preparation, read `docs/blueprint-preparation.md`, including the owner's rejection of the earlier agent tracings. For Blender work, also read `docs/assets/blender-workbench.md` and `docs/assets/pipeline-guide.md`.
 3. Read only the modules needed for the task; `src/main.js` is the composition root. `docs/readiness.md` records verified preparation and remaining gaps.
 4. State the bounded task and verification. Follow the user's authorization: autonomous preparation may proceed end-to-end; scene production and art-direction choices need a specific brief. Explain new Three.js concepts briefly to Michael.
 

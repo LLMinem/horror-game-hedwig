@@ -2,9 +2,9 @@
 
 ## Assessment
 
-The checkout is prepared for a new session to review photo locations, metadata and visual references before defining a specifically authorized implementation section. It is not a finished cemetery or an authorization to choose the route autonomously. The biggest initial problem was contradictory project context and inaccessible source knowledge, rather than the Three.js module structure.
+The [2026-10-16 blueprint preparation](blueprint-preparation.md) is the current guide for a bounded diagnostic pilot. Micha rejected the 113 agent-drawn interpretations as broadly inaccurate and worse than the canonical GeoJSON. The active atlas therefore uses only the 140 canonical source features, official rasters, numeric terrain and owner-corrected photo links. The source map remains a working baseline with local uncertainty. Pause whole-site map expansion; preparation is not authorization for Blender construction or production.
 
-The starting checkout was clean on `main` at `3ec81deef975981d46279e4be8480308638905b2`. The assessment used the October 4 strand note, revival handoff, technical readiness report and linked map/photo/material research. The preparation made no changes to `src/`, the canonical GeoJSON, existing Blender sources or the shipped lamp. No commit, upload or deployment was performed.
+The historical October 10 assessment below started from `main` at `3ec81deef975981d46279e4be8480308638905b2`. It used the October 4 strand note, revival handoff, technical readiness report and linked map/photo/material research. That preparation made no changes to `src/`, the canonical GeoJSON, existing Blender sources or the shipped lamp, and performed no commit, upload or deployment. Those statements describe that historical task, not later integration activity.
 
 ## Findings and changes
 
@@ -32,9 +32,9 @@ The workstation's npm minimum-release-age policy rejected Vite 7.3.7 because it 
 | Ground textures | Four JPEG files, colour/normal at 1K and 2K. | The scene loads the 2K pair. |
 | Environment lighting | Six HDR files, three environments at 1K and 2K. | The selected 2K environment is loaded. |
 | KTX2 | Decoder/loader support exists; no KTX2 assets or established converter are supplied. | None. |
-| Terrain/aerial evidence | No registered DGM1 or current DOP/TrueDOP clip is supplied to this workflow. | None. |
+| Terrain/aerial evidence | Official 20 cm TrueDOP RGB/CIR and 1 m numeric DGM/DOM, registered across a 520 m square; source-only private atlas and metric frame. | None; acquired for preparation only. |
 
-Photo metadata does not prove complete visual coverage, precise positions or camera pose. Asset filenames do not prove suitability for the actual cemetery. The photographs were not visually interpreted or sent to a model during preparation. Marketplace originals and personal photographs should remain outside Git and the published build; reproducible tools and access instructions belong in the repo instead.
+Photo metadata does not prove complete coverage or calibrated pose. The initial October10 preparation did not visually interpret photos; the later authorized reviews are recorded below. Raw assets, photographs and private derived maps remain outside Git and the web build.
 
 ## Code assessment
 
@@ -51,7 +51,9 @@ The existing content is also large for such a small scene. The browser resource 
 
 These are code-inspection findings and future change points, not reproduced failures of the present sandbox. No gameplay scaffold was added. The current grass/lamp scene remains the working baseline.
 
-## Exercised verification
+## Historical technical verification
+
+The results below record the earlier readiness work. They are not new verification of the corrected atlas, visual acceptance of cemetery geometry or approval to model from the rejected traces.
 
 | Check | Observed result | Limit |
 | --- | --- | --- |
@@ -77,8 +79,8 @@ Final housekeeping removed disposable source fixtures and stopped the preparatio
 
 ## Remaining prerequisites, not hidden setup tasks
 
-1. Review photo locations and metadata on the private map; Micha can correct uncertain positions before choosing a first visible section. Establish reference coverage and asset/material fit before modelling recognizable architecture. Prefer authored site geometry; the lamp/test props are not production requirements.
-2. Establish official terrain/aerial inputs and the shared metric coordinate/height contract. Existing phone altitude and estimated map widths are insufficient.
+1. Choose a small diagnostic pilot with Micha using the source-only atlas and a region-specific photo set. The 13 photo-index groups are navigation aids, not trusted work cards. Follow the context package and acceptance criteria in [Blueprint preparation](blueprint-preparation.md).
+2. Use the acquired terrain and documented frame when an explicit modeling brief authorizes source work. Compare relevant stable source IDs with aerial imagery and corrected photos. Record uncertainty and make only evidence-supported local corrections. Runtime terrain and coordinate integration remain unimplemented.
 3. Provide a reachable independent backup destination and demonstrate restoration before valuable source authoring. The earlier Time Machine report did not prove an external restore; extra local copies do not resolve it.
 4. Agree target hardware/browser/resolution and later measure the actual route. Before public release, reconcile code-licence metadata and grass/HDRI provenance. The pack's commercial permission is already confirmed.
 
@@ -88,7 +90,7 @@ For a new session, start with `README.md` and the [active plan](asset-integratio
 
 The original JPEG wording obscured an important distinction: only embedded proxy metadata were removed; the ID-linked private manifest retained GPS, heading, altitude and camera observations. The reference CLI now refreshes known originals' metadata explicitly, generates a private offline photo-position editor, validates/imports manual corrections and exports effective placements as GeoJSON. Original observations and user corrections remain separate. See [the reference workflow](local-references.md#photo-position-workflow-verification) for exercised checks and commands.
 
-The live dataset has 98 metadata-linked photos: 50 with reported horizontal error ≤5 m and 48 above that provisional threshold. Neither group is survey-verified. Camera heading is useful but not calibrated pose; phone altitude is not terrain. No photo locations have been confirmed on Micha's behalf.
+Before the owner import, the dataset had 98 metadata-linked photos: 50 with reported horizontal error ≤5 m and 48 above that provisional threshold. Neither group was survey-verified. Camera heading is useful but not calibrated pose; phone altitude is not terrain. No photo locations were confirmed on Micha's behalf.
 
 Photo positioning/coverage review now precedes section selection. Site geometry should preferably be authored from references; complex vegetation may reuse the pack, and additional suitable textures/models remain an option. Existing lamp sources and sample props are disposable experiments, not production requirements. The working runtime has not been changed or stripped prematurely.
 
@@ -96,8 +98,32 @@ Browser choice belongs to the coding agent's native environment. The existing di
 
 ## Authorized visual review, 2026-10-15
 
+The following review counts predate the owner import and are superseded by the current correction records. They do not establish object geometry or visual acceptance.
+
 Micha requested visual review of every private photo against the map and capture sequence. All 98 were inspected individually. The private review layer applies five estimated camera positions and seven estimated headings, and leaves nineteen photos flagged for owner review. Original measurements and human corrections remain separate from those estimates.
 
 The map now identifies the pending component and shows a reason for each assessment. Twelve Python tests passed, and the actual Chrome page decoded all 98 previews with the expected review filters. Synthetic browser export/import and regeneration preserved human precedence and unresolved flags. Five sideways portrait proxies were also corrected by baking image orientation before metadata removal.
 
 All original HEIC files, the metadata manifest/cache and canonical GeoJSON retain their pre-review SHA-256 values. No human confirmation was fabricated. The [reference workflow](local-references.md#visual-review-and-owner-follow-up) describes the schema and remaining owner work. No scene production or canonical map corrections were performed.
+
+## Historical blueprint preparation, 2026-10-16
+
+The owner correction import preserved 91 rows and 51 numeric headings. The first atlas contained all 98 photo links, 14 verbatim owner notes, 140 unchanged source features and 113 separate interpreted features. It also presented thirteen regional work cards. Micha's subsequent rejection supersedes those interpretations and cards as modeling guidance. The current atlas retains the sources and corrected photos, with 13 navigation-only photo-index groups.
+
+Official TrueDOP RGB/CIR and numeric DGM1/DOM1 were acquired without accounts, paid orders or browser bot-check workarounds. Site imagery is from August 2025; eastern RGB context is from May 2023. The April 2020 height epoch was tied to actual WCS arrays by exact comparison against official downloadable tiles. [Blueprint preparation](blueprint-preparation.md) owns the detailed source and coordinate contract.
+
+The first builder ran successfully, and the twelve existing reference tests passed. Numeric integration checks covered human precedence, notes, photo references, raster pixels without local resampling, terrain row direction/height offset, geometry validity and geographic export. All 98 original HEIC hashes, original metadata/cache and canonical GeoJSON matched their earlier preservation baseline. Those technical results never established that the traced objects matched the cemetery.
+
+The first visible Chrome atlas loaded every raster and decoded all 98 photo previews. Photo filters returned 91 confirmed, 7 unconfirmed, 4 pending and 14 with notes. Region-card links, feature inspection, zoom, keyboard pan and pointer drag were exercised. Desktop and 390 px-wide layouts were inspected without horizontal overflow. Direct Chrome CDP capture/input supplied interaction evidence after other helpers timed out. Geometry-review wording in the old reports is superseded by Micha's rejection, regardless of the earlier checks.
+
+The rejected traces, old plans/SVG, full `photo-evidence.json` and historical reports belong under `.local/blueprint/archive/rejected-interpretation-2026-10-16/`. They are historical records, not optional modeling inputs. A rebuild uses private `photo-index.json` instead of old interpretation/evidence inputs. A fresh clone is insufficient, and Git push does not back up the ignored private pack.
+
+No Blender scene or runtime implementation was part of that preparation. An independent backup restore, a human-selected pilot brief and separate source/browser acceptance remain prerequisites.
+
+## Source-only correction, 2026-10-16
+
+The rebuilt atlas and plan sheets contain only the 140 projected canonical features. Their geometry and properties exactly match the source subset of the prior atlas, and all 98 effective photo records are unchanged. Eleven checksums matched across the correction, covering canonical GeoJSON, human corrections, original photo metadata, acquired source rasters and regenerated RGB/CIR PNGs and terrain CSV. The rejected geometry inputs and export are absent from active paths. Historical material is preserved in the rejection archive, with the owner's screenshot and a withdrawal notice.
+
+The builder completed without the rejected inputs, and all twelve existing reference tests passed. In visible Chrome, the source layer started enabled and could be hidden completely. The interpretation control was absent. Regional photo navigation, an owner's verbatim note, source-object selection and framing were exercised. All five raster images returned status 200, and no page exceptions were recorded. The regenerated atlas, PNG sheet and SVG were visually inspected for source-only presentation. Thirty-seven local documentation links resolved.
+
+The private record is `.local/blueprint/correction-verification.json`; the browser capture is `derived/browser-source-only.png` beneath the same directory. These checks establish the withdrawal and preservation of inputs. They do not approve individual GeoJSON features, photo-index associations or future model accuracy.

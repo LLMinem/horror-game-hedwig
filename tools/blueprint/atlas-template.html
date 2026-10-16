@@ -1,0 +1,574 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' file:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<title>Bestandsatlas · Private Vorbereitung</title>
+<style>
+:root{color-scheme:dark;--bg:#111916;--panel:#19241f;--raised:#23332b;--ink:#eff4ed;--muted:#b7c7bb;--line:#43584a;--accent:#e8ce83;--source:#efc779;--warning:#ffd1a2}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}button,input,select{font:inherit;color:inherit;background:var(--raised);border:1px solid #6e8273;border-radius:5px}button{padding:7px 10px;cursor:pointer;min-height:36px}button:hover:not(:disabled){border-color:var(--accent);background:#354736}button:disabled{opacity:.45;cursor:default}button[aria-pressed="true"]{border-color:var(--accent);background:#4c4529}button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible,summary:focus-visible,#map:focus-visible{outline:3px solid var(--accent);outline-offset:3px}input[type="checkbox"]{accent-color:var(--accent);width:16px;height:16px;flex:none}input[type="search"],select{width:100%;padding:7px;min-width:0}input[type="range"]{width:100%;accent-color:var(--accent)}a{color:#84d9e3}[hidden]{display:none!important}h1,h2,h3,p{margin:0 0 10px}h1{font-size:clamp(19px,2vw,25px);line-height:1.25}h2{font-size:17px}h3{font-size:14px}header{padding:15px 20px 12px;border-bottom:1px solid var(--line)}header p{margin:5px 0 0}.eyebrow{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:5px}.help{color:var(--muted);font-size:12px}.warning{color:var(--warning)}.badge{display:inline-block;font-size:11px;padding:2px 7px;border:1px solid var(--line);border-radius:20px;color:var(--muted)}.workspace{display:grid;grid-template-columns:250px minmax(320px,1fr) 340px;align-items:start;min-height:calc(100svh - 125px)}.controls,.inspection{background:var(--panel);min-width:0;max-height:calc(100svh - 125px);overflow:auto;scrollbar-gutter:stable}.controls{border-right:1px solid var(--line)}.inspection{border-left:1px solid var(--line)}.block{padding:16px;border-bottom:1px solid var(--line)}.field{display:block;margin:10px 0}.field>span{display:block;margin-bottom:5px}.check{display:flex;align-items:center;gap:8px;padding:5px 0;cursor:pointer}.check small{margin-left:auto;color:var(--muted)}.check .swatch{width:17px;height:4px;flex:none}.row{display:flex;flex-wrap:wrap;gap:7px}.stack{display:grid;gap:8px}.map-column{min-width:0;position:sticky;top:0}.toolbar{padding:10px;display:flex;flex-wrap:wrap;gap:6px;border-bottom:1px solid var(--line);background:var(--panel)}.toolbar .zoom{font-size:19px;line-height:1;min-width:38px}.map-wrap{position:relative;height:calc(100svh - 250px);min-height:420px;overflow:hidden;background:#243329}#map{display:block;width:100%;height:100%;touch-action:none;cursor:grab;user-select:none}#map.dragging{cursor:grabbing}.map-decoration{position:absolute;pointer-events:none;background:#132019e8;border:1px solid #607565;border-radius:5px;padding:6px 9px;box-shadow:0 2px 8px #0003}.north{top:12px;right:12px;text-align:center;line-height:1.2}.north b{display:block;font-size:25px}.north small{font-size:10px}.scale{left:12px;bottom:12px;font-size:11px}#scale-bar{height:8px;border:solid var(--ink);border-width:0 2px 2px;margin:3px 0 5px}.coordinates{right:12px;bottom:12px;font:11px/1.5 ui-monospace,SFMono-Regular,monospace;white-space:pre}.map-footer{padding:9px 12px;border-top:1px solid var(--line)}#map-status{min-height:18px;margin-bottom:4px}.legend{display:flex;flex-wrap:wrap;gap:5px 16px;font-size:12px}.legend-item{display:flex;align-items:center;gap:7px}.line-sample{display:inline-block;width:25px;border-top:3px solid var(--source)}.point-sample{width:11px;height:11px;border-radius:50%;background:#93d6ab;border:1px solid #e7f9ee}.point-sample.unconfirmed{background:#a5c5f0}.warning-list{padding-left:18px;margin:8px 0}.warning-list li{margin-bottom:7px;overflow-wrap:anywhere}summary{cursor:pointer;font-weight:600;padding:4px 0}details>div{padding-top:9px}.metadata{margin:0;display:grid;grid-template-columns:minmax(82px,35%) minmax(0,1fr);gap:6px 10px;font-size:12px}.metadata dt{color:var(--muted);overflow-wrap:anywhere}.metadata dd{margin:0;white-space:pre-wrap;overflow-wrap:anywhere}.metadata .metadata{display:block;border-left:1px solid var(--line);padding-left:8px}.metadata .metadata dt{margin-top:5px}.metadata .metadata dd{margin-top:2px}.metadata ul{padding-left:16px;margin:0}.photo-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(47px,1fr));gap:5px;max-height:170px;overflow:auto;padding:3px;margin:8px -3px}.photo-button{font-size:12px;padding:6px 3px;border-bottom:3px solid #a5c5f0}.photo-button.confirmed{border-bottom-color:#93d6ab}.photo-button.pending:after{content:" · ?";color:var(--warning)}#preview{width:100%;max-height:360px;object-fit:contain;background:#101813;border-radius:4px;display:block}#preview-link{display:block}#photo-note{white-space:pre-wrap;overflow-wrap:anywhere;border-left:3px solid var(--accent);padding-left:10px}#photo-title,#feature-title{overflow-wrap:anywhere}.feature-shape{vector-effect:non-scaling-stroke;stroke-linejoin:round;stroke-linecap:round}.feature-hit{vector-effect:non-scaling-stroke;stroke:transparent;stroke-width:14;fill:none;pointer-events:stroke;cursor:pointer}.feature-shape{cursor:pointer}.selection-shape{vector-effect:non-scaling-stroke;stroke:#fff3aa;stroke-width:5;stroke-linejoin:round;fill:#ffe7a0;fill-opacity:.15;pointer-events:none}.photo-symbol{cursor:pointer}.photo-symbol text{fill:#102118;font:600 10px system-ui,sans-serif;text-anchor:middle;pointer-events:none}.photo-symbol circle{stroke:#102118;stroke-width:1.6}.photo-symbol.selected circle{stroke:#fff0a0;stroke-width:3}.heading-ray{vector-effect:non-scaling-stroke;stroke:#b7d7e3;stroke-width:1.2;opacity:.65;pointer-events:none}.heading-ray.selected{stroke:#ffe08b;stroke-width:3;opacity:1}.source-card+.source-card{border-top:1px solid var(--line);margin-top:14px;padding-top:14px}.source-card h3{overflow-wrap:anywhere}#feature-select{min-height:120px}noscript{display:block;padding:20px;color:var(--warning)}
+@media(min-width:1500px){.workspace{grid-template-columns:275px minmax(400px,1fr) 380px}}
+@media(max-width:1100px){.workspace{grid-template-columns:230px minmax(320px,1fr)}.inspection{grid-column:1/-1;max-height:none;display:grid;grid-template-columns:1fr 1fr;border-left:0;border-top:1px solid var(--line)}.inspection>.block{border-right:1px solid var(--line)}.controls{max-height:none}.map-column{position:sticky;top:0}.map-wrap{height:65svh;min-height:480px}}
+@media(max-width:650px){header{padding:12px}.workspace{display:flex;flex-direction:column}.map-column{order:0;width:100%;position:static}.controls{order:1;width:100%;border-right:0}.inspection{order:2;display:block;width:100%}.map-wrap{height:60svh;min-height:340px}.toolbar{padding:8px}.toolbar button{font-size:12px}.map-footer{padding:8px 10px}.coordinates{font-size:10px;right:8px;bottom:10px}.scale{left:8px;bottom:10px}.block{padding:14px}.photo-list{max-height:145px}.controls .layer-options{display:grid;grid-template-columns:1fr 1fr;gap:0 15px}.inspection>.block{border-right:0}#preview{max-height:55svh}}
+@media(prefers-reduced-motion:no-preference){button{transition:background .12s,border-color .12s}}
+</style>
+</head>
+<body>
+<header>
+<div class="eyebrow">Private Arbeitsreferenz · Offline · Nur Lesen</div>
+<h1 id="atlas-title">Bestandsatlas</h1>
+<p class="warning"><strong>Die früheren Agent-Zeichnungen wurden nach Michas Prüfung zurückgezogen.</strong> Sie sind archiviert und keine Bauvorlage. Das ursprüngliche GeoJSON bleibt die Arbeitsgrundlage, mit bekannten Lücken und lokalen Fehlern. Es ist keine Vermessung.</p>
+<p class="help">Nur projizierte Quellgeometrie, amtliche Raster und Fotoreferenzen. Originale und menschliche Korrekturen bleiben unverändert; keine kalibrierte Kamerarekonstruktion.</p>
+</header>
+<noscript>Für die eingebettete Karte wird JavaScript benötigt. Es werden keine Daten an einen Server gesendet.</noscript>
+<main class="workspace">
+<aside class="controls" aria-label="Kartenebenen und Quellen">
+<section class="block">
+<h2>Hintergrund</h2>
+<label class="field" for="raster"><span>Rasterquelle</span><select id="raster"><option value="">Ohne Raster</option></select></label>
+<label class="field" for="raster-opacity"><span>Deckkraft <output id="opacity-value" for="raster-opacity">85 %</output></span><input id="raster-opacity" type="range" min="0" max="100" value="85"></label>
+<p id="raster-description" class="help">Kein Raster ausgewählt.</p>
+<p id="raster-error" class="warning help" role="status" hidden></p>
+<details id="raster-metadata-wrap" hidden><summary>Raster-Metadaten</summary><div id="raster-metadata"></div></details>
+</section>
+<section class="block">
+<h2>Quellgeometrie</h2>
+<label class="check"><input id="show-source" type="checkbox" checked><span>GeoJSON-Quelle anzeigen</span><small id="source-count"></small></label>
+<p class="help">Für die Rasteransicht Quellgeometrie ausschalten; bei Bedarf auch Rastergitter und Fotostandorte ausblenden. Farben bezeichnen Objektarten, nicht Genauigkeit. Keine Ersatzzeichnungen eingeblendet.</p>
+<div id="layer-options" class="layer-options"></div>
+</section>
+<section class="block">
+<h2>Orientierung</h2>
+<label class="check"><input id="show-photos" type="checkbox"><span>Fotostandorte</span></label>
+<label class="check"><input id="show-rays" type="checkbox" checked><span>Blickrichtungsstrahlen</span></label>
+<label class="check"><input id="show-grid" type="checkbox" checked><span>Metrisches Raster</span></label>
+<p class="help">Fotostandorte bei Bedarf einschalten. Strahlen sind Richtungssymbole, keine Sichtweite oder gemessenen Sichtfelder. Foto-Filter wirken nur auf die Liste.</p>
+<details><summary>Koordinatenrahmen</summary><div id="frame-details"></div></details>
+</section>
+<section class="block">
+<details open><summary>Grenzen der Aussagekraft</summary><ul id="warnings" class="warning-list help warning"></ul></details>
+</section>
+<section class="block">
+<details><summary>Quellen, Lizenzen und Epochen</summary><div id="sources"></div></details>
+<p class="help">OSM-Grundlage: © OpenStreetMap-Mitwirkende · ODbL. Weitere Rechte und Aufnahmedaten stehen bei den einzelnen Quellen. Private Fotos sind keine Veröffentlichungsfreigabe.</p>
+</section>
+<section class="block"><details><summary>Stand der Vorbereitung</summary><div id="summary"></div></details></section>
+</aside>
+<section class="map-column" aria-label="Interaktive Bestandskarte">
+<div class="toolbar">
+<button id="fit-site" type="button">Friedhof einpassen</button>
+<button id="fit-context" type="button">Gesamter Kontext</button>
+<button id="locate-photo" type="button" disabled>Zum Foto</button>
+<button id="zoom-in" class="zoom" type="button" aria-label="Karte vergrößern">+</button>
+<button id="zoom-out" class="zoom" type="button" aria-label="Karte verkleinern">−</button>
+</div>
+<div class="map-wrap">
+<svg id="map" xmlns="http://www.w3.org/2000/svg" tabindex="0" role="img" aria-label="Bestandskarte. Ziehen zum Verschieben, Mausrad oder Plus und Minus zum Zoomen. Pfeiltasten verschieben, Taste F passt den Friedhof ein. Objekte und Fotostandorte sind auswählbar; dieselbe Auswahl ist in den Listen verfügbar." preserveAspectRatio="xMidYMid meet">
+<defs><pattern id="grid-pattern" patternUnits="userSpaceOnUse"><path id="grid-path" fill="none" stroke="#e5efdf" stroke-opacity=".25" stroke-width="1" vector-effect="non-scaling-stroke"/></pattern></defs>
+<g id="raster-layer" pointer-events="none"></g>
+<rect id="grid" fill="url(#grid-pattern)" pointer-events="none"/>
+<g id="feature-layer"></g>
+<g id="selection-layer" pointer-events="none"></g>
+<g id="ray-layer" pointer-events="none"></g>
+<g id="photo-layer"></g>
+</svg>
+<div class="map-decoration north" aria-hidden="true">N<b>↑</b><small>Gitternord (UTM)</small></div>
+<div class="map-decoration scale"><div id="scale-text"></div><div id="scale-bar"></div><div id="grid-text"></div></div>
+<div id="coordinates" class="map-decoration coordinates" aria-live="off">x → Ost · y ↑ Nord</div>
+</div>
+<div class="map-footer">
+<p id="map-status" class="help" role="status" aria-live="polite">Karte wird vorbereitet.</p>
+<div class="legend"><span class="legend-item"><i class="line-sample"></i>Quelle, nicht vermessen</span><span class="legend-item"><i class="point-sample"></i>Standort menschlich bestätigt</span><span class="legend-item"><i class="point-sample unconfirmed"></i>Standort unbestätigt</span></div>
+<p class="help" style="margin:6px 0 0">Ziehen / ein Finger: verschieben · Mausrad / zwei Finger: zoomen · Kartenfokus: Pfeile, +, −, F · Keine Bearbeitung oder Speicherung.</p>
+</div>
+</section>
+<aside class="inspection" aria-label="Foto- und Objektinspektion">
+<section class="block" id="photo-index" hidden>
+<details open>
+<summary>Regionaler Fotoindex <span id="region-count" class="badge"></span></summary>
+<p class="help" style="margin-top:10px">Nur Navigationshilfe zu Fotos. Zuordnungen sind keine bestätigte Objektidentifikation; der Index enthält keine geprüften Beobachtungen, Objektpositionen oder Bauanweisungen. Menschliche Notizen stehen unverändert beim jeweiligen Foto.</p>
+<label class="field" for="region-select"><span>Bereich / Motiv</span><select id="region-select"></select></label>
+<div id="region-card"></div>
+</details>
+</section>
+<section class="block">
+<h2>Fotoreferenzen <span id="photo-count" class="badge"></span></h2>
+<label class="field" for="photo-search"><span>Nummer, ID oder Notiz suchen</span><input id="photo-search" type="search" placeholder="z. B. Tor oder 42" autocomplete="off"></label>
+<label class="field" for="photo-filter"><span>Auswahl eingrenzen</span><select id="photo-filter"><option value="all">Alle Fotos</option><option value="confirmed">Standort menschlich bestätigt</option><option value="unconfirmed">Standort nicht menschlich bestätigt</option><option value="pending">Offene Prüfpunkte</option><option value="notes">Mit Notiz</option></select></label>
+<div id="photo-list" class="photo-list" aria-label="Nummerierte Fotos"></div>
+<p id="photo-list-status" class="help"></p>
+<div class="row"><button id="previous-photo" type="button" disabled>← Vorheriges</button><button id="next-photo" type="button" disabled>Nächstes →</button></div>
+</section>
+<section class="block" id="photo-inspection">
+<h2 id="photo-title">Foto auswählen</h2>
+<a id="preview-link" target="_blank" rel="noopener noreferrer" hidden><img id="preview" alt="" decoding="async"></a>
+<p id="preview-message" class="help">Nummer auf der Karte oder in der Fotoliste auswählen.</p>
+<p id="photo-pending" class="warning help" hidden></p>
+<dl id="photo-details" class="metadata"></dl>
+<div id="photo-note-wrap" hidden style="margin-top:14px"><h3>Menschliche Notiz / überlieferter Wortlaut</h3><p id="photo-note"></p></div>
+<details id="photo-evidence-wrap" hidden style="margin-top:12px"><summary>Belege und zusätzliche Angaben</summary><div id="photo-evidence"></div></details>
+<p class="help" style="margin-top:12px">Bestätigte Position und bestätigte Richtung sind getrennte Aussagen. Auch eine menschliche Bestätigung ist keine Vermessung. Der Quellwinkel bleibt unverändert sichtbar. Für die Karte wird, sofern geliefert, der auf UTM-Gitternord umgerechnete Winkel verwendet; andernfalls bleibt die Strahlrichtung eine Näherung.</p>
+</section>
+<section class="block">
+<h2>Objektinspektion</h2>
+<label class="field" for="feature-search"><span>Objekt, ID oder Eigenschaft suchen</span><input id="feature-search" type="search" autocomplete="off" placeholder="z. B. Hecke oder way/"></label>
+<label class="field" for="feature-select"><span>Sichtbare Objekte</span><select id="feature-select" size="5" aria-label="Sichtbare Kartenobjekte"></select></label>
+<p id="feature-list-status" class="help"></p>
+<h3 id="feature-title">Noch kein Objekt ausgewählt</h3>
+<p id="feature-warning" class="warning help"></p>
+<button id="locate-feature" type="button" hidden>Objekt einpassen</button>
+<dl id="feature-details" class="metadata" style="margin-top:12px"></dl>
+</section>
+</aside>
+</main>
+<script id="site-data" type="application/json">__SITE_JSON__</script>
+<script>
+'use strict';
+(() => {
+  const $ = id => document.getElementById(id);
+  const svgNS = 'http://www.w3.org/2000/svg';
+  const finite = value => typeof value === 'number' && Number.isFinite(value);
+  const array = value => Array.isArray(value) ? value : [];
+  const fmt = (value, digits = 1) => finite(value) ? value.toLocaleString('de-DE', {maximumFractionDigits: digits}) : 'nicht angegeben';
+  const text = value => value == null ? 'nicht angegeben' : typeof value === 'object' ? JSON.stringify(value, null, 2) : String(value);
+  const validBounds = value => Array.isArray(value) && value.length === 4 && value.every(finite) && value[2] > value[0] && value[3] > value[1];
+  const point = value => Array.isArray(value) && finite(value[0]) && finite(value[1]);
+  function element(tag, content, className) {
+    const node = document.createElement(tag);
+    if (content !== undefined) node.textContent = text(content);
+    if (className) node.className = className;
+    return node;
+  }
+  function svg(tag, attributes = {}) {
+    const node = document.createElementNS(svgNS, tag);
+    for (const [key, value] of Object.entries(attributes)) node.setAttribute(key, String(value));
+    return node;
+  }
+  // Only relative local image references are permitted, never data URLs or remote hosts.
+  function imagePath(value) {
+    return typeof value === 'string' && value.length > 0 && value === value.trim() && !/^[\/]|[\\:\u0000-\u001f\u007f]/.test(value) ? value : null;
+  }
+  const labels = {
+    id:'ID', category:'Objektart', status:'Status', source_id:'Quell-ID', source:'Quelle', source_ids:'Quell-IDs',
+    label:'Bezeichnung', note:'Notiz', description:'Beschreibung', evidence:'Belege', photo_numbers:'Fotoreferenzen',
+    license:'Lizenz', licence:'Lizenz', attribution:'Namensnennung', epoch:'Aufnahmeepoche', date:'Datum', url:'Quelladresse',
+    resolution:'Auflösung', resolution_m:'Rasterweite (m)', bounds:'Ausdehnung [xmin, ymin, xmax, ymax]',
+    epsg:'Koordinatensystem (EPSG)', origin:'Ursprung [E, N, H₀] in m', siteBounds:'Friedhofsrahmen (lokale m)', heightDatum:'Höhenbezug',
+    path:'Lokaler Pfad', position_source:'Positionsherkunft', heading_source:'Richtungsherkunft', pending:'Offene Prüfpunkte',
+    position_evidence:'Positionsbelege', heading_evidence:'Richtungsbelege', limitations:'Einschränkungen', provenance:'Herkunft',
+    acquisition_date:'Erwerbsdatum', capture_date:'Aufnahmedatum', notes:'Notizen'
+  };
+  function valueNode(value) {
+    if (Array.isArray(value)) {
+      if (!value.length) return element('span', 'Keine Angaben');
+      const list = element('ul');
+      for (const item of value) { const li = element('li'); li.append(valueNode(item)); list.append(li); }
+      return list;
+    }
+    if (value && typeof value === 'object') {
+      const dl = element('dl', undefined, 'metadata');
+      for (const [key, item] of Object.entries(value)) addDetail(dl, labels[key] || key, item);
+      if (!dl.childElementCount) dl.append(element('dd', 'Keine Angaben'));
+      return dl;
+    }
+    return element('span', value);
+  }
+  function addDetail(dl, label, value) {
+    const dd = element('dd'); dd.append(valueNode(value));
+    dl.append(element('dt', label), dd);
+  }
+  function warning(message) { $('warnings').append(element('li', message)); }
+  function status(message) { $('map-status').textContent = message; }
+  let data;
+  try {
+    data = JSON.parse($('site-data').textContent);
+    if (!data || !validBounds(data.frame?.bounds)) throw new Error('Gültiger lokaler Meterrahmen fehlt.');
+  } catch (error) {
+    status('Atlas nicht verfügbar: ' + error.message);
+    warning('Die eingebetteten Daten sind nicht lesbar. Es wird keine Ersatzkarte erfunden.');
+    document.querySelectorAll('button,input,select').forEach(node => { node.disabled = true; });
+    return;
+  }
+  const frame = data.frame, photos = array(data.photos), features = array(data.features), rasters = array(data.rasters);
+  $('atlas-title').textContent = data.title || 'Bestandsatlas';
+  document.title = text(data.title || 'Bestandsatlas') + ' · Private Vorbereitung';
+  $('frame-details').append(valueNode(frame));
+  $('summary').append(valueNode(data.summary || {}));
+  warning('Numerische Registrierung im Meterrahmen ist keine Aussage über Lagegenauigkeit. OSM, Luftbilder, Gelände und Fotoeinschätzungen haben unterschiedliche Fehler und Zeitstände.');
+  warning('Luftbildmosaike können mehrere Aufnahmeepochen enthalten. Quelle, Teilflächen und Epochengrenzen beachten; unbekannte Angaben bleiben unbekannt.');
+  for (const item of array(data.warnings)) warning(typeof item === 'string' ? item : text(item));
+  const sources = Array.isArray(data.sources) ? data.sources : data.sources && typeof data.sources === 'object' ? Object.entries(data.sources).map(([id, value]) => ({id, ...(typeof value === 'object' && value ? value : {description:value})})) : [];
+  if (!sources.length) $('sources').append(element('p', 'Keine zusätzlichen Quellenmetadaten eingebettet. Lizenz, Epoche und Genauigkeit sind damit nicht belegt.', 'warning help'));
+  sources.forEach((source, index) => {
+    const section = element('section', undefined, 'source-card');
+    section.append(element('h3', typeof source === 'object' && source ? source.label || source.title || source.name || source.id || 'Quelle ' + (index + 1) : 'Quelle ' + (index + 1)), valueNode(source));
+    $('sources').append(section);
+  });
+  const categories = {
+    boundary:['Friedhofsgrenze','#f4d184'], path:['Wege','#f2e3ba'], building:['Gebäude','#eeb2a4'], storage:['Lager / Betrieb','#d99e78'],
+    hedge:['Hecken','#a7cf83'], fence:['Zäune','#deb0e7'], gate:['Tore / Eingänge','#f1e39e'], water:['Wasser','#83cdec'],
+    landmark:['Orientierungspunkte','#ffbd8d'], columbarium:['Kolumbarien','#d3bbeb']
+  };
+  const categoryName = category => categories[category]?.[0] || category || 'Ohne Kategorie';
+  const categoryColor = category => categories[category]?.[1] || '#c5cdd3';
+  function confirmed(photo) { return photo.position_source === 'user_confirmed'; }
+  function provenance(value) {
+    const names = {user_confirmed:'Menschlich bestätigt', agent_estimated:'Agent-Schätzung', agent_reviewed:'Agent-geprüft, nicht menschlich bestätigt', agent_estimate:'Agent-Schätzung', agent_adjusted:'Agent-Korrektur', original_exif:'Original-EXIF, unbestätigt', original_gps:'Original-GPS, unbestätigt', exif:'Original-EXIF, unbestätigt', source_unverified:'Quelle, unbestätigt'};
+    return value ? (names[value] ? names[value] + ' (' + value + ')' : text(value) + ' — nicht als menschliche Bestätigung eingestuft') : 'Nicht angegeben / unbestätigt';
+  }
+  function hasPending(photo) {
+    return Array.isArray(photo.pending) ? photo.pending.length > 0 : !!photo.pending && (typeof photo.pending !== 'object' || Object.keys(photo.pending).length > 0);
+  }
+  const map = $('map');
+  let view = {x:0,y:0,width:1,height:1}, metersPerPixel = 1, selectedPhoto = null, selectedFeature = null;
+  let pixelWidth = 1, pixelHeight = 1;
+  const featureRecords = [], photoRecords = [], categoryInputs = new Map();
+  function geometryShape(geometry) {
+    if (!geometry || !Array.isArray(geometry.coordinates)) throw new Error('Geometrie fehlt');
+    const coordinates = geometry.coordinates;
+    let bounds = [Infinity,Infinity,-Infinity,-Infinity];
+    function coordinate(p) {
+      if (!point(p)) throw new Error('Koordinate ist kein lokales Meterpaar');
+      bounds[0] = Math.min(bounds[0],p[0]); bounds[1] = Math.min(bounds[1],p[1]);
+      bounds[2] = Math.max(bounds[2],p[0]); bounds[3] = Math.max(bounds[3],p[1]);
+      return p[0] + ',' + (-p[1]);
+    }
+    function line(points, close = false) {
+      if (!Array.isArray(points) || points.length < (close ? 3 : 2)) throw new Error('Unvollständige Geometrie');
+      return 'M' + points.map(coordinate).join('L') + (close ? 'Z' : '');
+    }
+    function polygon(rings) {
+      if (!Array.isArray(rings) || !rings.length) throw new Error('Polygon ohne Ringe');
+      return rings.map(ring => line(ring,true)).join('');
+    }
+    let shape;
+    switch (geometry.type) {
+      case 'Point': coordinate(coordinates); shape = svg('circle',{cx:coordinates[0],cy:-coordinates[1],r:4}); break;
+      case 'LineString': shape = svg('path',{d:line(coordinates)}); break;
+      case 'Polygon': shape = svg('path',{d:polygon(coordinates)}); break;
+      case 'MultiLineString': if (!coordinates.length) throw new Error('Leere Geometrie'); shape = svg('path',{d:coordinates.map(points => line(points)).join('')}); break;
+      case 'MultiPolygon': if (!coordinates.length) throw new Error('Leere Geometrie'); shape = svg('path',{d:coordinates.map(polygon).join('')}); break;
+      default: throw new Error('Nicht unterstützter Geometrietyp: ' + geometry.type);
+    }
+    return {shape,bounds};
+  }
+  let malformed = 0;
+  features.forEach((feature,index) => {
+    try {
+      const {shape,bounds} = geometryShape(feature.geometry);
+      const category = feature.category || 'unknown';
+      const group = svg('g'), color = categoryColor(category), isArea = ['Polygon','MultiPolygon'].includes(feature.geometry.type);
+      shape.setAttribute('class','feature-shape'); shape.setAttribute('stroke',color);
+      shape.setAttribute('stroke-width',category === 'boundary' ? 3 : 2);
+      shape.setAttribute('fill',isArea || feature.geometry.type === 'Point' ? color : 'none');
+      shape.setAttribute('fill-opacity',feature.geometry.type === 'Point' ? '.9' : category === 'boundary' ? '.025' : '.15');
+      shape.setAttribute('fill-rule','evenodd');
+      const title = svg('title'); title.textContent = text(feature.properties?.label || categoryName(category)) + ' · Quelle, Genauigkeit nicht bestätigt'; shape.append(title);
+      group.append(shape);
+      if (!isArea && feature.geometry.type !== 'Point') {
+        const hit = svg('path',{d:shape.getAttribute('d'),class:'feature-hit'}); group.append(hit);
+      }
+      const record = {feature,index,shape,group,bounds,category,isArea};
+      group.addEventListener('click',event => { if (!suppressClick) { event.stopPropagation(); selectFeature(record); } });
+      featureRecords.push(record); $('feature-layer').append(group);
+    } catch (error) { malformed++; warning('Objekt ' + text(feature?.id || index) + ' nicht gezeichnet: ' + error.message); }
+  });
+  // Areas form a background; lines and points remain reachable above their fills.
+  featureRecords.filter(record => !record.isArea).forEach(record => $('feature-layer').append(record.group));
+  const categoryCounts = new Map();
+  featureRecords.forEach(record => categoryCounts.set(record.category,(categoryCounts.get(record.category) || 0) + 1));
+  for (const [category,count] of categoryCounts) {
+    const label = element('label',undefined,'check'), input = element('input'); input.type = 'checkbox'; input.checked = true;
+    const swatch = element('i',undefined,'swatch'); swatch.style.backgroundColor = categoryColor(category); swatch.setAttribute('aria-hidden','true');
+    label.append(input,swatch,element('span',categoryName(category)),element('small',count));
+    input.addEventListener('change',updateVisibility); categoryInputs.set(category,input); $('layer-options').append(label);
+  }
+  $('source-count').textContent = featureRecords.length;
+  function visible(record) { return categoryInputs.get(record.category)?.checked && $('show-source').checked; }
+  function updateVisibility() {
+    featureRecords.forEach(record => { record.group.style.display = visible(record) ? '' : 'none'; });
+    $('photo-layer').style.display = $('show-photos').checked ? '' : 'none';
+    $('ray-layer').style.display = $('show-photos').checked && $('show-rays').checked ? '' : 'none';
+    $('grid').style.display = $('show-grid').checked ? '' : 'none';
+    renderFeatureList(); renderSelection();
+    if (selectedPhoto) updatePhotoStatus();
+  }
+  ['show-source','show-photos','show-rays','show-grid'].forEach(id => $(id).addEventListener('change',updateVisibility));
+  let rasterNode = null;
+  rasters.forEach((raster,index) => { const option = element('option',raster.label || raster.id || 'Raster ' + (index + 1)); option.value = String(index); $('raster').append(option); });
+  function chooseRaster() {
+    $('raster-layer').replaceChildren(); rasterNode = null; $('raster-error').hidden = true;
+    const raster = $('raster').value === '' ? null : rasters[Number($('raster').value)];
+    $('raster-metadata-wrap').hidden = !raster; $('raster-metadata').replaceChildren();
+    $('raster-description').textContent = raster ? text(raster.description || 'Quelle, Epoche oder Auflösung nicht beschrieben; keine Genauigkeitsannahme.') : 'Ohne Raster — nur eingebettete Vektoren und Fotostandorte.';
+    if (!raster) return;
+    $('raster-metadata').append(valueNode(raster));
+    const path = imagePath(raster.path);
+    if (!path || !validBounds(raster.bounds)) {
+      $('raster-error').hidden = false; $('raster-error').textContent = 'Raster nicht dargestellt: relativer Bildpfad oder metrische Ausdehnung fehlt / ist ungültig.'; return;
+    }
+    const [xmin,ymin,xmax,ymax] = raster.bounds;
+    const image = svg('image',{x:xmin,y:-ymax,width:xmax-xmin,height:ymax-ymin,preserveAspectRatio:'none',opacity:Number($('raster-opacity').value)/100});
+    image.addEventListener('error',() => { if (rasterNode !== image) return; $('raster-error').hidden = false; $('raster-error').textContent = 'Lokales Raster nicht lesbar: ' + path + '. Vektor- und Fotolayer bleiben verfügbar.'; });
+    rasterNode = image; $('raster-layer').append(image); image.setAttribute('href',path);
+  }
+  $('raster').addEventListener('change',chooseRaster);
+  $('raster-opacity').addEventListener('input',() => { $('opacity-value').textContent = $('raster-opacity').value + ' %'; rasterNode?.setAttribute('opacity',Number($('raster-opacity').value)/100); });
+  function niceDistance(value) {
+    const power = 10 ** Math.floor(Math.log10(value)), scaled = value / power;
+    return (scaled >= 5 ? 5 : scaled >= 2 ? 2 : 1) * power;
+  }
+  function applyView() {
+    map.setAttribute('viewBox',[view.x,view.y,view.width,view.height].join(' '));
+    metersPerPixel = view.width / pixelWidth;
+    const spacing = niceDistance(metersPerPixel * 105), pattern = $('grid-pattern');
+    pattern.setAttribute('width',spacing); pattern.setAttribute('height',spacing);
+    $('grid-path').setAttribute('d','M' + spacing + ',0H0V' + spacing);
+    for (const [key,value] of Object.entries(view)) $('grid').setAttribute(key,value);
+    const distance = niceDistance(metersPerPixel * Math.min(130,pixelWidth * .3));
+    $('scale-text').textContent = fmt(distance,3) + ' m'; $('scale-bar').style.width = distance / metersPerPixel + 'px';
+    $('grid-text').textContent = 'Raster ' + fmt(spacing,3) + ' m' + ($('show-grid').checked ? '' : ' (aus)');
+    featureRecords.forEach(record => { if (record.feature.geometry.type === 'Point') record.shape.setAttribute('r',5 * metersPerPixel); });
+    photoRecords.forEach(record => record.marker.setAttribute('transform','translate(' + record.photo.x + ',' + (-record.photo.y) + ') scale(' + metersPerPixel + ')'));
+    renderSelection();
+  }
+  function fit(bounds,padding = 1.12) {
+    const [xmin,ymin,xmax,ymax] = bounds;
+    const width = Math.max(xmax-xmin,20)*padding, height = Math.max(ymax-ymin,20)*padding;
+    const ratio = pixelWidth / pixelHeight, w = Math.max(width,height*ratio), h = w / ratio;
+    view = {x:(xmin+xmax)/2-w/2,y:-(ymin+ymax)/2-h/2,width:w,height:h}; applyView();
+  }
+  function zoom(factor,anchor = {x:view.x+view.width/2,y:view.y+view.height/2}) {
+    const desired = view.width * factor, maxWidth = Math.max(frame.bounds[2]-frame.bounds[0],frame.bounds[3]-frame.bounds[1]) * 8;
+    const width = Math.max(8,Math.min(maxWidth,desired)), actual = width / view.width;
+    view = {x:anchor.x+(view.x-anchor.x)*actual,y:anchor.y+(view.y-anchor.y)*actual,width,height:view.height*actual}; applyView();
+  }
+  function mapPoint(clientX,clientY) {
+    const rect = map.getBoundingClientRect();
+    return {x:view.x+(clientX-rect.left)/rect.width*view.width,y:view.y+(clientY-rect.top)/rect.height*view.height};
+  }
+  function resize() {
+    const rect = map.getBoundingClientRect(); if (!rect.width || !rect.height) return;
+    const first = pixelWidth === 1, centerY = view.y+view.height/2;
+    pixelWidth = rect.width; pixelHeight = rect.height;
+    if (first) fit(validBounds(frame.siteBounds) ? frame.siteBounds : frame.bounds);
+    else { view.height = view.width*pixelHeight/pixelWidth; view.y = centerY-view.height/2; applyView(); }
+  }
+  $('fit-site').addEventListener('click',() => { fit(validBounds(frame.siteBounds) ? frame.siteBounds : frame.bounds); status('Friedhof eingepasst.'); });
+  $('fit-context').addEventListener('click',() => { fit(frame.bounds); status('Vollständiger Datenrahmen eingepasst.'); });
+  $('zoom-in').addEventListener('click',() => zoom(.75)); $('zoom-out').addEventListener('click',() => zoom(1/.75));
+  $('show-grid').addEventListener('change',applyView);
+  const pointers = new Map(); let gesture = null, suppressClick = false;
+  function startGesture() {
+    const points = [...pointers.values()];
+    if (!points.length) { gesture = null; return; }
+    const center = points.length > 1 ? {x:(points[0].x+points[1].x)/2,y:(points[0].y+points[1].y)/2} : points[0];
+    gesture = {center,distance:points.length > 1 ? Math.hypot(points[1].x-points[0].x,points[1].y-points[0].y) : 0,view:{...view}};
+  }
+  map.addEventListener('pointerdown',event => {
+    if (event.button !== 0 && event.pointerType === 'mouse') return;
+    if (!pointers.size) suppressClick = false;
+    pointers.set(event.pointerId,{x:event.clientX,y:event.clientY}); event.target.setPointerCapture(event.pointerId); startGesture();
+    map.classList.add('dragging');
+  });
+  map.addEventListener('pointermove',event => {
+    const p = mapPoint(event.clientX,event.clientY);
+    $('coordinates').textContent = 'x ' + fmt(p.x) + ' m · y ' + fmt(-p.y) + ' m';
+    if (!pointers.has(event.pointerId) || !gesture) return;
+    pointers.set(event.pointerId,{x:event.clientX,y:event.clientY});
+    const points = [...pointers.values()], center = points.length > 1 ? {x:(points[0].x+points[1].x)/2,y:(points[0].y+points[1].y)/2} : points[0];
+    const dx = center.x-gesture.center.x, dy = center.y-gesture.center.y;
+    if (Math.hypot(dx,dy)>4 || points.length>1) suppressClick = true;
+    view = {...gesture.view};
+    if (points.length>1 && gesture.distance>0) {
+      const distance = Math.hypot(points[1].x-points[0].x,points[1].y-points[0].y);
+      if (distance>0) zoom(gesture.distance/distance,mapPoint(gesture.center.x,gesture.center.y));
+    }
+    view.x -= dx*view.width/pixelWidth; view.y -= dy*view.height/pixelHeight; applyView();
+  });
+  function endPointer(event) {
+    pointers.delete(event.pointerId); startGesture();
+    if (!pointers.size) map.classList.remove('dragging');
+  }
+  map.addEventListener('pointerup',endPointer); map.addEventListener('pointercancel',endPointer); map.addEventListener('lostpointercapture',endPointer);
+  map.addEventListener('wheel',event => {
+    event.preventDefault(); const delta = event.deltaY * (event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? pixelHeight : 1);
+    zoom(Math.exp(Math.max(-1,Math.min(1,delta*.002))),mapPoint(event.clientX,event.clientY));
+  },{passive:false});
+  map.addEventListener('keydown',event => {
+    if (event.altKey || event.ctrlKey || event.metaKey) return;
+    const steps = {ArrowLeft:[-.12,0],ArrowRight:[.12,0],ArrowUp:[0,-.12],ArrowDown:[0,.12]};
+    if (steps[event.key]) { event.preventDefault(); view.x += steps[event.key][0]*view.width; view.y += steps[event.key][1]*view.height; applyView(); }
+    else if (event.key === '+' || event.key === '=') { event.preventDefault(); zoom(.75); }
+    else if (event.key === '-') { event.preventDefault(); zoom(1/.75); }
+    else if (event.key.toLowerCase() === 'f') { event.preventDefault(); fit(validBounds(frame.siteBounds) ? frame.siteBounds : frame.bounds); }
+  });
+  function photoNumber(photo) { return photo.number ?? photos.indexOf(photo)+1; }
+  photos.forEach(photo => {
+    if (!finite(photo.x) || !finite(photo.y)) return;
+    const marker = svg('g',{class:'photo-symbol'}), circle = svg('circle',{r:11,fill:confirmed(photo) ? '#93d6ab' : '#a5c5f0'});
+    const label = svg('text',{y:3.5}); label.textContent = photoNumber(photo);
+    const title = svg('title'); title.textContent = 'Foto ' + photoNumber(photo) + ' · ' + provenance(photo.position_source);
+    marker.append(circle,label,title);
+    marker.addEventListener('click',event => { if (!suppressClick) { event.stopPropagation(); selectPhoto(photo); } });
+    let ray = null;
+    const heading = finite(photo.grid_heading) ? photo.grid_heading : photo.heading;
+    if (finite(heading) && heading >= 0 && heading < 360) {
+      const angle = heading*Math.PI/180, length = 22;
+      ray = svg('path',{class:'heading-ray',d:'M'+photo.x+','+(-photo.y)+'l'+(Math.sin(angle)*length)+','+(-Math.cos(angle)*length)});
+      $('ray-layer').append(ray);
+    }
+    $('photo-layer').append(marker); photoRecords.push({photo,marker,ray});
+  });
+  const unlocated = photos.length-photoRecords.length;
+  if (unlocated) warning(unlocated + ' Fotos haben keine verwendbare lokale Position. Sie bleiben in der Fotoliste, ohne erfundenen Kartenstandort.');
+  $('photo-count').textContent = photos.length;
+  let filteredPhotos = [], photoButtons = new Map();
+  function renderPhotoList() {
+    const query = $('photo-search').value.trim().toLocaleLowerCase('de'), filter = $('photo-filter').value;
+    filteredPhotos = photos.filter(photo => {
+      const match = !query || [photoNumber(photo),photo.id,photo.note].map(text).join(' ').toLocaleLowerCase('de').includes(query);
+      return match && (filter === 'all' || filter === 'confirmed' && confirmed(photo) || filter === 'unconfirmed' && !confirmed(photo) || filter === 'pending' && hasPending(photo) || filter === 'notes' && !!photo.note);
+    });
+    $('photo-list').replaceChildren(); photoButtons = new Map();
+    filteredPhotos.forEach(photo => {
+      const button = element('button',photoNumber(photo),'photo-button'+(confirmed(photo)?' confirmed':'')+(hasPending(photo)?' pending':''));
+      button.type = 'button'; button.setAttribute('aria-label','Foto '+photoNumber(photo)+' · '+provenance(photo.position_source));
+      button.title = 'Foto '+photoNumber(photo)+' · '+text(photo.id); button.setAttribute('aria-pressed',String(photo===selectedPhoto));
+      button.addEventListener('click',() => selectPhoto(photo)); $('photo-list').append(button); photoButtons.set(photo,button);
+    });
+    $('photo-list-status').textContent = filteredPhotos.length + ' von ' + photos.length + ' Fotos in der Liste. Alle Standorte bleiben auf der Karte sichtbar, sofern aktiviert.';
+    updatePhotoNavigation();
+  }
+  function updatePhotoNavigation() {
+    const index = filteredPhotos.indexOf(selectedPhoto);
+    $('previous-photo').disabled = !filteredPhotos.length || index === 0;
+    $('next-photo').disabled = !filteredPhotos.length || index === filteredPhotos.length-1;
+  }
+  $('photo-search').addEventListener('input',renderPhotoList); $('photo-filter').addEventListener('change',renderPhotoList);
+  function navigatePhoto(direction) {
+    const index = filteredPhotos.indexOf(selectedPhoto);
+    const next = index < 0 ? (direction>0 ? 0 : filteredPhotos.length-1) : index+direction;
+    if (filteredPhotos[next]) selectPhoto(filteredPhotos[next]);
+  }
+  $('previous-photo').addEventListener('click',() => navigatePhoto(-1)); $('next-photo').addEventListener('click',() => navigatePhoto(1));
+  let previewSequence = 0;
+  function updatePhotoStatus() {
+    if (!selectedPhoto) return;
+    status('Foto ' + photoNumber(selectedPhoto) + ' ausgewählt.' + (!$('show-photos').checked ? ' Fotostandorte sind ausgeblendet.' : '') + (!finite(selectedPhoto.x) || !finite(selectedPhoto.y) ? ' Kein Kartenstandort vorhanden.' : ''));
+  }
+  function selectPhoto(photo) {
+    selectedPhoto = photo; const sequence = ++previewSequence;
+    photoRecords.forEach(record => { const selected = record.photo===photo; record.marker.classList.toggle('selected',selected); record.ray?.classList.toggle('selected',selected); if (selected) { $('photo-layer').append(record.marker); if (record.ray) $('ray-layer').append(record.ray); } });
+    photoButtons.forEach((button,item) => button.setAttribute('aria-pressed',String(item===photo)));
+    const photoButton = photoButtons.get(photo);
+    if (photoButton) {
+      const list = $('photo-list'), box = list.getBoundingClientRect(), buttonBox = photoButton.getBoundingClientRect();
+      if (buttonBox.top < box.top) list.scrollTop -= box.top-buttonBox.top;
+      else if (buttonBox.bottom > box.bottom) list.scrollTop += buttonBox.bottom-box.bottom;
+    }
+    $('photo-title').textContent = 'Foto ' + photoNumber(photo) + ' · ' + text(photo.id);
+    const path = imagePath(photo.proxy), image = $('preview'), link = $('preview-link');
+    link.hidden = true; link.removeAttribute('href'); image.removeAttribute('src');
+    $('preview-message').textContent = path ? 'Lokale Vorschau wird geladen …' : 'Keine gültige lokale Vorschau angegeben.';
+    image.onload = () => { if (sequence!==previewSequence) return; link.hidden = false; $('preview-message').textContent = 'Foto anklicken: unveränderte lokale Arbeitskopie in einem neuen Tab öffnen.'; };
+    image.onerror = () => { if (sequence!==previewSequence) return; link.hidden = true; $('preview-message').textContent = 'Vorschau nicht lesbar: ' + path + '. Position und Belege bleiben verfügbar.'; };
+    image.alt = 'Fotoreferenz '+photoNumber(photo)+' · '+text(photo.id);
+    if (path) { link.href = path; image.src = path; }
+    const details = $('photo-details'); details.replaceChildren();
+    addDetail(details,'Position (lokale m)',finite(photo.x)&&finite(photo.y) ? 'x '+fmt(photo.x,2)+' · y '+fmt(photo.y,2) : 'Nicht vorhanden');
+    addDetail(details,'Positionsherkunft',provenance(photo.position_source));
+    addDetail(details,'Blickrichtung (Quelle)',finite(photo.heading)&&photo.heading>=0&&photo.heading<360 ? fmt(photo.heading,1)+'° im Uhrzeigersinn ab geografisch Nord' : 'Keine verwendbare Richtung');
+    addDetail(details,'Strahl auf der Karte',finite(photo.grid_heading)&&photo.grid_heading>=0&&photo.grid_heading<360 ? fmt(photo.grid_heading,2)+'° ab UTM-Gitternord (umgerechnet)' : 'Quellwinkel als Näherung; keine Meridian-Konvergenzkorrektur angegeben');
+    addDetail(details,'Richtungsherkunft',provenance(photo.heading_source));
+    $('photo-pending').hidden = !hasPending(photo); $('photo-pending').textContent = hasPending(photo) ? 'Offene Prüfpunkte: '+text(photo.pending) : '';
+    $('photo-note-wrap').hidden = !photo.note; $('photo-note').textContent = photo.note || '';
+    const extras = Object.fromEntries(Object.entries(photo).filter(([key]) => !['number','id','x','y','heading','grid_heading','position_source','heading_source','note','proxy'].includes(key)));
+    $('photo-evidence-wrap').hidden = !Object.keys(extras).length; $('photo-evidence').replaceChildren(valueNode(extras));
+    $('locate-photo').disabled = !finite(photo.x)||!finite(photo.y);
+    updatePhotoNavigation(); updatePhotoStatus();
+  }
+  $('locate-photo').addEventListener('click',() => { if (!selectedPhoto || !finite(selectedPhoto.x) || !finite(selectedPhoto.y)) return; fit([selectedPhoto.x-35,selectedPhoto.y-35,selectedPhoto.x+35,selectedPhoto.y+35]); updatePhotoStatus(); });
+  function featureLabel(record) { return text(record.feature.properties?.label || categoryName(record.category)) + ' · ' + text(record.feature.id) + ' · Quelle'; }
+  function renderFeatureList() {
+    const query = $('feature-search').value.trim().toLocaleLowerCase('de');
+    $('feature-select').replaceChildren(); let count = 0;
+    featureRecords.forEach(record => {
+      if (!visible(record) || query && !(featureLabel(record)+' '+text(record.feature.properties)).toLocaleLowerCase('de').includes(query)) return;
+      const option = element('option',featureLabel(record)); option.value = String(record.index); option.selected = selectedFeature===record;
+      $('feature-select').append(option); count++;
+    });
+    if (!selectedFeature || ![...$('feature-select').options].some(option => option.value===String(selectedFeature.index))) $('feature-select').selectedIndex = -1;
+    $('feature-list-status').textContent = count+' passende sichtbare Objekte'+(malformed ? ' · '+malformed+' nicht darstellbar' : '')+'.';
+    if (selectedFeature) $('feature-warning').textContent = featureWarning(selectedFeature);
+  }
+  function featureWarning(record) {
+    return 'Unveränderte Quellgeometrie im lokalen Rahmen. Lage, Breite und Höhe sind nicht automatisch verifiziert.' + (!visible(record) ? ' Dieses Objekt ist momentan ausgeblendet.' : '');
+  }
+  function renderSelection() {
+    $('selection-layer').replaceChildren();
+    if (!selectedFeature || !visible(selectedFeature)) return;
+    const original = selectedFeature.shape, shape = svg(original.tagName.toLowerCase(),{class:'selection-shape','fill-rule':'evenodd'});
+    if (original.tagName.toLowerCase()==='circle') { shape.setAttribute('cx',original.getAttribute('cx')); shape.setAttribute('cy',original.getAttribute('cy')); shape.setAttribute('r',8*metersPerPixel); }
+    else { shape.setAttribute('d',original.getAttribute('d')); if (!selectedFeature.isArea) shape.setAttribute('fill','none'); }
+    $('selection-layer').append(shape);
+  }
+  function selectFeature(record) {
+    selectedFeature = record; $('feature-title').textContent = featureLabel(record); $('feature-warning').textContent = featureWarning(record);
+    const dl = $('feature-details'); dl.replaceChildren();
+    addDetail(dl,'ID',record.feature.id); addDetail(dl,'Objektart',categoryName(record.category)); addDetail(dl,'Geometrie',record.feature.geometry.type);
+    addDetail(dl,'Ebene','GeoJSON-Quelle, Genauigkeit unbestätigt');
+    for (const [key,value] of Object.entries(record.feature.properties || {})) addDetail(dl,labels[key] || key,value);
+    $('locate-feature').hidden = false; renderFeatureList(); renderSelection(); status('Objekt ausgewählt: '+featureLabel(record));
+  }
+  $('feature-search').addEventListener('input',renderFeatureList);
+  $('feature-select').addEventListener('change',() => { const record = featureRecords.find(item => String(item.index)===$('feature-select').value); if (record) selectFeature(record); });
+  $('locate-feature').addEventListener('click',() => { if (selectedFeature) fit(selectedFeature.bounds,1.4); });
+  function referenceButtons(numbers) {
+    const row = element('div',undefined,'row');
+    for (const number of array(numbers)) {
+      const photo = photos.find(item => String(photoNumber(item))===String(number));
+      const button = element('button','Foto '+text(number)); button.type = 'button';
+      if (photo) {
+        button.addEventListener('click',() => {
+          selectPhoto(photo);
+          $('photo-inspection').scrollIntoView({block:'nearest',inline:'nearest'});
+        });
+      } else {
+        button.disabled = true; button.title = 'Diese Fotoreferenz ist nicht im eingebetteten Atlas enthalten.';
+      }
+      row.append(button);
+    }
+    return row;
+  }
+  function renderRegion(region) {
+    const card = $('region-card'); card.replaceChildren();
+    if (!region) { card.append(element('p','Keine Bereichskarte vorhanden.','help')); return; }
+    card.append(element('h3',region.label || region.id || 'Bereichskarte'));
+    card.append(element('p','Bereichs-ID: '+text(region.id),'help'));
+    if (array(region.photo_numbers).length) {
+      card.append(element('h3','Fotoreferenzen'),referenceButtons(region.photo_numbers));
+      card.append(element('p','Foto wählen öffnet die gemeinsame Vorschau; es setzt keine Objektposition.','help'));
+    }
+  }
+  const photoIndex = data.photo_index;
+  if (photoIndex && typeof photoIndex === 'object') {
+    const regions = array(photoIndex.regions);
+    $('photo-index').hidden = false; $('region-count').textContent = regions.length;
+    regions.forEach((region,index) => {
+      const option = element('option',region.label || region.id || 'Bereich '+(index+1));
+      option.value = String(index); $('region-select').append(option);
+    });
+    $('region-select').disabled = !regions.length;
+    $('region-select').addEventListener('change',() => renderRegion(regions[Number($('region-select').value)]));
+    renderRegion(regions[0]);
+  }
+  renderPhotoList(); updateVisibility();
+  if (rasters.length) $('raster').value = '0';
+  chooseRaster(); resize(); new ResizeObserver(resize).observe(map);
+  status(featureRecords.length+' Quellobjekte · '+photos.length+' Fotoreferenzen. Foto oder Objekt auswählen; lokale Unsicherheiten und Quellen beachten.');
+})();
+</script>
+</body>
+</html>

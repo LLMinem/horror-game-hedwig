@@ -8,7 +8,7 @@ Run the commands below from the repository root. Python 3 uses only its standard
 
 Open `tools/map/index.html` directly in a browser, for example with `open tools/map/index.html` on macOS. The standalone viewer embeds the map and needs no web server or external tiles. It contains no photographs. Its source is `data/cemetery_final.geojson`, not a terrain model.
 
-The verified map contains 140 features, including 96 path sections, one cemetery boundary, five building/storage footprints, 17 hedges, four fences, four gates, two columbaria and eleven other points. Only one path has a width tag. Individual graves, most trees, terrain relief and most object heights are absent. Hedge dimensions are authored tags, not verified measurements.
+The canonical map contains 140 features, including 96 path sections, one cemetery boundary, five building/storage footprints, 17 hedges, four fences, four gates, two columbaria and eleven other points. Those counts describe the file, not verified spatial accuracy. Only one path has a width tag. Individual graves, most trees, terrain relief and most object heights are absent. Hedge dimensions are authored tags, not verified measurements.
 
 The October 4 viewer was imported from `~/vaults/meeq-vault/03-Projects/Hedwig-and-Creative-Portfolio/Research/assets/neuer-friedhof-karte-2026-10-04.html`. A separate delivery copy was found at `~/Downloads/Hedwig-Karte-2026-10-04.html`. The recorded GeoJSON SHA-256 is `faa0de398279fca13e7c4946a1991db14257dda8082053c3a63a363020eddfca`. The standalone HTML is a snapshot, so changes to the GeoJSON do not update it automatically.
 
@@ -79,7 +79,7 @@ Position the **camera / photographer at capture time**, not the photographed obj
 
 In `placements.geojson`, `geometry` uses the human correction first, then an applied agent estimate, then observed GPS. Every feature retains the original `metadata`, source path and ID. `position_source` distinguishes `user_confirmed`, `agent_estimate` and `observed_gps`; agent estimates never set `user_confirmed`. `review` retains both assessment reasons, and `pending_review` lists unresolved components after human corrections. Original GPS accuracy groups remain independent of visual assessment. `effective_heading_deg`, `effective_heading_source` and `effective_heading_ref` identify the selected heading. A human row takes precedence over an agent estimate, including the explicit original-EXIF fallback for a null human heading.
 
-GeoJSON coordinates contain only WGS84 longitude and latitude. Phone altitude remains in the metadata with its reference tag, and is never copied into world Z. Altitude is not DGM terrain, a verified vertical datum or a measured camera height. A heading is not calibrated camera pose, and focal length alone does not establish pose. Agent or Blender use still needs an explicit coordinate transform, terrain source and vertical reference before constructing metric scene geometry.
+GeoJSON coordinates contain only WGS84 longitude and latitude. Phone altitude remains metadata, never world Z. For metric scene work, use the acquired DGM and explicit coordinate/height contract in [Blueprint preparation](blueprint-preparation.md). A located photo and heading are not a calibrated camera pose.
 
 ### Visual review and owner follow-up
 
@@ -97,7 +97,15 @@ The version-1 review envelope contains `photos`. Each row has `id`, `number`, `p
 
 The owner queue uses separate position and heading flags. A saved human position resolves the position flag; a numeric human heading resolves the heading flag. Removing a human correction restores the agent/original layer and its pending flags. The browser download contains manual corrections only, because the agent assessments already live in their own file. Numbered photos, per-component reasons and filter counts make the remaining work visible without reading JSON.
 
-The completed review covers every photo individually against map features and neighbouring captures. Five estimated positions and seven estimated headings were applied. Nineteen photos retain owner checks: sixteen positions and six headings, with three photos in both groups. These counts are recorded evidence, not a promise of survey accuracy. The private review directory contains the full assessments, annotated maps, source checksums and `report.md` with the outstanding questions. Do not treat missing or approximate map features as proof that the camera must move.
+The completed 2026-10-15 review covered every photo individually and applied five estimated positions and seven estimated headings. Its nineteen owner checks were the state before the subsequent human import. The private review directory retains those assessments and their evidence as history. Do not use its older counts instead of the current `map-status.json`.
+
+### Owner corrections and blueprint preparation
+
+On 2026-10-16 Micha supplied `foto-korrekturen.json` and asked that it become the standard. The validated import contains 91 positions and 51 numeric headings. Regenerated placements use every supplied row unchanged and keep original EXIF for a null human heading. Seven photos have no human row. Four workflow flags remain: position for photo43 and heading for44,88,97. Fourteen verbatim notes include additional estimates and uncertainty; confirmation does not override their meaning.
+
+The later authorization includes private photo comparison for the blueprint, not publication or Blender construction. Micha subsequently rejected the 113 agent-drawn interpretations as broadly inaccurate. The read-only atlas at `.local/blueprint/atlas.html` now joins effective camera positions to official imagery, numeric terrain and only the 140 canonical source features. Human photo corrections and all verbatim notes remain active.
+
+[Blueprint preparation](blueprint-preparation.md) owns acquisition, the metric frame, the next agent's context package and pilot acceptance criteria. The atlas's 13 regional groups come from private `photo-index.json` and contain only navigation links, not trusted observations or construction tasks. The rejected traces, old plans, full `photo-evidence.json` and historical interpretation reports belong under `.local/blueprint/archive/rejected-interpretation-2026-10-16/`, outside active modeling context. Continue importing camera corrections through this reference workflow, then regenerate both map and atlas. The atlas rebuild requires the private photo index, not archived interpretation inputs.
 
 ### Generate local working copies
 
@@ -162,9 +170,9 @@ Prefer agent-built geometry for the site's buildings, paths, boundaries and othe
 
 ## Missing inputs and backup limits
 
-No official DGM terrain or DOP/TrueDOP aerial clip has been supplied to this reference workflow. Earlier bounded discovery did not locate one, which does not establish that none exists elsewhere. The inventory does not conduct a broad disk search or acquire replacement data. Future acquisition needs a small site clip plus its epoch, CRS, vertical datum, licence and provider metadata. Older scans remain unverified context until their provenance is known.
+Official TrueDOP RGB/CIR, DGM1 and DOM1 are now registered under `.local/blueprint/`. Their capture dates, resolution, height datum, licenses and limitations are documented in [Blueprint preparation](blueprint-preparation.md). Remaining gaps include unseen geometry, local object dimensions and independently verified survey anchors, not basic access to terrain or aerial imagery.
 
-The source directories and `.local/` are ignored. They are not backed up by Git. Saved `.blend1` to `.blend3` files are same-disk recovery copies. The October 2 evidence found Time Machine inclusion metadata, but its external destination could not be mounted and no independent restore was demonstrated. Generating a manifest, JPEGs or more local copies does not resolve that backup limitation.
+The source directories and `.local/` are ignored. A Git push does not back up the private reference pack, photo corrections, acquired rasters, photo index or rejection archive. A fresh clone needs those private inputs restored separately before rebuilding the atlas. Saved `.blend1` to `.blend3` files are same-disk recovery copies. The October 2 evidence found Time Machine inclusion metadata, but its external destination could not be mounted and no independent restore was demonstrated. Generating a manifest, JPEGs or more local copies does not resolve that backup limitation.
 
 Keep source evidence separate from `public/`. Only deliberately reviewed runtime derivatives should enter the web build. A source-to-runtime conversion needs a recorded source, transform, material/export settings and browser acceptance; it is outside the current preparation task.
 
@@ -192,7 +200,7 @@ Integration completed on 2026-10-10: `status` and `inventory` matched the counts
 
 ### Photo-position workflow verification
 
-The following preparation checks predate the authorized visual review above.
+The following historical preparation checks predate the authorized visual review and owner correction import above. Their confirmation counts are superseded. Technical workflow checks do not establish visual accuracy.
 
 The follow-up refreshed metadata from exactly the 98 manifest paths, without a Photos database query. All 98 include altitude reference (`0`, EXIF above-sea-level), 35 mm-equivalent focal length (24 or 28 mm), aperture and exposure time in addition to GPS, true-north heading and horizontal error. No pitch/roll, GPS DOP or GPS measure-mode tags were returned. This is useful camera evidence, not a complete calibrated pose or a surveyed height model.
 
@@ -203,6 +211,8 @@ Verification: eight synthetic Python tests passed (`python3 -m unittest discover
 SHA-256 checks across the complete workflow matched all 98 original HEIC files and the canonical GeoJSON before/after. No real location was inferred or corrected automatically. Private map, sidecars and proxies remain on this Mac; disposable synthetic browser fixtures were removed.
 
 ### Visual review verification, 2026-10-15
+
+The counts below describe the historical state before the 2026-10-16 owner import. They do not override current owner corrections or validate the later rejected object interpretations.
 
 Twelve Python regression tests passed, including independent agent position/heading estimates, human precedence, unresolved heading flags, malformed review rejection and portrait conversion. The image regression exposed two fixture setup issues (a JPEG with a HEIC suffix, then a test size that caused native upscaling); both were corrected before the final passing run.
 

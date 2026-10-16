@@ -14,7 +14,7 @@ The boundary envelope is approximately 220 × 234 m; all features span approxima
 - All 17 hedges carry authored width 1 m and height 1.5 m; photo/field validation is outstanding.
 - Individual graves, most trees, terrain relief, roof shapes and most building/fence heights are absent.
 - Preserve `@id`, tags and original coordinates. Keep uncertainties in derived data; do not silently modify the source to fit a scene.
-- A single site-frame contract must align map, terrain, Blender and Three.js. EPSG:25832 is the researched planar CRS; DHHN2016_NH is the proposed official-terrain datum. Origin, axes and transforms are not implemented. Test axes with known anchors; do not mistake Blender Z-up → glTF Y-up for a geospatial alignment.
+- Use the unchanged source as the working geometry baseline, then compare the selected area against aerial images and ground photos. Micha rejected the separate 2026-10-16 agent tracings as broadly inaccurate; they are archived, not replacement geometry. For metric conversion, terrain, evidence priority and Blender setup, read [Blueprint preparation](../docs/blueprint-preparation.md). Its private `site-frame.json` fixes EPSG:25832, DHHN2016 normal heights and the Blender/glTF axis transform. Numerical registration does not establish object accuracy.
 
 Source SHA-256: `faa0de398279fca13e7c4946a1991db14257dda8082053c3a63a363020eddfca`.
 

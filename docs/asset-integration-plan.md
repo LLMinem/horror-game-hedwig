@@ -2,7 +2,7 @@
 type: plan
 status: active
 created: 2025-09-23
-last_verified: 2026-10-10
+last_verified: 2026-10-16
 ---
 
 # Hedwig — evidence-led environment revival
@@ -15,7 +15,9 @@ The Mac is the authoritative coding and Blender workstation. VPS deployment, clo
 
 Micha's follow-up prioritizes photo location review before choosing a polished section: retain original metadata, distinguish device-reported accuracy from verified positions, and let him correct uncertain camera locations on the map. Prefer agent-built, reference-backed models of the cemetery itself. Complex assets such as trees may use the existing pack; additional textures/models remain an option when needed after fit and licence checks. The existing lamp, Blender lamp sources and sample props are pipeline experiments, not authoritative references or required production content.
 
-On 2026-10-15 Micha explicitly authorized the agent to inspect every private photo and estimate camera positions and headings from visible evidence. That review is complete for all 98 photos. The private map now separates agent estimates from human confirmations and marks nineteen photos for owner follow-up. This authorization does not extend to scene production.
+The 2026-10-15 visual review covered all 98 photos and left nineteen owner checks. On 2026-10-16 Micha supplied corrections and authorized autonomous map preparation using additional geodata and the photos, explicitly excluding Blender construction. His imported rows now have priority. He subsequently rejected the 113 agent-drawn traces, including urn bays, lawns and canopy geometry, as broadly inaccurate and worse than the canonical GeoJSON. Technical validation never established visual accuracy.
+
+[Blueprint preparation](blueprint-preparation.md) is the authoritative guide for the source-only atlas, acquired sources, metric contract and next agent's context package. Retain the 140 canonical features as a working baseline with local uncertainty. Pause whole-site map expansion and do not commission a full redraw. The 13 regional photo-index groups help find photos, but do not supply trusted observations or modeling instructions.
 
 ## Current implementation
 
@@ -31,27 +33,26 @@ This repo plan condenses Micha's accepted direction from the local Vault, rather
 - `~/vaults/meeq-vault/03-Projects/Hedwig-and-Creative-Portfolio/Handoff-Hedwig-Revival.md` (2026-10-04).
 - In that project folder: `Handoff-Hedwig-Readiness-2026-10-02.md` and `Research/06-neuer-friedhof-reconstruction-inputs.md` contain measured evidence and limits; `Research/05-astra-blender-threejs-workbench.md` contains workflow rationale.
 
-The newer handoff supersedes the September research proposals: 12–20 minutes, artistic route compression, a VPS-first split, six buildings and an already available DEM are **not accepted current facts**. The 2026-10-04 inspection counts 140 map objects, 96 path segments and five building/storage footprints. The identified photo set is 98 originals with GPS and true-north heading, not proof of exhaustive coverage or calibrated camera poses.
+The newer direction supersedes unsupported September proposals about 12 to 20 minutes of gameplay, artistic route compression, a VPS-first split, six buildings and a DEM supposedly available at that time. Terrain was actually acquired and registered on 2026-10-16. The source map still contains 140 objects, 96 path segments and five building/storage footprints. The 98 original photos do not establish exhaustive coverage or calibrated camera poses.
 
-Read [local references](local-references.md) for actual source paths, commands, map access and gaps. Photos stay private. OSM supplies plan structure; photos establish visible appearance. DGM1/TrueDOP clips, their metadata and an independent source backup still need to be established.
+Read [local references](local-references.md) for source access and correction authority. For terrain, aerial imagery, plan geometry or the next Blender session, read [Blueprint preparation](blueprint-preparation.md). Official DGM1, DOM1 and TrueDOP clips with capture dates and licenses are now acquired. An independently restored source backup remains unverified.
 
 ## Next work, in order
 
-1. **Resolve reference uncertainties.** The individual visual review is complete. Use the private map's owner, position and heading filters to resolve the remaining flagged components. Agent estimates are not surveyed positions or human confirmations. Original measurements remain alongside them, and incomplete map features must not be treated as exact anchors. Use the resulting coverage and landmark evidence to propose a bounded production brief. A polished section still needs Micha's direction.
-2. **One coordinate contract and spatial skeleton.** Preserve source GeoJSON. Establish a shared local-metre frame for map, terrain, Blender exports and runtime placement. The research proposes EPSG:25832 and DHHN2016_NH; origin, vertical offset and concrete axis transform still need a tested contract. Validate at least three independent anchors. Do not confuse geodetic height with phone altitude or silently mirror the site when moving between Z-up Blender and Y-up glTF/Three.js.
-3. **Connected site and movement.** Build boundary, path network, exterior building masses and hedge/gate logic from evidence. Ground sampling, object placement and player movement must share the same height model. Test a continuous entrance → main path → side path → evidence-selected destination → return route; major boundaries/buildings must be non-traversable.
-4. **Polish one supported section.** Match recognizable silhouettes, surfaces, vegetation and details. Simple geometry is useful for layout checks, not the final artistic style. Use instancing for repeated assets and authored, evidence-backed forms for distinctive buildings/props. Classify important claims as observed, estimated or representative.
-5. **Accept Blender and runtime separately.** Produce a neutral photo-comparison view, dusk/night view and the same section in Three.js. Measure frame times/draw calls/loading on stated hardware, browser, resolution and quality. Agree the performance tier before calling it accepted. The old 60 FPS / ≤400 draw-call goals are provisional budgets.
+1. Select a small diagnostic pilot with Micha. Compare relevant canonical source IDs against official aerial imagery and a small set of corrected photos. An urn-bay pilot could demonstrate a better reference-to-model workflow; entrance/hall is an alternative. Use the guide's uncertainty list and acceptance criteria, not rejected geometry or archived work cards.
+2. Prepare the agreed inputs and coordinate contract. Preserve source GeoJSON, owner notes and stable IDs. Use `site-frame.json`, the acquired DGM and documented raster grid. Numerical registration is distinct from independent survey control; record local disagreements rather than silently fitting the sources together.
+3. Begin a bounded source model only after Micha authorizes the brief and an independent source backup restore is demonstrated. Make local corrections only with cited evidence. Keep unknown dimensions and obscured areas explicit. The current preparation authorizes no Blender or runtime work.
+4. Accept source appearance and browser behavior separately. Micha reviews neutral overhead and named photo-station comparisons before production approval. Later runtime work must demonstrate export appearance, loading, ground sampling, collision and measured performance on agreed hardware, browser, resolution and quality. The old 60 FPS / ≤400 draw-call goals remain provisional.
 
-A full spatial skeleton and one polished continuous route are the first milestone, not a demand to detail every grave before showing a useful section.
+The eventual environment milestone includes a full spatial skeleton and one polished continuous route. It is not the next authorized task. Pilot findings and human review must determine whether and how to expand beyond the selected area.
 
 ## Before modifying sources
 
-Keep raw pack files and existing `.blend` revisions immutable. Work in new revisions/copies and use the explicit [Blender workbench](assets/blender-workbench.md), not a remembered global export preset. The [pipeline checklist](assets/pipeline-guide.md) covers materials and browser reception. Local backups or Photos originals on the same Mac are not an independently restored backup.
+Keep raw pack files and existing `.blend` revisions immutable. Work in new revisions/copies and use the explicit [Blender workbench](assets/blender-workbench.md), not a remembered global export preset. The [pipeline checklist](assets/pipeline-guide.md) covers materials and browser reception. Local backups or Photos originals on the same Mac are not an independently restored backup. Git push does not back up the ignored private reference pack or acquired geodata.
 
 ## Human decisions still needed
 
-- Photo location confirmations/corrections first; first visible section, polished route and destination later, based on reviewed coverage.
+- Select the diagnostic pilot and authorize its bounded modeling brief and source acceptance criteria. Resolve only uncertainties relevant to that work; the later polished route remains a separate decision.
 - Target desktop/browser/resolution and quality tier.
 - Independent backup destination and restore proof before valuable source edits.
 - Whether environmental audio belongs in this milestone.
