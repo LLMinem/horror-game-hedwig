@@ -37,7 +37,7 @@ The source map is included in Git. This prepared Mac also has **98 JPEG proxies 
 
 The individual review covers every photo, and Micha's imported corrections are now authoritative wherever supplied. The private photo map keeps original observations, agent estimates and human corrections separate. See [owner corrections](docs/local-references.md#owner-corrections-and-blueprint-preparation).
 
-For the next reference or modelling session, read [Blueprint preparation](docs/blueprint-preparation.md) and open `.local/blueprint/atlas.html`. Micha rejected the 113 agent-drawn interpretations as broadly inaccurate. The active atlas uses only the 140 canonical source features, official 20 cm aerial imagery, numeric terrain and corrected photo links. Its 13 regional photo-index groups are navigation aids, not trusted work cards. Keep local uncertainty explicit and pause whole-site map expansion while Micha chooses a small diagnostic pilot. No Blender construction or production approval is authorized by preparation.
+For the next modelling session, implement the [approved entrance and hall pilot](docs/asset-integration-plan.md#approved-entrance-and-hall-pilot). Micha approved Blender authoring and the required runtime changes on 2026-10-16, starting next session and stopping at the first textured, walkable browser review. Read [Blueprint preparation](docs/blueprint-preparation.md), the [backup/restore evidence](docs/readiness.md#pilot-approval-and-backup-2026-10-16), and open `.local/blueprint/atlas.html`. No renewed scope approval or repeated setup smoke is needed. The rejected 113 agent interpretations remain excluded; the 13 photo-index groups are navigation aids, not trusted work cards.
 
 The guide defines the next agent's context package, separate source/browser acceptance gates and the private rejection archive. Rebuilding requires the private `photo-index.json`, acquired rasters and photo inputs, not the rejected traces or old `photo-evidence.json`. Opening the prepared atlas requires only a browser. A fresh clone lacks the private pack, and a Git push does not back it up.
 
@@ -60,7 +60,7 @@ The Vite dev server denies `.local/`, `.cache/`, source directories, private doc
 
 ## Documentation entry points
 
-- [AGENTS.md](AGENTS.md): single policy entry for coding agents; `CLAUDE.md` points there.
+- [AGENTS.md](AGENTS.md): canonical policy entry for coding agents; root `CLAUDE.md` is a symlink to it. Git checkpoint and pilot branch are documented there.
 - [Active plan](docs/asset-integration-plan.md): direction, implementation sequence and human decisions.
 - [Readiness](docs/readiness.md): analysis, changes, exercised checks and known limits.
 - [Source/reference access](docs/local-references.md) and [asset pipeline](docs/assets/pipeline-guide.md): use for reference and content work.

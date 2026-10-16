@@ -1,7 +1,7 @@
 ---
 type: backlog
 status: active
-last_verified: 2026-10-10
+last_verified: 2026-10-16
 ---
 
 # Hedwig backlog
@@ -10,9 +10,9 @@ The ordered milestone lives in [the active plan](asset-integration-plan.md). Thi
 
 ## Before production depends on them
 
-- Resolve independent source backup and demonstrate restoration; local snapshots and sibling blends are insufficient.
-- Acquire/register bounded DGM1 and current DOP/TrueDOP clips with epoch, CRS, vertical datum, nodata and delivered licence. They are not verified local inputs yet.
-- Review and confirm/correct photo camera locations, then determine visual coverage and a bounded first section. Agree target hardware/resolution before performance acceptance.
+- Maintain the owner-approved local snapshots under `/Users/meeq/.backups/horror-game-hedwig/` and preserve new source revisions before session end. An additional off-device backup remains recommended, not a blocker for the approved pilot; see [current evidence](readiness.md#pilot-approval-and-backup-2026-10-16).
+- Use the acquired and registered TrueDOP, DGM1 and DOM1 inputs through [Blueprint preparation](blueprint-preparation.md). Acquisition is complete; local geometry and unseen dimensions still need comparison in each modeled section.
+- Use the imported owner photo corrections and retain their uncertainty notes. The approved entrance/hall pilot and later section choices belong to the [active plan](asset-integration-plan.md). Agree target hardware/resolution before performance acceptance.
 - Reconcile provenance of shipped HDRIs/grass textures, code licence metadata and release attribution before public redistribution. The cemetery pack's commercial-use permission is already confirmed.
 
 ## With the corresponding feature

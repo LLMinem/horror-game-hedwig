@@ -174,6 +174,8 @@ Official TrueDOP RGB/CIR, DGM1 and DOM1 are now registered under `.local/bluepri
 
 The source directories and `.local/` are ignored. A Git push does not back up the private reference pack, photo corrections, acquired rasters, photo index or rejection archive. A fresh clone needs those private inputs restored separately before rebuilding the atlas. Saved `.blend1` to `.blend3` files are same-disk recovery copies. The October 2 evidence found Time Machine inclusion metadata, but its external destination could not be mounted and no independent restore was demonstrated. Generating a manifest, JPEGs or more local copies does not resolve that backup limitation.
 
+For the approved entrance/hall pilot, Micha selected `/Users/meeq/.backups` on 2026-10-16. The [active plan](asset-integration-plan.md#before-modifying-sources) now defines the local snapshot policy, and [readiness](readiness.md#pilot-approval-and-backup-2026-10-16) records the actual restore check and recovery layout. This replaces the old independent-destination blocker for the pilot, without claiming protection from hardware loss. Use only the 98 manifest-listed originals when backing up Photos references; do not copy unrelated library content.
+
 Keep source evidence separate from `public/`. Only deliberately reviewed runtime derivatives should enter the web build. A source-to-runtime conversion needs a recorded source, transform, material/export settings and browser acceptance; it is outside the current preparation task.
 
 ## Evidence and integration checks

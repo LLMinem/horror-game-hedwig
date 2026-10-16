@@ -4,6 +4,8 @@ Micha authorized reference preparation on 2026-10-16, excluding Blender construc
 
 The active atlas uses only the 140 canonical source features, official aerial imagery, numeric terrain and corrected private photo links. The canonical map is a working baseline with local uncertainty, not a survey or an approved production plan. Pause whole-site map expansion and do not attempt another full redraw. Preparation should support a small diagnostic pilot chosen by Micha.
 
+Micha subsequently approved the [entrance/hall pilot](asset-integration-plan.md#approved-entrance-and-hall-pilot), including Blender authoring and runtime changes, on 2026-10-16. Implementation starts next session and stops at the first textured, walkable browser checkpoint for his visual review. The source rules on this page remain binding. The earlier preparation-only restriction and urn-bay suggestion do not override this approval.
+
 ## Start here
 
 Open the private atlas on the prepared Mac:
@@ -94,20 +96,20 @@ Keep `data/cemetery_final.geojson` unchanged as the baseline. Retain its stable 
 
 Use this guide as the handoff; do not create another competing plan. Assemble the following package for one proposed region:
 
-1. Include the accepted brief and explicit scope. The project aims to reproduce the actual cemetery at dusk or night, with an environment prototype before gameplay. The current task remains reference preparation only. Name the proposed diagnostic pilot, its bounds, requested outputs and exclusions. An urn-bay pilot could test whether the revised workflow produces a faithful local model; the entrance/hall is an alternative if Micha prefers it.
+1. Include the approved brief and explicit scope from the [active plan](asset-integration-plan.md#approved-entrance-and-hall-pilot). The project aims to reproduce the actual cemetery at dusk or night, with an environment prototype before gameplay. Name the approved pilot's bounds, requested outputs and exclusions. Broader site expansion still requires review.
 2. Include the canonical GeoJSON and `site-local.json`, with the relevant stable source IDs. Include unannotated RGB/CIR, their capture dates and visibility limits, plus `site-frame.json` and the DGM grid contract above. Use source-only sheets for orientation, not as new measured evidence.
 3. Include effective photo placements and verbatim owner notes, with original metadata and provenance available. Use `.local/blueprint/photo-index.json` to select a small region-specific photo set, then inspect those photos directly. The 13 groups contain only IDs, labels and photo numbers; the atlas embeds them as `data.photo_index`, not `photo_evidence`.
 4. Include a short uncertainty list tied to source IDs and photo numbers. For each item, state the question, supporting or conflicting evidence and the human decision needed. If an object has no source ID, identify the nearby source feature and photo without inventing a footprint. Unknown areas need written limits, not speculative polygons.
 
-The package is sufficient for a bounded pilot when the private inputs open, the region and relevant IDs/photos are identified, and visible anchors can be compared in the shared frame. Every proposed correction must cite evidence, and unresolved dimensions or occlusions must remain explicit. Micha must select the pilot and authorize its task brief before modeling begins. Neither a complete whole-site redraw nor another review of all 98 photos is required.
+The package is sufficient for the bounded pilot when the private inputs open, the relevant IDs/photos are identified, and visible anchors can be compared in the shared frame. Every proposed correction must cite evidence, and unresolved dimensions or occlusions must remain explicit. Micha has selected the entrance/hall pilot and approved its brief. Neither a complete whole-site redraw nor another review of all 98 photos is required.
 
 ## Bounded pilot and acceptance
 
 First, compare the selected canonical features against RGB alone and the small photo set. Record local discrepancies without silently replacing source geometry. Do not infer a connected path surface, a closed urn structure or a tree inventory from a schematic map ring or foliage.
 
-Second, agree the pilot's observable acceptance criteria with Micha. Require a neutral overhead source comparison and ground-level comparisons from named photo stations for the selected area. List supported local corrections and unresolved details. A visually plausible result without those comparisons is not acceptance.
+Second, apply the approved pilot's observable acceptance criteria. Require a neutral overhead source comparison and ground-level comparisons from named photo stations for the selected area. List supported local corrections and unresolved details. A visually plausible result without those comparisons is not acceptance.
 
-Third, begin source authoring only after an explicit modeling brief and an independent backup restoration check. Keep existing Blender files unchanged and work in a new revision. No add-on or GIS server is needed to use the supplied coordinates and rasters.
+Third, begin source authoring next session under the approved brief and [owner-selected local backup policy](asset-integration-plan.md#before-modifying-sources). Read the recorded restore evidence rather than reopening the old independent-destination blocker. Keep existing Blender files unchanged and work in a new revision. No add-on or GIS server is needed.
 
 For an authorized pilot, preserve the reference setup:
 
@@ -117,7 +119,7 @@ For an authorized pilot, preserve the reference setup:
 
 Keep source acceptance and browser acceptance separate. Source acceptance requires Micha's review of the pilot comparisons, local corrections and remaining uncertainty. Dusk/night appearance can be reviewed alongside neutral views, but should not hide mismatches. Photo positions and headings guide comparisons without supplying calibrated lens, pitch or roll.
 
-Browser acceptance comes later through the existing [Blender workbench](assets/blender-workbench.md) and [asset pipeline](assets/pipeline-guide.md). It must establish export appearance, loading, collision, ground sampling and measured performance on agreed hardware, browser and resolution. A working atlas, valid geometry or passing CLI tests satisfies neither source visual acceptance nor runtime acceptance. Agents cannot approve production autonomously.
+Browser acceptance is a separate check within the approved pilot, not a reason to postpone all runtime work to another session. Follow the existing [Blender workbench](assets/blender-workbench.md) and [asset pipeline](assets/pipeline-guide.md). Establish export appearance, loading, collision, ground sampling and measured performance at a recorded hardware, browser and resolution. Local browser inspection of reviewed runtime derivatives is not public release or human art approval. A working atlas, valid geometry or passing CLI tests satisfies neither source visual acceptance nor runtime acceptance. Agents cannot approve production autonomously.
 
 ## Rebuild and recovery
 

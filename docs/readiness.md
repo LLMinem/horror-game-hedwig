@@ -2,7 +2,7 @@
 
 ## Assessment
 
-The [2026-10-16 blueprint preparation](blueprint-preparation.md) is the current guide for a bounded diagnostic pilot. Micha rejected the 113 agent-drawn interpretations as broadly inaccurate and worse than the canonical GeoJSON. The active atlas therefore uses only the 140 canonical source features, official rasters, numeric terrain and owner-corrected photo links. The source map remains a working baseline with local uncertainty. Pause whole-site map expansion; preparation is not authorization for Blender construction or production.
+Micha approved the [entrance and hall pilot](asset-integration-plan.md#approved-entrance-and-hall-pilot), including Blender authoring and runtime changes, on 2026-10-16. Implementation begins next session and stops at the first textured, walkable browser checkpoint for his visual review. The owner-selected local backup and restore evidence are recorded below. [Blueprint preparation](blueprint-preparation.md) owns the source contract. The rejected 113 agent interpretations remain excluded. No cemetery model or runtime integration was created during planning or session closure.
 
 The historical October 10 assessment below started from `main` at `3ec81deef975981d46279e4be8480308638905b2`. It used the October 4 strand note, revival handoff, technical readiness report and linked map/photo/material research. That preparation made no changes to `src/`, the canonical GeoJSON, existing Blender sources or the shipped lamp, and performed no commit, upload or deployment. Those statements describe that historical task, not later integration activity.
 
@@ -79,9 +79,9 @@ Final housekeeping removed disposable source fixtures and stopped the preparatio
 
 ## Remaining prerequisites, not hidden setup tasks
 
-1. Choose a small diagnostic pilot with Micha using the source-only atlas and a region-specific photo set. The 13 photo-index groups are navigation aids, not trusted work cards. Follow the context package and acceptance criteria in [Blueprint preparation](blueprint-preparation.md).
-2. Use the acquired terrain and documented frame when an explicit modeling brief authorizes source work. Compare relevant stable source IDs with aerial imagery and corrected photos. Record uncertainty and make only evidence-supported local corrections. Runtime terrain and coordinate integration remain unimplemented.
-3. Provide a reachable independent backup destination and demonstrate restoration before valuable source authoring. The earlier Time Machine report did not prove an external restore; extra local copies do not resolve it.
+1. Implement the approved entrance/hall pilot from the [active plan](asset-integration-plan.md#approved-entrance-and-hall-pilot). The brief and first review checkpoint no longer need approval. Use the source-only atlas and selected photos; regional index labels remain navigation aids, not evidence.
+2. Use the acquired terrain and documented frame. Compare relevant stable source IDs with aerial imagery and corrected photos. Record uncertainty and make only evidence-supported local corrections. Runtime terrain and coordinate integration remain to be implemented within the pilot.
+3. Preserve new source revisions through the [owner-approved local backup policy](asset-integration-plan.md#before-modifying-sources). The old independent-destination blocker is superseded; protection against loss of this Mac remains outside the verified backup.
 4. Agree target hardware/browser/resolution and later measure the actual route. Before public release, reconcile code-licence metadata and grass/HDRI provenance. The pack's commercial permission is already confirmed.
 
 For a new session, start with `README.md` and the [active plan](asset-integration-plan.md). Source access and Blender setup no longer require rediscovering paths from old conversations. Fresh clones still need the private source workspace or the documented recovery steps; private material is deliberately not part of Git.
@@ -127,3 +127,39 @@ The rebuilt atlas and plan sheets contain only the 140 projected canonical featu
 The builder completed without the rejected inputs, and all twelve existing reference tests passed. In visible Chrome, the source layer started enabled and could be hidden completely. The interpretation control was absent. Regional photo navigation, an owner's verbatim note, source-object selection and framing were exercised. All five raster images returned status 200, and no page exceptions were recorded. The regenerated atlas, PNG sheet and SVG were visually inspected for source-only presentation. Thirty-seven local documentation links resolved.
 
 The private record is `.local/blueprint/correction-verification.json`; the browser capture is `derived/browser-source-only.png` beneath the same directory. These checks establish the withdrawal and preservation of inputs. They do not approve individual GeoJSON features, photo-index associations or future model accuracy.
+
+## Blender pilot planning, 2026-10-16
+
+Micha initially requested workspace exploration and a reasoned pilot plan before construction. That planning pass proposed the bounded entrance/hall section, local infrastructure followed by recognizable architecture/materials, and a walkable browser review in the same authoring pass. The subsequent approval is recorded below. Plan approval is not approval of a yet-unbuilt model's appearance.
+
+Planning inspected the unannotated aerial overview and nine selected ground photos directly, along with source features, the active workflow documentation, existing Blender reports and current runtime movement/asset seams. The source hall's principal polygon edges are approximately 15.7 and 27.7 m, and the source approach from the entrance gate to its first bend is approximately 35.7 m. Those calculations do not establish field dimensions, path widths or building height. Generic asphalt tags do not override visible paving.
+
+The existing CPU render, Draco round trip, collection export and browser-input checks were not rerun. One uncovered authoring capability was exercised with Blender 5.2.2 LTS: create a disposable one-metre plane with UVs, a material and a packed generated image; save a new `.blend`; reopen it in a separate Blender process. Dimensions, position, unit scale, UVs, packed pixels, material link and custom revision metadata all survived. Both processes exited zero with empty stderr. The fixture opened no original sources.
+
+The new private record is `.local/blender-smoke/authoring-bd2g6oh1/report.json`, alongside `disposable.blend`. This is save/reopen and local permission evidence only, not a rendered appearance test, GPU proof, independent backup or browser acceptance. No global Blender preferences, permissions or installations were changed. No runtime code, canonical geometry, existing source blends or marketplace originals were changed.
+
+At the planning checkpoint, independent backup restoration remained outstanding. The planning pass did not repeat the earlier unavailable Time Machine check or treat its same-disk test file as a backup. The later owner-selected backup and its restoration are recorded below.
+
+## Pilot approval and backup, 2026-10-16
+
+Micha explicitly approved the entire entrance/hall pilot plan and the required runtime changes. He asked for implementation to begin in the next session and selected a project subfolder under `/Users/meeq/.backups` for backups. The next agent may proceed through the approved first review checkpoint without another scope/permission question. Broader expansion, public release and deployment remain excluded. His subsequent Git-workflow instruction authorizes atomic commits during work and pushes at session end; follow root `AGENTS.md`.
+
+The pre-pilot snapshot is `/Users/meeq/.backups/horror-game-hedwig/pre-pilot-2026-10-16-shrwd9cf/`. Its layout is:
+
+- `snapshot/project/` contains the project working tree and Git metadata, including uncommitted planning/approval documents, original GeoJSON, runtime assets, raw/working marketplace sources, private references, acquired rasters, rejected-history archive and existing smoke evidence.
+- `snapshot/photo-originals/` contains only the 98 manifest-listed HEIC originals, with their suffix directories below the original Photos `originals/` root preserved. It is not a copy of the whole Photos library.
+- `manifest.json` records SHA-256 checksums and exclusions. `verification.json` records the completed restore/usability checks. Both are private backup records, not runtime or repository assets.
+
+The initial copy and full restore verified 1,048 files, approximately 2.95 GB of payload, against source and backup SHA-256 values. A separate restore-check directory was populated entirely from the snapshot. The restored reference CLI reindexed all 98 backed-up originals without changing human corrections. One restored HEIC decoded successfully through `sips`. Blender 5.2.2 opened the restored lamp source through the restored workbench; all five image dependencies resolved inside the restored project tree. No original source was opened for editing. The disposable restore-check directory was removed after verification; the snapshot and reports remain.
+
+Reproducible dependencies and build caches are excluded: root `node_modules/`, `dist/`, `.cache/`, `.local/blueprint-venv/` and Python `__pycache__/` directories. Finder `.DS_Store` metadata is not part of content verification. Existing docs specify `npm ci` and the pinned blueprint environment recreation when recovery requires them. No installed applications, entire Photos library, unrelated home files or global configuration are backed up.
+
+For recovery, copy `snapshot/project/` into a new working location and copy `snapshot/photo-originals/` into a durable private originals directory. Never run authoring or reindexing inside the snapshot itself. In the restored project, run `python3 tools/references/references.py index --metadata .local/references/cached-exif.json --originals-root /absolute/path/to/restored/photo-originals`. That relocation path was exercised in the disposable restore and retained the owner corrections.
+
+The backup resides on the same filesystem as the working project. It protects against working-copy mistakes but does not provide independent hardware or off-device protection. Micha's chosen local arrangement replaces the earlier backup-destination gate for this pilot; it is not evidence that an off-device restore succeeded. No scheduled backup was installed. Save later reviewable `.blend` revisions and dependencies in new snapshots under the same project backup root, without overwriting this baseline.
+
+The initial session closure changed only documentation and private backup/evidence files. At that point no pilot modeling, runtime implementation, commit, push or deployment had been performed.
+
+### Version-control handoff
+
+Micha subsequently requested commits and a push of the completed preparation, an annotated pre-implementation checkpoint, and a separate implementation branch. The checkpoint is named `checkpoint/pre-entrance-hall-pilot`; implementation belongs on `feat/entrance-hall-pilot`. Root `AGENTS.md` owns the Git workflow, and root `CLAUDE.md` is its symlink rather than a second policy file. The private backup above remains immutable and predates this Git handoff; Git does not replace snapshots of private sources.
