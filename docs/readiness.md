@@ -2,7 +2,7 @@
 
 ## Assessment
 
-The entrance/hall pilot at `981fd64` is a useful foundation according to Micha's review, not finished or fully accurate modeling. Jagged path sections and irregular invisible barriers remain open; suspected foliage collision has not been established. The next session is agent-tooling and focused pilot polish, as defined by the [active plan](asset-integration-plan.md). Separate final source/browser art acceptance is not recorded. [Blueprint preparation](blueprint-preparation.md) owns the source contract, and the rejected 113 agent interpretations remain excluded.
+The entrance/hall pilot at `981fd64` is a useful foundation according to Micha's review, not finished or fully accurate modeling. Jagged path sections and irregular invisible barriers remain open; suspected foliage collision has not been established. The approved next work covers agent tooling, movement over all supported ground and a whole-cemetery ground foundation, as defined by the [active plan](asset-integration-plan.md). These changes are not implemented yet. Separate final source/browser art acceptance is not recorded. [Blueprint preparation](blueprint-preparation.md) owns the source contract, and the rejected 113 agent interpretations remain excluded.
 
 The historical October 10 assessment below started from `main` at `3ec81deef975981d46279e4be8480308638905b2`. It used the October 4 strand note, revival handoff, technical readiness report and linked map/photo/material research. That preparation made no changes to `src/`, the canonical GeoJSON, existing Blender sources or the shipped lamp, and performed no commit, upload or deployment. Those statements describe that historical task, not later integration activity.
 
@@ -231,3 +231,13 @@ The active plan links each issue and defines order and scope. The former first-p
 This handoff changed planning, guidance and issue state only. No runtime, authored geometry, source assets or canonical map data changed. No new browser benchmark, setup smoke or heavy QA was run. The prior source backup and measured evidence remain historical records, with the new owner feedback recorded separately.
 
 Planning verification resolved 74 local Markdown links and heading anchors across 11 affected or linked documents. GitHub API reads confirmed the seven new issue bodies, titles, labels and states, plus the intended closure/deferment of the historical issues. No obsolete references to the removed standalone backlog or retired pilot-plan anchor remained in the repository search.
+
+## Movement and ground planning decisions, 2026-10-18
+
+Micha approved configuring OMP's browser where practical and retaining the existing Chrome check for useful project checks or gaps. He accepted focused Blender script/export fixes with documented warnings that are verified harmless. The agreed approaches are recorded in issues #13 and #14; neither issue is implemented or closed.
+
+For movement, he rejected a thorough investigation of invisible shapes and approved walking across all supported ground with sensible solid-object collisions. [#15](https://github.com/LLMinem/horror-game-hedwig/issues/15) was revised accordingly. He also requested [#19](https://github.com/LLMinem/horror-game-hedwig/issues/19) for ground across the entire cemetery before detailed modeling expands.
+
+Read-only source research found that the prepared terrain covers the cemetery with margin. The present pilot uses a cropped heightfield and narrower path-derived walking restrictions. The expansion can reuse the existing terrain pipeline and movement interface, but must preserve the local hall platform adjustment. The cemetery boundary guides coverage; it does not authorize another hidden movement boundary inside rendered, supported ground.
+
+These are owner decisions and source-inspection findings, not new runtime evidence. No browser, terrain generation, export or movement verification was performed for this planning checkpoint. The active plan also records the owner's project-history context; the age and long pause alone do not establish that a stack rewrite is needed.

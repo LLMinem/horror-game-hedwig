@@ -6,7 +6,7 @@
 
 Build a faithful, beautiful, walkable **Neuer Friedhof, Bruchköbel** at dusk/night. The current milestone is an **environment prototype**, not the former game MVP. Read [the active plan](docs/asset-integration-plan.md) for direction and session scope. GitHub Issues own concrete work packages and status; `docs/archive/` and the lore are historical context.
 
-The default app is the textured entrance/hall pilot; the original sandbox remains at `?mode=sandbox`. Micha considers the pilot a useful basis, not finished modeling. Path/collision problems remain open. The next session is agent-tooling and pilot polish before further scene expansion; the active plan links its issues.
+The default app is the textured entrance/hall pilot; the original sandbox remains at `?mode=sandbox`. Micha considers the pilot a useful basis, not finished modeling. The approved next work covers agent tooling, natural movement over all supported ground and a whole-cemetery ground foundation before further detailed modeling. Read the active plan and linked issues for scope; these changes are not implemented yet.
 
 The lamp and sample props are disposable pipeline tests, not production references or mandatory assets. Prefer agent-authored, photo-backed geometry for the actual site; reusable complex vegetation may come from the local pack. Additional models/textures may be acquired when needed, with fit and licence checks.
 
