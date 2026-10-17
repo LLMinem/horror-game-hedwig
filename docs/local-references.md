@@ -166,7 +166,7 @@ Pack texture filenames include base colour, normal, NormalDX, roughness, metalne
 
 Micha confirmed purchase and commercial-use permission for the pack on October 4. Missing purchase paperwork is not a permission blocker. Vendor identity and detailed source history are still useful provenance records, while the origins and attribution of the existing grass/HDRI files remain incomplete. Existing names or old recommendations do not establish their licence.
 
-Prefer agent-built geometry for the site's buildings, paths, boundaries and other identifiable structures. Complex trees may come from the purchased pack. Additional textures or models remain an option when they fit the reference evidence, and the pack's churches and mausoleums are not substitutes for the actual cemetery buildings. Existing street-lamp files and test objects are source material or experiments, not authoritative production content. No visual suitability decision has been made.
+Prefer agent-built geometry for the site's buildings, paths, boundaries and other identifiable structures. Complex trees may come from the purchased pack. Additional textures or models remain an option when they fit the reference evidence, and the pack's churches and mausoleums are not substitutes for the actual cemetery buildings. Existing street-lamp files and test objects are experiments, not authoritative production content. Selected pilot assets have source/browser evidence in the current plan; no pack-wide visual suitability approval is implied.
 
 ## Missing inputs and backup limits
 
@@ -176,7 +176,7 @@ The source directories and `.local/` are ignored. A Git push does not back up th
 
 For the approved entrance/hall pilot, Micha selected `/Users/meeq/.backups` on 2026-10-16. The [active plan](asset-integration-plan.md#before-modifying-sources) now defines the local snapshot policy, and [readiness](readiness.md#pilot-approval-and-backup-2026-10-16) records the actual restore check and recovery layout. This replaces the old independent-destination blocker for the pilot, without claiming protection from hardware loss. Use only the 98 manifest-listed originals when backing up Photos references; do not copy unrelated library content.
 
-Keep source evidence separate from `public/`. Only deliberately reviewed runtime derivatives should enter the web build. A source-to-runtime conversion needs a recorded source, transform, material/export settings and browser acceptance; it is outside the current preparation task.
+Keep source evidence separate from `public/`. Only deliberately reviewed runtime derivatives should enter the web build. Source-to-runtime conversion needs a recorded source, transform, material/export settings and browser verification within the selected brief. The pilot's Blender/runtime work is approved, but a new section still needs a bounded brief.
 
 ## Evidence and integration checks
 

@@ -2,7 +2,7 @@
 
 A Three.js project aiming to reconstruct **Neuer Friedhof, Bruchköbel**, faithfully at dusk/night. The next milestone is a beautiful, walkable environment, not the former gameplay MVP.
 
-**Current app:** the entrance and funeral-hall pilot is the default review scene. It has a textured hall/tower exterior, a bounded DGM-based ground surface, connected paving, instanced vegetation and ground-following movement with solid barriers. Neutral, dusk and fixed comparison views are available. The original lamp sandbox remains at `?mode=sandbox`. The pilot awaits Micha's visual acceptance. See [the active plan](docs/asset-integration-plan.md) and [verification evidence](docs/readiness.md).
+**Current app:** the entrance and funeral-hall pilot is the default review scene. It has a textured hall/tower exterior, local terrain, connected paving, instanced vegetation and ground-following movement. Micha considers it a useful foundation, not finished modeling. Jagged paths and unexpected collision boundaries remain open in [#15](https://github.com/LLMinem/horror-game-hedwig/issues/15). Neutral/dusk and fixed views are available; the lamp sandbox remains at `?mode=sandbox`. See [the active plan](docs/asset-integration-plan.md) and [verification evidence](docs/readiness.md).
 
 ## Start from the repo root
 
@@ -37,7 +37,7 @@ The source map is included in Git. This prepared Mac also has **98 JPEG proxies 
 
 The individual review covers every photo, and Micha's imported corrections are now authoritative wherever supplied. The private photo map keeps original observations, agent estimates and human corrections separate. See [owner corrections](docs/local-references.md#owner-corrections-and-blueprint-preparation).
 
-The [approved entrance and hall pilot](docs/asset-integration-plan.md#approved-entrance-and-hall-pilot) has reached its first textured browser checkpoint. The next step is Micha's source/browser visual review, not automatic expansion. Read [Blueprint preparation](docs/blueprint-preparation.md), the current record in [readiness](docs/readiness.md), and open `.local/blueprint/atlas.html` for reference comparison. Existing setup tests need not be repeated. The rejected 113 agent interpretations remain excluded; the 13 photo-index groups are navigation aids, not trusted work cards.
+The [pilot review and next-session plan](docs/asset-integration-plan.md#current-pilot-and-review) schedule agent-tooling improvements and focused path/collision polish before further scene expansion. Concrete tasks and status live in [GitHub Issues](https://github.com/LLMinem/horror-game-hedwig/issues); the repo keeps direction, workflow contracts and verification records. Read [Blueprint preparation](docs/blueprint-preparation.md), the current [readiness record](docs/readiness.md), and use `.local/blueprint/atlas.html` for reference comparison. Reuse existing setup evidence. The rejected 113 agent interpretations remain excluded; the 13 photo-index groups are navigation aids, not trusted work cards.
 
 The guide defines the next agent's context package, separate source/browser acceptance gates and the private rejection archive. Rebuilding requires the private `photo-index.json`, acquired rasters and photo inputs, not the rejected traces or old `photo-evidence.json`. Opening the prepared atlas requires only a browser. A fresh clone lacks the private pack, and a Git push does not back it up.
 
@@ -61,10 +61,10 @@ The Vite dev server denies `.local/`, `.cache/`, source directories, private doc
 ## Documentation entry points
 
 - [AGENTS.md](AGENTS.md): canonical policy entry for coding agents; root `CLAUDE.md` is a symlink to it. Git checkpoint and pilot branch are documented there.
-- [Active plan](docs/asset-integration-plan.md): direction, implementation sequence and human decisions.
+- [Active plan](docs/asset-integration-plan.md): accepted direction, next-session order and scope.
 - [Readiness](docs/readiness.md): analysis, changes, exercised checks and known limits.
 - [Source/reference access](docs/local-references.md) and [asset pipeline](docs/assets/pipeline-guide.md): use for reference and content work.
-- [Backlog](docs/backlog.md): secondary risks/deferred work, not a competing roadmap.
+- [GitHub Issues](https://github.com/LLMinem/horror-game-hedwig/issues): work packages, acceptance criteria and status. Items labeled `deferred` are outside the next session.
 - `docs/archive/`, old lamp notes and lore: historical context, not current production instructions.
 
 ## Verification and release limits

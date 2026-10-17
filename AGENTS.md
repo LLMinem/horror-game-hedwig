@@ -4,15 +4,15 @@
 
 ## Direction
 
-Build a faithful, beautiful, walkable **Neuer Friedhof, Bruchköbel** at dusk/night. The current milestone is an **environment prototype**, not the former game MVP. Read [the active plan](docs/asset-integration-plan.md) before planning production work. It captures the accepted 2026-10-04 direction; older material under `docs/archive/` and the lore are history, not an implementation mandate.
+Build a faithful, beautiful, walkable **Neuer Friedhof, Bruchköbel** at dusk/night. The current milestone is an **environment prototype**, not the former game MVP. Read [the active plan](docs/asset-integration-plan.md) for direction and session scope. GitHub Issues own concrete work packages and status; `docs/archive/` and the lore are historical context.
 
-The default app is the textured entrance/hall review pilot, with local terrain, connected paths and collision. The original look-development sandbox remains at `?mode=sandbox`. Read the current checkpoint and remaining estimates in the active plan. Source and browser appearance await Micha's review before expansion.
+The default app is the textured entrance/hall pilot; the original sandbox remains at `?mode=sandbox`. Micha considers the pilot a useful basis, not finished modeling. Path/collision problems remain open. The next session is agent-tooling and pilot polish before further scene expansion; the active plan links its issues.
 
 The lamp and sample props are disposable pipeline tests, not production references or mandatory assets. Prefer agent-authored, photo-backed geometry for the actual site; reusable complex vegetation may come from the local pack. Additional models/textures may be acquired when needed, with fit and licence checks.
 
 ## Start a session
 
-1. Read `README.md`, `package.json` and the active plan; inspect existing working-tree changes before editing.
+1. Read `README.md`, `package.json`, the active plan and the issue selected for the session; inspect existing working-tree changes before editing.
 2. For photos, map, source assets or texture work, read `docs/local-references.md`. For terrain, site layout or Blender preparation, read `docs/blueprint-preparation.md`, including the owner's rejection of the earlier agent tracings. For Blender work, also read `docs/assets/blender-workbench.md` and `docs/assets/pipeline-guide.md`.
 3. Read only the modules needed for the task; `src/main.js` is the composition root. `docs/readiness.md` records verified preparation and remaining gaps.
 4. State the bounded task and verification. Follow the user's authorization: autonomous preparation may proceed end-to-end; scene production and art-direction choices need a specific brief. Explain new Three.js concepts briefly to Michael.

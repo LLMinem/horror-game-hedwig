@@ -1,18 +1,22 @@
 ---
 type: backlog
-status: active
+status: archived
 last_verified: 2026-10-16
+archived: 2026-10-17
+superseded_by: "docs/asset-integration-plan.md"
 ---
 
 # Hedwig backlog
 
-The ordered milestone lives in [the active plan](asset-integration-plan.md). This file holds secondary risks and deferred work, not a competing roadmap.
+Historical planning snapshot. The first pilot checkpoint was delivered and reviewed as a useful basis, with open path/collision and modeling limits. Use the [current plan](../asset-integration-plan.md) and linked GitHub Issues for new work. The future-tense instructions below are retained as history, not current tasks.
+
+The ordered milestone lives in [the active plan](../asset-integration-plan.md). This file holds secondary risks and deferred work, not a competing roadmap.
 
 ## Before production depends on them
 
-- Maintain the owner-approved local snapshots under `/Users/meeq/.backups/horror-game-hedwig/` and preserve new source revisions before session end. An additional off-device backup remains recommended, not a blocker for the approved pilot; see [current evidence](readiness.md#pilot-approval-and-backup-2026-10-16).
-- Use the acquired and registered TrueDOP, DGM1 and DOM1 inputs through [Blueprint preparation](blueprint-preparation.md). Acquisition is complete; local geometry and unseen dimensions still need comparison in each modeled section.
-- Use the imported owner photo corrections and retain their uncertainty notes. The approved entrance/hall pilot and later section choices belong to the [active plan](asset-integration-plan.md). Agree target hardware/resolution before performance acceptance.
+- Maintain the owner-approved local snapshots under `/Users/meeq/.backups/horror-game-hedwig/` and preserve new source revisions before session end. An additional off-device backup remains recommended, not a blocker for the approved pilot; see [current evidence](../readiness.md#pilot-approval-and-backup-2026-10-16).
+- Use the acquired and registered TrueDOP, DGM1 and DOM1 inputs through [Blueprint preparation](../blueprint-preparation.md). Acquisition is complete; local geometry and unseen dimensions still need comparison in each modeled section.
+- Use the imported owner photo corrections and retain their uncertainty notes. The approved entrance/hall pilot and later section choices belong to the [active plan](../asset-integration-plan.md). Agree target hardware/resolution before performance acceptance.
 - Reconcile provenance of shipped HDRIs/grass textures, code licence metadata and release attribution before public redistribution. The cemetery pack's commercial-use permission is already confirmed.
 
 ## With the corresponding feature

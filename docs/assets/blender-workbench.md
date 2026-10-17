@@ -7,7 +7,7 @@ owned_by: human
 
 # Local Blender workbench
 
-The Mac is the source workstation. Micha approved the [bounded entrance/hall pilot](../asset-integration-plan.md#approved-entrance-and-hall-pilot), including Blender authoring and runtime changes, on 2026-10-16. Implementation starts next session and stops at its first human review checkpoint. These tools do not authorize work beyond that brief; the target remains an environment prototype, not the former gameplay plan.
+The Mac is the source workstation. The first entrance/hall pilot is implemented and has been reviewed as a useful basis, with open modeling and path/collision limits. The [active plan](../asset-integration-plan.md) and selected GitHub Issue define the next bounded work. These tools do not authorize further scene expansion on their own; the target remains an environment prototype.
 
 ## Commands from the repository root
 

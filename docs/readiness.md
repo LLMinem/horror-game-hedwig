@@ -2,11 +2,11 @@
 
 ## Assessment
 
-The approved entrance and hall pilot now has a textured, walkable browser checkpoint on `feat/entrance-hall-pilot`. The first implementation checks are recorded below, separately from the historical preparation evidence. Micha's source and browser visual acceptance remains outstanding. [Blueprint preparation](blueprint-preparation.md) owns the source contract, and the rejected 113 agent interpretations remain excluded.
+The entrance/hall pilot at `981fd64` is a useful foundation according to Micha's review, not finished or fully accurate modeling. Jagged path sections and irregular invisible barriers remain open; suspected foliage collision has not been established. The next session is agent-tooling and focused pilot polish, as defined by the [active plan](asset-integration-plan.md). Separate final source/browser art acceptance is not recorded. [Blueprint preparation](blueprint-preparation.md) owns the source contract, and the rejected 113 agent interpretations remain excluded.
 
 The historical October 10 assessment below started from `main` at `3ec81deef975981d46279e4be8480308638905b2`. It used the October 4 strand note, revival handoff, technical readiness report and linked map/photo/material research. That preparation made no changes to `src/`, the canonical GeoJSON, existing Blender sources or the shipped lamp, and performed no commit, upload or deployment. Those statements describe that historical task, not later integration activity.
 
-## Findings and changes
+## Historical preparation findings
 
 | Area | Initial problem | Preparation |
 | --- | --- | --- |
@@ -19,9 +19,9 @@ The historical October 10 assessment below started from `main` at `3ec81deef9759
 
 The workstation's npm minimum-release-age policy rejected Vite 7.3.7 because it was published on October 6. The preparation respected that policy and selected 7.3.6 rather than weakening global npm settings. Updating compatible transitive dependencies removed the advisory findings observed during installation.
 
-## Source inventory and access
+## Historical preparation inventory
 
-[Local references](local-references.md) contains commands, paths and privacy rules. The current inventory is:
+[Local references](local-references.md) contains source access and privacy rules. The following inventory describes preparation before pilot implementation, not the current runtime content:
 
 | Material | Available locally | In the browser runtime |
 | --- | --- | --- |
@@ -36,11 +36,11 @@ The workstation's npm minimum-release-age policy rejected Vite 7.3.7 because it 
 
 Photo metadata does not prove complete coverage or calibrated pose. The initial October10 preparation did not visually interpret photos; the later authorized reviews are recorded below. Raw assets, photographs and private derived maps remain outside Git and the web build.
 
-## Code assessment
+## Historical pre-pilot code assessment
 
-The current module split is adequate for the next bounded implementation. `src/main.js` provides a clear composition root, asset loading has one shared path, and atmosphere/lighting can be retained while replacing the flat sandbox world. A framework migration, ECS or broad refactor would add risk without resolving the missing reference and coordinate decisions.
+The preparation assessment found the existing module split adequate for bounded implementation. It recommended retaining the renderer, atmosphere and shared loaders while replacing the flat sandbox assumptions. A framework migration or ECS was not required.
 
-The actual development work should address these seams when introducing the corresponding feature:
+The following were pre-pilot change points, not a current task list. Later implementation and verification are recorded below:
 
 - **Site geometry and movement:** `World.js` constructs a flat plane and sample props. `PlayerController.js` fixes camera height and clamps a rectangle. Terrain sampling, placement and collision must share one site frame and height contract. No existing module supplies that contract.
 - **Content loading and lifecycle:** `main.js` only logs lamp readiness/failure. `Environment.js` handles HDRIs separately and has no request-order guard for rapid switches. Its material traversal assumes a single material, and PMREM render-target lifetime needs review when asset loading is expanded. The explicit environment binding is a repo convention, not a general Three.js r179 requirement.
@@ -77,14 +77,9 @@ Reference/privacy and Blender tooling received separate read-only code reviews. 
 
 Final housekeeping removed disposable source fixtures and stopped the preparation dev/preview servers. Browser smoke processes closed their temporary profiles; private reference copies and local test evidence remain available. Git ignore checks covered 109 private/source paths, with no private source files tracked. Local Markdown links in the eleven current entry/workflow documents resolved.
 
-## Remaining prerequisites, not hidden setup tasks
+## Current session handoff
 
-1. Implement the approved entrance/hall pilot from the [active plan](asset-integration-plan.md#approved-entrance-and-hall-pilot). The brief and first review checkpoint no longer need approval. Use the source-only atlas and selected photos; regional index labels remain navigation aids, not evidence.
-2. Use the acquired terrain and documented frame. Compare relevant stable source IDs with aerial imagery and corrected photos. Record uncertainty and make only evidence-supported local corrections. Runtime terrain and coordinate integration remain to be implemented within the pilot.
-3. Preserve new source revisions through the [owner-approved local backup policy](asset-integration-plan.md#before-modifying-sources). The old independent-destination blocker is superseded; protection against loss of this Mac remains outside the verified backup.
-4. Agree target hardware/browser/resolution and later measure the actual route. Before public release, reconcile code-licence metadata and grass/HDRI provenance. The pack's commercial permission is already confirmed.
-
-For a new session, start with `README.md` and the [active plan](asset-integration-plan.md). Source access and Blender setup no longer require rediscovering paths from old conversations. Fresh clones still need the private source workspace or the documented recovery steps; private material is deliberately not part of Git.
+Use `README.md`, the [active plan](asset-integration-plan.md) and its selected GitHub Issue for current work. The first pilot implementation is complete as a checkpoint; the remaining path/collision observations and agent-tooling limits are not dismissed by that result. Reuse existing source/setup evidence. Fresh clones still need the private workspace or documented recovery steps.
 
 ## Follow-up: photo metadata and authoring direction
 
@@ -220,3 +215,19 @@ No hard operational blocker remained. The following workarounds and warnings are
 - No language server was configured for this repository. Existing module seams and direct source inspection were used; no new tooling dependency was added.
 - Blender 5.2.2 emitted `use_nodes` deprecation warnings for Blender 6 and a shared-image-sampler export warning. Export and browser loading succeeded; the warnings were not suppressed. Vite retained its greater-than-500-kB chunk warning (735.51 kB minified / 205.09 kB gzip).
 - The inspected pack did not supply a faithful birch or the required clipped vegetation forms. Selected broadleaf meshes and authored conifer/shrub/hedge geometry are silhouette approximations, not species-accurate reconstructions. Source and browser look remain separate human review gates.
+
+## Owner review and planning handoff, 2026-10-17
+
+Micha described the pilot as good progress and a useful first version to build on. He did not approve every modeled detail or request an exhaustive polish inventory. He reported jagged path sections and irregular invisible barriers. Possible collision around tree foliage was his impression without clear evidence, so the cause remains open. The earlier passing route covered selected positions and does not establish correctness across the full supported area.
+
+The next session is reserved for agent-tooling improvements and focused path/collision work before further production. GitHub Issues now own concrete tasks and status:
+
+- #12 covers Python environment selection and language-server access; #13 covers reliable browser metrics and captures.
+- #14 covers Blender API/sampler warnings; #15 groups path contours, unexpected barriers and the tree-collision suspicion.
+- #16 covers measured loading cost, #17 vegetation fit and #18 independent backup. They are deferred rather than new prerequisites for the pilot.
+
+The active plan links each issue and defines order and scope. The former first-pilot plan and Markdown backlog were archived. GitHub proposals #1, #5, #7 and #9 were closed as superseded or not planned, not as fully implemented. Historical reports #3, #4 and #10 remain deferred and were not re-diagnosed.
+
+This handoff changed planning, guidance and issue state only. No runtime, authored geometry, source assets or canonical map data changed. No new browser benchmark, setup smoke or heavy QA was run. The prior source backup and measured evidence remain historical records, with the new owner feedback recorded separately.
+
+Planning verification resolved 74 local Markdown links and heading anchors across 11 affected or linked documents. GitHub API reads confirmed the seven new issue bodies, titles, labels and states, plus the intended closure/deferment of the historical issues. No obsolete references to the removed standalone backlog or retired pilot-plan anchor remained in the repository search.
