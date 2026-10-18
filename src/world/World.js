@@ -22,8 +22,8 @@ export function createWorld({ scene, constants, defaults, sandbox = true }) {
   // =============== FOG SETUP
   // FogExp2 creates exponential fog - more realistic than linear fog
   // The density parameter controls how quickly the fog thickens with distance
-  // Formula: fogFactor = 1 - e^(-distance * density)
-  // At density 0.02: ~50% visibility at 35m, ~86% fog at 100m
+  // Formula: fogFactor = 1 - e^(-(distance * density)^2)
+  // At density 0.02: ~39% fog at 35m, ~98% fog at 100m
   scene.fog = new THREE.FogExp2(
     defaults.fogColor,   // Bluish charcoal for night atmosphere
     defaults.fogDensity  // 0.02 gives us ~70-80m practical visibility

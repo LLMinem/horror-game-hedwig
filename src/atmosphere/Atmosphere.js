@@ -141,21 +141,12 @@ const skyFragmentShader = `
 
     // Note: Stars removed from fragment shader - now rendered via THREE.Points (see ADR-003)
 
-    // Apply dithering to prevent color banding
-    // Uses screen-space position for stable noise pattern
-    float dither = hash(gl_FragCoord.xy);
-    dither = (dither - 0.5) * ditherAmount; // Center around 0, scale by amount
-    col += vec3(dither); // Add noise to break up gradients
-
     // CUSTOM FOG BLENDING - blend fog color based on altitude
     // Lower altitude = more fog (horizon gets fogged, zenith stays clear)
     float fogFactor = 1.0 - altitude; // Inverted: 1.0 at horizon, 0.0 at zenith
     fogFactor = pow(fogFactor, 2.0); // Strengthen the effect near horizon
     // Scale with fog density - denser fog = more sky obscured
     fogFactor *= clamp(fogDensity * 35.0, 0.0, fogMax); // 35 is empirical scale factor
-
-    // Blend sky color with fog color
-    col = mix(col, fogColor, fogFactor);
 
     // HORROR ATMOSPHERE GRADING (optional post-processing)
     if (u_horrorEnabled > 0.5) {
@@ -182,6 +173,17 @@ const skyFragmentShader = `
     }
 
     gl_FragColor = vec4(col, 1.0);
+    #include <tonemapping_fragment>
+    #include <colorspace_fragment>
+
+    // Match Three.js object fog: blend in output space, after tone mapping.
+    // fogColor is a linear THREE.Color, unlike the renderer's converted fog uniform.
+    vec3 outputFogColor = linearToOutputTexel(vec4(fogColor, 1.0)).rgb;
+    gl_FragColor.rgb = mix(gl_FragColor.rgb, outputFogColor, fogFactor);
+
+    // Dither in output space so dark gradients do not gain bright linear-space noise.
+    float dither = (hash(gl_FragCoord.xy) - 0.5) * ditherAmount;
+    gl_FragColor.rgb += vec3(dither);
   }
 `;
 
@@ -208,17 +210,11 @@ const starVertexShader = `
     vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
     gl_Position = projectionMatrix * mvPosition;
 
-    // Calculate point size based on attributes and uniforms
+    // Celestial points have no distance attenuation. Their size is in CSS pixels,
+    // independent of camera rotation and the arbitrary celestial sphere radius.
     float starSize = mix(u_sizeMin, u_sizeMax, size);
-
-    // Size attenuation: make distant stars smaller (perspective)
-    float calculatedSize = starSize * (300.0 / -mvPosition.z);
-    vCalculatedSize = calculatedSize; // Pass to fragment shader
-
-    // FIX: Enforce 2-pixel minimum to prevent sub-pixel flickering
-    // 2 logical pixels accounting for device pixel ratio
-    float minPixels = 2.0 * u_pixelRatio;
-    gl_PointSize = max(calculatedSize, minPixels);
+    vCalculatedSize = starSize;
+    gl_PointSize = max(starSize, 2.0) * u_pixelRatio;
   }
 `;
 
@@ -240,7 +236,7 @@ const starFragmentShader = `
     float alpha;
     if (u_useAntiAlias) {
       // Smooth anti-aliased edges
-      alpha = smoothstep(0.5, 0.3, dist);
+      alpha = 1.0 - smoothstep(0.3, 0.5, dist);
     } else {
       // Hard edges (for testing)
       alpha = dist < 0.5 ? 1.0 : 0.0;
@@ -263,6 +259,8 @@ const starFragmentShader = `
     alpha *= exp(-u_fogDensity * 60.0 * (1.0 - altitude)); // 60 is empirical scale
 
     gl_FragColor = vec4(u_tintColor, alpha);
+    #include <tonemapping_fragment>
+    #include <colorspace_fragment>
   }
 `;
 
@@ -273,16 +271,15 @@ function generateStarGeometry(starCount, constants) {
   const brightnesses = new Float32Array(starCount);
 
   for (let i = 0; i < starCount; i++) {
-    // Generate points only in upper hemisphere (no stars below horizon)
-    const theta = Math.random() * Math.PI * 2; // 0 to 2π (full circle)
-    const phi = Math.random() * Math.PI * 0.5; // 0 to π/2 (upper hemisphere only)
-
-    // Convert spherical to cartesian coordinates
-    // Radius matches skydome
+    // Uniform solid-angle sampling: uniform polar angles crowd the zenith.
+    // Independent random directions retain natural close pairs, not a grid.
+    const theta = Math.random() * Math.PI * 2;
+    const altitude = Math.random();
+    const horizontal = Math.sqrt(1 - altitude * altitude);
     const radius = constants.SKYDOME_RADIUS;
-    const x = radius * Math.sin(phi) * Math.cos(theta);
-    const y = radius * Math.cos(phi); // Y is up
-    const z = radius * Math.sin(phi) * Math.sin(theta);
+    const x = radius * horizontal * Math.cos(theta);
+    const y = radius * altitude;
+    const z = radius * horizontal * Math.sin(theta);
 
     positions[i * 3] = x;
     positions[i * 3 + 1] = y;
@@ -349,7 +346,7 @@ export function createAtmosphere({ scene, renderer, camera, constants, defaults 
       fogMax: { value: defaults.fogMax },
 
       // HORROR GRADING - Post-processing effects
-      u_resolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
+      u_resolution: { value: renderer.getDrawingBufferSize(new THREE.Vector2()) },
       u_time: { value: 0.0 },
       u_horrorEnabled: { value: defaults.horrorEnabled ? 1.0 : 0.0 },
       u_desat: { value: defaults.horrorDesat },
@@ -364,7 +361,7 @@ export function createAtmosphere({ scene, renderer, camera, constants, defaults 
     side: THREE.BackSide, // Render inside of sphere
     depthWrite: false, // Don't write to depth buffer
     depthTest: false, // CRITICAL: Don't test depth at all
-    fog: false, // MUST be false - fog on skydome with no depth causes black screen!
+    fog: false, // The shader blends horizon fog explicitly, not at dome distance.
   });
 
   const skydome = new THREE.Mesh(skyGeometry, skyMaterial);
@@ -381,7 +378,6 @@ export function createAtmosphere({ scene, renderer, camera, constants, defaults 
       u_horizonFade: { value: defaults.starHorizonFade },
       u_pixelRatio: { value: renderer.getPixelRatio() },
       u_useAntiAlias: { value: defaults.starAntiAlias },
-      u_cameraPos: { value: camera.position }, // For potential future use
       u_fogDensity: { value: defaults.fogDensity },
       u_tintColor: { value: new THREE.Color(defaults.starTint) },
     },
@@ -397,7 +393,9 @@ export function createAtmosphere({ scene, renderer, camera, constants, defaults 
   let currentStarCount = defaults.starCount;  // Track current star count
   const starGeometry = generateStarGeometry(currentStarCount, constants);
   const stars = new THREE.Points(starGeometry, starMaterial);
-  stars.renderOrder = -1000; // Render before skydome
+  // Transparent points render after the opaque dome; depth testing hides them
+  // behind world geometry, while depthWrite:false keeps the sky out of its way.
+  stars.renderOrder = -998;
   stars.frustumCulled = false; // Never cull stars
   stars.visible = defaults.starEnabled;
   scene.add(stars);
@@ -424,7 +422,7 @@ export function createAtmosphere({ scene, renderer, camera, constants, defaults 
     starMaterial.uniforms.u_pixelRatio.value = renderer.getPixelRatio();
 
     // Update resolution for horror vignette effect
-    skyMaterial.uniforms.u_resolution.value.set(window.innerWidth, window.innerHeight);
+    renderer.getDrawingBufferSize(skyMaterial.uniforms.u_resolution.value);
   }
 
   /**
