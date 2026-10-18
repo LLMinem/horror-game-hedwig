@@ -11,21 +11,26 @@ export async function exercisePilot() {
   const route = [[-29,-65],[-27.7,-62.9],[-11.7,-35.9],[-11,-31.7],[-13.8,-26.9],[-16.2,-25.1],
     [-22.2,-20.7],[-25.1,-18.6],[-27.4,-15.3],[-27.3,-11.5],[-26.5,-9.3],[-20.3,1.2],[-17.9,4.8],
     [-14.5,2.9],[-10.9,.55],[-1.1,-5.7],[4.1,-8.8],[13,-14.4],[.9,-34.1],[-3.7,-31.3],[-11,-31.7]];
+  const groundRoute = [[-27,-62],[20,-60],[105,-60],[105,100],[-85,100],[-85,-105],[20,-105],[20,-60]];
+  check(api.canStand(20,-60), 'Supported grass is still restricted to paths');
   api.reset();
   let minFloor = Infinity, maxFloor = -Infinity;
   const timings = [], calls = []; let previous = await frame();
-  for (const [x,z] of route) {
-    let iterations = 0;
-    while (Math.hypot(api.camera.position.x-x, api.camera.position.z-z) > .08) {
-      const dx=x-api.camera.position.x,dz=z-api.camera.position.z,remaining=Math.hypot(dx,dz);
-      const step=Math.min(.35,remaining);
-      api.player.setView({x:api.camera.position.x,z:api.camera.position.z,yaw:Math.atan2(dx,-dz),pitch:0});
-      check(api.move(dx/remaining*step,dz/remaining*step),`Route movement failed at ${x}, ${z}`);
-      const state=api.snapshot();
-      check(state.supported && Math.abs(state.position[1]-state.floor-eyeHeight)<.001,'Route lost ground contact');
-      minFloor=Math.min(minFloor,state.floor);maxFloor=Math.max(maxFloor,state.floor);
-      const now=await frame();timings.push(now-previous);previous=now;calls.push(api.renderer.info.render.calls);
-      check(++iterations<200,`Route blocked before ${x}, ${z}`);
+  for (const [stations,stepLimit] of [[route,.35],[groundRoute,1.5]]) {
+    api.reset();
+    for (const [x,z] of stations) {
+      let iterations = 0;
+      while (Math.hypot(api.camera.position.x-x, api.camera.position.z-z) > .08) {
+        const dx=x-api.camera.position.x,dz=z-api.camera.position.z,remaining=Math.hypot(dx,dz);
+        const step=Math.min(stepLimit,remaining);
+        api.player.setView({x:api.camera.position.x,z:api.camera.position.z,yaw:Math.atan2(dx,-dz),pitch:0});
+        check(api.move(dx/remaining*step,dz/remaining*step),`Route movement failed at ${x}, ${z}`);
+        const state=api.snapshot();
+        check(state.supported && Math.abs(state.position[1]-state.floor-eyeHeight)<.001,'Route lost ground contact');
+        minFloor=Math.min(minFloor,state.floor);maxFloor=Math.max(maxFloor,state.floor);
+        const now=await frame();timings.push(now-previous);previous=now;calls.push(api.renderer.info.render.calls);
+        check(++iterations<200,`Route blocked before ${x}, ${z}`);
+      }
     }
   }
   // Compare the decoded, transformed render terrain with the movement heightfield.
@@ -60,18 +65,27 @@ export async function exercisePilot() {
   for(let i=0;i<10;i++)api.move(-.35,.05);
   const slidingDistance=api.camera.position.distanceTo(beforeSlide);
   check(slidingDistance>.3 && api.snapshot().supported,'Angled wall sliding stuck');
-  // Closed boundary wall at entrance and unsupported pilot edge; large sprint-like displacements.
+  // Retain physical gate collision and protect the actual finite terrain footprint.
   api.reset();for(let i=0;i<20;i++)api.move(-.8,-.5);
   const gateStop=api.snapshot();check(gateStop.supported,'Crossed the entrance boundary');
-  api.reset();for(let i=0;i<100;i++)api.move(.5,.85);
-  check(api.snapshot().supported,'Sprinting crossed the pilot edge or obstacle');
-  check(!api.canStand(-49.5,-84.5) && api.sampleHeight(-1000,0)===null,'Unsupported terrain must be refused');
+  const ground=api.world.data.ground;
+  const xmax=ground.x0+(ground.columns-1)*ground.step,zmax=ground.z0+(ground.rows-1)*ground.step;
+  const radius=.28,midX=(ground.x0+xmax)/2,midZ=(ground.z0+zmax)/2;
+  for(const [x,z,dx,dz] of [[ground.x0+radius+.1,midZ,-1,0],[xmax-radius-.1,midZ,1,0],[midX,ground.z0+radius+.1,0,-1],[midX,zmax-radius-.1,0,1]]) {
+    check(api.player.setView({x,z,yaw:0,pitch:0}),'Terrain edge start is unsupported');
+    for(let i=0;i<3;i++)api.move(dx,dz);
+    const edge=api.snapshot();
+    check(edge.supported && Math.hypot(edge.position[0]-x,edge.position[2]-z)<.11,'Crossed finite terrain edge');
+  }
+  check(!api.canStand(ground.x0,ground.z0) && api.sampleHeight(xmax+1,midZ)===null,'Unsupported terrain must be refused');
+  const trunk=api.world.data.obstacles.find(o=>o.id.includes('-trunk-')).polygon;
+  check(!api.canStand(trunk.reduce((sum,p)=>sum+p[0],0)/trunk.length,trunk.reduce((sum,p)=>sum+p[1],0)/trunk.length),'Tree trunk became walkable');
   api.setView('overhead');const overhead=api.camera.position.clone();
   check(!api.move(1,0) && api.camera.position.equals(overhead),'Inspection view enabled walking');
   api.reset();check(api.snapshot().mode==='walk' && Math.abs(api.camera.position.y-api.sampleHeight(api.camera.position.x,api.camera.position.z)-eyeHeight)<.001,'Reset did not re-ground the camera');
   timings.sort((a,b)=>a-b);
   const gl=api.renderer.getContext(),ext=gl.getExtension('WEBGL_debug_renderer_info');
-  return {routePoints:route.length,frameSamples:timings.length,meanFrameMs:timings.reduce((a,b)=>a+b,0)/timings.length,
+  return {routePoints:route.length,wholeGroundRoute:groundRoute,frameSamples:timings.length,meanFrameMs:timings.reduce((a,b)=>a+b,0)/timings.length,
     p95FrameMs:timings[Math.floor(timings.length*.95)],maxDrawCalls:Math.max(...calls),
     floorRange:[minFloor,maxFloor],decodedGroundSamples:checked,maxSurfaceError,slidingDistance,
     gateStop:gateStop.position,hallStop:stopped.position,buffer:[api.renderer.domElement.width,api.renderer.domElement.height],

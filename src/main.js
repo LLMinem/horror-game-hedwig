@@ -39,6 +39,8 @@ function setView(id) {
   const view = pilot.views.find(candidate => candidate.id === id);
   if (!view || !player.setView(view)) return false;
   camera.fov = view.inspection ? 65 : 55;
+  // A higher near plane preserves depth precision for 25 mm paving at overview height.
+  camera.near = view.inspection ? 1 : 0.1;
   camera.updateProjectionMatrix();
   if (view.inspection) guiControls.setReviewLighting('neutral');
   activeView = id;
@@ -52,6 +54,7 @@ function reset() {
   review.setActiveView('');
   if (pilot) {
     camera.fov = 55;
+    camera.near = 0.1;
     camera.updateProjectionMatrix();
   }
   review.setStatus('ready', 'Walking — entrance spawn. Prototype, awaiting visual review.');
@@ -104,6 +107,8 @@ if (pilot) {
       };
     },
   });
+} else {
+  window.__sandboxReview = Object.freeze({ ready, camera, renderer, scene, player, devRoom, atmosphere, world, guiControls });
 }
 
 window.addEventListener('keydown', event => {

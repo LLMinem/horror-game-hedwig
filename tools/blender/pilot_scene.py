@@ -52,7 +52,6 @@ for name in data['textures']:material(name,(.5,.5,.5))
 material('glass',(.075,.11,.12),.18,.25)
 material('metal',(.4,.43,.42),.34,.75)
 material('dark-metal',(.065,.075,.085),.65,.5)
-material('review-limit',(.58,.33,.07),.8)
 material('rubber',(.045,.05,.052),.98)
 
 
@@ -236,11 +235,6 @@ for sign in [-1,1]:
     for i in range(14):
         q=(post[0]+(end[0]-post[0])*i/13,post[1]+(end[1]-post[1])*i/13)
         beam((*q,ground(*q)+.16),(*q,ground(*q)+1.35),.025,.025,'metal','world')
-# Explicit review limits, not fictitious cemetery walls. Amber bars across terminated branches.
-for section in [data['pathSections'][-1],data['pathSections'][-3]]:
-    a,b=section['line'][-2:];direction=Vector((b[0]-a[0],b[1]-a[1],0)).normalized();perp=Vector((-direction.y,direction.x,0))*section['width']/2
-    left=Vector((*b,ground(*b)+.04))-perp;right=Vector((*b,ground(*b)+.04))+perp
-    beam(tuple(left),tuple(right),.06,.09,'review-limit','world')
 
 
 def mesh_object(name,verts,faces,collection,mat=None,uv=None):
@@ -272,7 +266,9 @@ for view in walk['views']:
     direction=Vector((math.sin(yaw)*math.cos(pitch),math.cos(yaw)*math.cos(pitch),math.sin(pitch)))
     obj.rotation_euler=direction.to_track_quat('-Z','Y').to_euler()
     cam.sensor_fit='VERTICAL';cam.sensor_height=24;cam.lens=24/(2*math.tan(math.radians(55)/2))
-    if view.get('inspection'):cam.type='ORTHO';cam.sensor_fit='HORIZONTAL';cam.ortho_scale=200
+    if view.get('inspection'):
+        cam.type='ORTHO';cam.sensor_fit='HORIZONTAL'
+        cam.ortho_scale=max(walk['ground']['columns'],walk['ground']['rows'])*1.9 if view['id']=='site-overhead' else 200
 scene.camera=bpy.data.objects['approach']
 worldmat=bpy.data.worlds.new('Review World');scene.world=worldmat
 bg=worldmat.node_tree.nodes.get('Background');bg.inputs[0].default_value=(.58,.65,.72,1);bg.inputs[1].default_value=.65

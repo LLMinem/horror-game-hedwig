@@ -1,4 +1,4 @@
-"""Prepare only the approved entrance/hall section, using the private source-only atlas.
+"""Prepare whole-cemetery ground around the reference-backed entrance/hall section.
 Run with the existing .local/blueprint-venv/bin/python. Never edits source evidence.
 Dimensions without survey control are explicit editable review estimates below.
 """
@@ -130,22 +130,34 @@ def main():
     features={f['properties']['source_id']:f for f in site['features']}
     coords=lambda id: features[id]['geometry']['coordinates']
     dgm=np.loadtxt(ROOT/'.local/blueprint/derived/terrain-local.csv',delimiter=',')
-    # Exact DGM centres: local east x=-49.5..29.5, north y=84.5..-24.5.
-    heights=dgm[175:285,210:290].copy()
+    # Sample-centred crop covering the cemetery and entrance, with an 8 m margin.
+    # The polygon chooses coverage only; it is never a walking mask.
+    cemetery=Polygon(coords('way/40068348')[0])
+    west,south,east,north=cemetery.bounds
+    c0=math.floor((min(west,-49.5)-8)+259.5)
+    c1=math.ceil((max(east,29.5)+8)+259.5)
+    r0=math.floor(259.5-(max(north,84.5)+8))
+    r1=math.ceil(259.5-(min(south,-24.5)-8))
+    if not (0<=c0<c1<dgm.shape[1] and 0<=r0<r1<dgm.shape[0]):
+        raise ValueError('Prepared DGM does not cover the requested ground')
+    heights=dgm[r0:r1+1,c0:c1+1].copy()
+    rows,columns=heights.shape
+    x0=-259.5+c0; north0=259.5-r0
     hall=Polygon(coords('way/362596059')[0])
-    floor=float(np.median([heights[round(84.5-y),round(x+49.5)] for x,y in hall.exterior.coords]))
+    # Same source samples and median as r05; never re-level the existing hall.
+    floor=float(np.median([dgm[round(259.5-y),round(x+259.5)] for x,y in hall.exterior.coords]))
     # Local constructed hall platform, blended into general DGM over two metres.
     # The one-metre DGM is not a kerb/threshold survey.
     terrace=Polygon([xy(0,-1.8),xy(27.72,-1.8),xy(27.72,15.7),xy(0,15.7)])
-    for row in range(110):
-        for col in range(80):
-            p=Point(-49.5+col,84.5-row)
+    for row in range(rows):
+        for col in range(columns):
+            p=Point(x0+col,north0-row)
             weight=max(0,1-terrace.distance(p)/2)
             heights[row,col]=heights[row,col]*(1-weight)+floor*weight
     heights=np.round(heights,5)
 
     def ground(x,y):
-        cx=x+49.5; rz=84.5-y; col=min(78,max(0,math.floor(cx))); row=min(108,max(0,math.floor(rz)))
+        cx=x-x0; rz=north0-y; col=min(columns-2,max(0,math.floor(cx))); row=min(rows-2,max(0,math.floor(rz)))
         tx=cx-col; tz=rz-row
         a,b,c,d=heights[row,col],heights[row,col+1],heights[row+1,col],heights[row+1,col+1]
         return float(a+(c-a)*tz+(d-c)*tx if tz>=tx else a+(b-a)*tx+(d-b)*tz)
@@ -159,13 +171,25 @@ def main():
               ('east',coords('way/1165093239'),2.4),
               ('north-junction',coords('way/1165093234')[-3:],3),
               ('south-limit',coords('way/1165079380')[:2],3)]
-    paving=unary_union([LineString(line).buffer(width/2,cap_style=2,join_style=2) for _,line,width in sections])
+    paving_parts=[LineString(line).buffer(width/2,cap_style=2,join_style=2) for _,line,width in sections]
+    # Taper the two abrupt entrance-approach width changes instead of square steps.
+    # Keep the source centreline and intentional hall/path corners unchanged.
+    for left,right in zip(sections[:2],sections[1:3]):
+        _,a,wa=left; _,b,wb=right
+        narrow=b if wa>wb else list(reversed(a))
+        start,end=narrow[:2]; dx=end[0]-start[0]; dy=end[1]-start[1]
+        length=math.hypot(dx,dy); distance=min(2,length/2)
+        nx,ny=-dy/length,dx/length
+        finish=[start[0]+dx/length*distance,start[1]+dy/length*distance]
+        wide,thin=max(wa,wb)/2,min(wa,wb)/2
+        paving_parts.append(Polygon([
+            (start[0]+nx*wide,start[1]+ny*wide),(start[0]-nx*wide,start[1]-ny*wide),
+            (finish[0]-nx*thin,finish[1]-ny*thin),(finish[0]+nx*thin,finish[1]+ny*thin)]))
+    paving=unary_union(paving_parts)
     # Door landing connects the centreline surface to the existing source entrance recess.
     landing=Polygon([xy(10,-4.2),xy(14.8,-4.2),xy(14.8,-1.0),xy(10,-1.0)])
     paving=unary_union([paving,landing]).difference(hall)
     paths=rings(paving)
-    walkable=unary_union([paving.buffer(1.2,join_style=2),Point(*coords('node/10836993157')).buffer(6.5)])
-    # Keep the supported area connected but bounded; this is not the entire authoring rectangle.
     obstacles=[{'id':'hall','polygon':runtime_ring(hall.exterior.coords)}]
     tower=coords('node/10837322627')
     tower_poly=Polygon([(tower[0]-2,tower[1]-2),(tower[0]+2,tower[1]-2),
@@ -183,10 +207,15 @@ def main():
            {'id':'entrance','label':'Halleneingang','x':-17.2,'z':-27,'yaw':math.radians(149),'pitch':.1},
            {'id':'tower','label':'Glockenturm','x':-16,'z':-25,'yaw':math.radians(230),'pitch':.12},
            {'id':'gate','label':'Friedhofstor','x':-27,'z':-61.5,'yaw':math.radians(330),'pitch':0},
-           {'id':'overhead','label':'Aufsicht · Inspektion','x':-10,'y':100,'z':-29,'yaw':0,'pitch':-math.pi/2+.0001,'inspection':True}]
-    walk={'version':1,'ground':{'x0':-49.5,'z0':-84.5,'step':1,'columns':80,'rows':110,'heights':heights.flatten().tolist()},
+           {'id':'overhead','label':'Pilot · Aufsicht','x':-10,'y':100,'z':-29,'yaw':0,'pitch':-math.pi/2+.0001,'inspection':True},
+           {'id':'site-overhead','label':'Gesamtes Gelände · Aufsicht','x':x0+(columns-1)/2,'y':230,'z':-north0+(rows-1)/2,'yaw':0,'pitch':-math.pi/2+.0001,'inspection':True},
+           {'id':'north-ground','label':'Nord · Gelände','x':10,'z':-105,'yaw':math.pi,'pitch':-.12},
+           {'id':'east-ground','label':'Ost · Gelände','x':105,'z':0,'yaw':-math.pi/2,'pitch':-.12},
+           {'id':'south-ground','label':'Süd · Gelände','x':10,'z':110,'yaw':0,'pitch':-.12},
+           {'id':'west-ground','label':'West · Gelände','x':-85,'z':0,'yaw':math.pi/2,'pitch':-.12}]
+    walk={'version':2,'ground':{'x0':x0,'z0':-north0,'step':1,'columns':columns,'rows':rows,'heights':heights.flatten().tolist()},
           'surfaces':[{'id':f'paving-{i}','polygon':runtime_ring(p),'offset':.025} for i,p in enumerate(paths)],
-          'walkable':[runtime_ring(p) for p in rings(walkable)],'obstacles':obstacles,'barriers':barriers,
+          'obstacles':obstacles,'barriers':barriers,
           'spawn':views[0], 'views':views,'vegetation':[]}
     # Deliberate, sparse reference-guided placements; no inferred full tree inventory.
     plants={
@@ -207,9 +236,11 @@ def main():
                 obstacles.append({'id':f'{name}-trunk-{i}','polygon':runtime_ring(Point(x,y).buffer(.25*scale,quad_segs=4).exterior.coords)})
     # Clip visible paving against EACH ground triangle: identical interpolation everywhere.
     pavement_vertices=[]; pavement_faces=[]
-    for row in range(109):
-        for col in range(79):
-            x,y=-49.5+col,84.5-row
+    # Only paving-adjacent cells need polygon intersections, even on the larger grid.
+    px0,py0,px1,py1=paving.bounds
+    for row in range(max(0,math.floor(north0-py1)),min(rows-1,math.ceil(north0-py0))):
+        for col in range(max(0,math.floor(px0-x0)),min(columns-1,math.ceil(px1-x0))):
+            x,y=x0+col,north0-row
             for points in [[(x,y),(x,y-1),(x+1,y-1)],[(x,y),(x+1,y-1),(x+1,y)]]:
                 poly=Polygon(points).intersection(paving)
                 if poly.is_empty or poly.area<1e-8: continue

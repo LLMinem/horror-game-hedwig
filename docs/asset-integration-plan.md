@@ -23,9 +23,9 @@ The current intention is to build the full game with Three.js. Micha may later c
 
 The first entrance/hall implementation brief has reached its requested textured browser checkpoint. Micha reviewed the pilot and considers it a useful basis for continued work. He explicitly did not describe the modeling as finished or fully accurate.
 
-His feedback identifies jagged path sections and unexpected, irregular invisible barriers. He also suspects collision near tree foliage, but has no clear evidence for that interpretation. [Issue #15](https://github.com/LLMinem/horror-game-hedwig/issues/15) now owns the agreed change to natural movement across all supported ground, sensible solid-object collisions and representative paving corrections. Micha rejected a thorough collision-shape investigation. Passing the earlier selected route does not prove that all nearby walking areas work correctly.
+The supported-ground movement and whole-cemetery terrain milestone is implemented. Paths no longer define invisible walking corridors. Visible hall, gate and trunk obstacles remain, together with safety at the finite terrain edge. Two entrance approach width changes now taper instead of ending in square steps. The suspected foliage collision was never established and is not claimed as a separate diagnosed fix.
 
-The baseline is commit `981fd64` on `feat/entrance-hall-pilot`. The current export source is `assets/source/working/entrance-hall-pilot/r05/entrance-hall.blend`, with `entrance-hall-review.blend` beside it for combined inspection. Vegetation comes from `vegetation-r06/vegetation-r06.blend`. The runtime derivatives remain under `public/assets/models/pilot/`. Heights, widths, plant forms and some facade details remain estimates. Separate final source and browser art acceptance has not been recorded.
+The current source is `assets/source/working/entrance-hall-pilot/r06-site/entrance-hall.blend`, with `entrance-hall-review.blend` beside it. It preserves all old pilot ground samples and adds a 239 × 253 sample heightfield across the cemetery and surrounding margin. Vegetation still comes from `vegetation-r06/vegetation-r06.blend`. Runtime derivatives remain under `public/assets/models/pilot/`. The old sources and `checkpoint/pre-entrance-hall-pilot` remain unchanged. Heights, widths, species and facade details remain estimates; final human art acceptance is outstanding.
 
 The [original pilot brief](archive/entrance-hall-pilot-plan-2026-10-16.md#decision-and-scope) preserves its authoring bounds, source IDs and estimates. [Readiness](readiness.md#final-pilot-checkpoint-and-single-qa-2026-10-16) records the completed single heavy QA, applied findings, measurements and source backup. Those records describe a first pilot, not full-site fidelity or complete collision coverage.
 
@@ -37,25 +37,15 @@ Before opening an issue, check for an existing matching item. Group related smal
 
 The repository and its issues are public. Keep private photographs, metadata, inscriptions, source packs, credentials and unsanitized evidence local. Link to tracked guidance and summarize the relevant observation instead of uploading the private reference set.
 
-The [previous Markdown backlog](archive/backlog-before-issues-2026-10-16.md) is archived. Historical GitHub proposals #1, #5, #7 and #9 were closed as superseded or not planned, not as fully implemented. Atmosphere and sandbox reports #3, #4 and #10 remain deferred and were not re-diagnosed during this planning session.
+The [previous Markdown backlog](archive/backlog-before-issues-2026-10-16.md) is archived. Historical proposals #1, #5, #7 and #9 were closed as superseded or not planned. The current milestone also addresses atmosphere issues #3/#4 and sandbox lamp issue #10 through focused source and browser checks.
 
-## Next implementation sequence
+## Implemented milestone
 
-Improve the agent tools, make supported ground naturally walkable and extend the ground foundation across the cemetery before further detailed modeling. Reuse the established setup and current pilot rather than reinstalling tools or restarting the site model. The sequence below may span sessions; the issues hold the agreed implementation details.
+The approved session combined #12/#13 tooling, #14 Blender warning classification, #15 natural walking and #19 whole-site ground. Browser checks now assert the viewport, DPR, drawing buffer and saved PNG dimensions, including high-resolution capture. JavaScript definitions/references work through the project language server, and Python roles remain separate.
 
-| Order | Work package | Issue |
-| --- | --- | --- |
-| 1 | Make viewport, DPR and full-resolution browser evidence reliable. | [#13](https://github.com/LLMinem/horror-game-hedwig/issues/13) |
-| 2 | Make Python environment selection and available language-server access explicit. | [#12](https://github.com/LLMinem/horror-game-hedwig/issues/12) |
-| 3 | Resolve or precisely classify the Blender API and image-sampler warnings. | [#14](https://github.com/LLMinem/horror-game-hedwig/issues/14) |
-| 4 | Make all supported ground walkable, retain sensible collisions and correct representative jagged paving joins. | [#15](https://github.com/LLMinem/horror-game-hedwig/issues/15) |
-| 5 | Extend the terrain foundation across the whole cemetery and existing entrance approach. | [#19](https://github.com/LLMinem/horror-game-hedwig/issues/19) |
+The scene keeps the existing hall platform and site frame. Ground covers the cemetery with an approximately eight-metre margin, without a walking fence along the cemetery polygon. New review views expose distant areas and the full footprint. The expanded area is a ground foundation, not a detailed cemetery reconstruction.
 
-The order favors reliable evidence before geometry changes. Prefer configuring OMP's integrated browser, with a small reusable invocation where persistent defaults are unavailable. Extend the existing Chrome check only for demonstrated gaps or useful application checks. Verify the saved image separately from the model-visible preview. For Blender warnings, fix script or export defects; a warning verified harmless for the selected assets may remain documented.
-
-Movement should follow all rendered, supported ground, including grass and any surrounding terrain margin. Keep collisions for visible solid objects and safety at the actual terrain edge. The canonical cemetery boundary guides ground coverage, not an invisible walking fence. Remove obsolete path and pilot restrictions rather than building a collision-overlay project. Reuse the acquired terrain and preserve the current hall platform and site frame. Check a few representative walking cases, not every boundary or grid cell.
-
-End the session with exercised tool entrypoints, source revisions for any geometry changes, and before/after browser evidence for the affected walking cases. Record remaining limits without claiming that every model detail is finished. Reuse earlier setup evidence; run the changed paths, not the completed installation or initial heavy-QA round again. No exhaustive polish inventory is required.
+Source and browser evidence, performance conditions and remaining limits belong in [readiness](readiness.md). The review PR does not authorize merging, deployment or public release. The next step is Micha's browser review, followed by the bounded modeling section below.
 
 ## Following production sessions
 
