@@ -41,7 +41,6 @@ def studio(directory, name, target, width, resolution=(1400, 900)):
     scene.render.resolution_x, scene.render.resolution_y = resolution
     scene.render.resolution_percentage = 100
     scene.world = bpy.data.worlds.new("PreviewWorld")
-    scene.world.use_nodes = True
     scene.world.node_tree.nodes["Background"].inputs[0].default_value = (0.45, 0.5, 0.56, 1)
     scene.world.node_tree.nodes["Background"].inputs[1].default_value = 1.4
     camera_data = bpy.data.cameras.new("PreviewCamera")
@@ -66,7 +65,6 @@ def studio(directory, name, target, width, resolution=(1400, 900)):
 
 def inspection_material(name, color, opacity=None):
     material = bpy.data.materials.new(name)
-    material.use_nodes = True
     tree = material.node_tree
     shader = tree.nodes.get("Principled BSDF")
     shader.inputs["Roughness"].default_value = 0.85
@@ -154,7 +152,6 @@ def image_copy(source, directory, name, size=512, opacity=None, non_color=False)
 
 def material(name, color, normal=None, cutout=False):
     mat = bpy.data.materials.new(name)
-    mat.use_nodes = True
     tree = mat.node_tree
     shader = tree.nodes.get("Principled BSDF")
     shader.inputs["Roughness"].default_value = 0.87

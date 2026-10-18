@@ -32,7 +32,7 @@ materials={}; batches=defaultdict(lambda:{'vertices':[],'faces':[],'uv':[]})
 
 
 def material(name,color,rough=.8,metal=0):
-    m=bpy.data.materials.new(name);m.use_nodes=True
+    m=bpy.data.materials.new(name)
     bs=m.node_tree.nodes.get('Principled BSDF');bs.inputs['Base Color'].default_value=(*color,1)
     bs.inputs['Roughness'].default_value=rough;bs.inputs['Metallic'].default_value=metal
     if name in data['textures']:
@@ -260,7 +260,7 @@ for obstacle in walk['obstacles']:
 movement.hide_viewport=True
 # Reference plane is private, excluded from export and render, packed for source recovery.
 im=bpy.data.images.load(str(ROOT/'.local/blueprint/derived/orthophoto-rgb.png'));im.pack()
-m=bpy.data.materials.new('PRIVATE_Aerial');m.use_nodes=True;node=m.node_tree.nodes.new('ShaderNodeTexImage');node.image=im
+m=bpy.data.materials.new('PRIVATE_Aerial');node=m.node_tree.nodes.new('ShaderNodeTexImage');node.image=im
 m.node_tree.links.new(node.outputs['Color'],m.node_tree.nodes.get('Principled BSDF').inputs['Base Color'])
 ref=mesh_object('PRIVATE_TrueDOP_reference',[(-260,-260,-4),(260,-260,-4),(260,260,-4),(-260,260,-4)],[(0,1,2,3)],references,m,[[(0,0),(1,0),(1,1),(0,1)]])
 ref.hide_viewport=True
@@ -274,7 +274,7 @@ for view in walk['views']:
     cam.sensor_fit='VERTICAL';cam.sensor_height=24;cam.lens=24/(2*math.tan(math.radians(55)/2))
     if view.get('inspection'):cam.type='ORTHO';cam.sensor_fit='HORIZONTAL';cam.ortho_scale=200
 scene.camera=bpy.data.objects['approach']
-worldmat=bpy.data.worlds.new('Review World');worldmat.use_nodes=True;scene.world=worldmat
+worldmat=bpy.data.worlds.new('Review World');scene.world=worldmat
 bg=worldmat.node_tree.nodes.get('Background');bg.inputs[0].default_value=(.58,.65,.72,1);bg.inputs[1].default_value=.65
 sun=bpy.data.lights.new('Review sun','SUN');sun.energy=2.2;sun.angle=.12
 sunobj=bpy.data.objects.new('Review sun',sun);review.objects.link(sunobj);sunobj.rotation_euler=(.4,-.5,-.5)
