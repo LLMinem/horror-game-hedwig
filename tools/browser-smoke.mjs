@@ -51,12 +51,18 @@ const logs = [], errors = [], responses = [];
 const deadline = Date.now() + 20000;
 let pilotEvidence = null;
 
+function rejectPending(error) {
+  for (const request of pending.values()) { clearTimeout(request.timer); request.reject(error); }
+  pending.clear();
+}
+
 async function evaluate(expression) {
   const result = await send('Runtime.evaluate', { expression, awaitPromise: true, returnByValue: true });
   if (result.exceptionDetails) throw Error(JSON.stringify(result.exceptionDetails));
   return result.result.value;
 }
 function send(method, params = {}) {
+  if (ws?.readyState !== WebSocket.OPEN) return Promise.reject(Error('CDP connection is not open.'));
   return new Promise((resolve, reject) => {
     const id = ++nextId;
     const timer = setTimeout(() => { pending.delete(id); reject(Error(`CDP timeout: ${method}`)); }, 60000);
@@ -90,6 +96,9 @@ try {
   const target = pages.find(page => page.type === 'page');
   assert(target, 'Chrome did not create a page.');
   ws = new WebSocket(target.webSocketDebuggerUrl);
+  // Keep this listener through close(), including an aborted opening handshake.
+  ws.on('error', rejectPending);
+  ws.on('close', () => rejectPending(Error('CDP connection closed.')));
   await once(ws, 'open', { signal: AbortSignal.timeout(10000) });
   ws.addEventListener('message', event => {
     const message = JSON.parse(event.data);
@@ -199,7 +208,7 @@ try {
   await writeFile(path.join(output, 'report.json'), JSON.stringify({ result: 'FAIL', error: String(error), pilot: pilotEvidence, logs, errors, responses, chromeLog }, null, 2));
   throw error;
 } finally {
-  for (const request of pending.values()) { clearTimeout(request.timer); request.reject(Error('Chrome smoke ended.')); }
+  rejectPending(Error('Chrome smoke ended.'));
   ws?.close();
   if (child.pid && child.exitCode === null) {
     const exited = once(child, 'exit');

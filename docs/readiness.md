@@ -255,3 +255,53 @@ The active plan records the owner's intention to build the full game with Three.
 The architecture review also identified a possible out-of-order HDRI selection in `src/world/Environment.js` and a question about ownership of generated PMREM render targets. It did not reproduce the ordering problem or establish a resource leak. Existing issues #3, #4, #10 and #16 do not cover those details, but the active plan already retains them for relevant lighting/lifecycle work. No new architecture issue or broad overhaul was created.
 
 Planning verification resolved 37 local links and heading anchors across the five changed entry, plan and reference documents. GitHub API reads verified each updated issue body and state, including the accepted closure of #18 and the new #19 ground issue. No runtime or source assets changed during these interviews.
+
+## Whole-cemetery ground milestone, 2026-10-18
+
+The owner approved implementation of #3, #4, #10, #12, #13, #14, #15 and #19, with #16 and #17 left deferred. The changes were consolidated on `feat/entrance-hall-pilot`. They provide a walkable ground foundation and retain the detailed entrance/hall section, not a finished cemetery model.
+
+### Ground, movement and source preservation
+
+The new `r06-site` revision contains a 239 × 253 sample grid at one-metre spacing. Its runtime bounds are X −108.5 to 129.5 m and Z −120.5 to 131.5 m, covering the canonical cemetery with approximately eight metres of margin. Numeric comparison of every old pilot sample found **zero height change**. The hall platform remains at 0.118 m in the existing local frame. The canonical map was not edited.
+
+`walk.json` version 2 removes the path-derived walking mask. Hall, tower bed, trunks and represented entrance barriers remain solid; the grid boundary supplies outer-edge safety. Two entrance-path width changes now taper over at most two metres while retaining the centreline and intentional corners. No foliage-mesh collision defect is claimed. Amber review-limit bars are gone.
+
+Actual browser checks covered the retained 21-station pilot route, eight wider ground stations, all four terrain edges, hall sliding, trunk exclusion, reset and decoded terrain agreement. Trusted keyboard input walked and sprinted on grass across the old pilot edge. At the tested samples, decoded terrain disagreement was at most 0.00543 m. The whole-site overhead initially exposed depth fighting between ground and 25 mm raised paving; increasing the inspection camera's near plane to 1 m fixed the visible conflict. Walking/reset restores 0.1 m.
+
+Source Cycles comparisons are under `.local/pilot/r06-site/`, including pilot/whole-site overhead and dusk approach. Runtime comparisons are in the production smoke directories below. The new source, combined review blend, textures, inputs and script copies remain private. Consolidation preserved the warning fixture and lamp r03 source as well. A new approved local snapshot contains **58 files, 97,418,161 bytes**, with SHA-256 comparison for every copy; `.local/milestone/source-backup.json` records its location and manifest. No Time Machine restore test was performed or required.
+
+### Tooling and browser evidence
+
+The selected blueprint interpreter performed a Pillow resize and PNG round trip with checked dimensions and colour. The development-only TypeScript server and `jsconfig.json` provide JavaScript project navigation without a TypeScript migration. A live OMP references query for `createPilotMovement` returned the declaration, import and caller in `PilotWorld.js`.
+
+Native OMP viewport/capture helpers did not retain the requested dimensions in this session. A screenshot helper saved 756 × 413 pixels despite a previously observed 3456 × 1838 buffer. The exercised workaround applies CDP metrics before loading and captures with an explicit viewport clip inside the same native `tab.run`. Both requested sizes below matched CSS viewport, DPR, canvas and PNG headers, with pointer lock and trusted walking in each session. `.local/milestone/native-browser.json` records the results; tool-provider reports were submitted.
+
+The existing Chrome smoke now accepts size/DPR and optional headless arguments and checks every PNG header. Large PNG replies stalled with Node 24.15.0's built-in WebSocket across Chrome 148 and 155, while the same path worked with Bun's transport. Switching the Node tool to the small development-only `ws` package resolved the stalls without adding another browser framework. Saved images and model-visible previews remain separate; crop a saved image for close inspection.
+
+`npm run build` passed with Vite 7.3.6. The existing chunk-size warning remains visible, as agreed for #16. The build was exercised through `npm run preview`, not only the dev server:
+
+| Production check | Render buffer | Result | Mean frame time | p95 frame time | Maximum draw calls |
+| --- | --- | --- | --- | --- | --- |
+| Pilot and whole-ground routes, DPR 1 | 1280 × 720 | PASS | 16.67 ms | 16.80 ms | 23 |
+| Pilot and whole-ground routes, DPR 2 | 3456 × 1838 | PASS | 16.67 ms | 16.70 ms | 23 |
+| Sandbox input and loading, DPR 1 | 1280 × 720 | PASS | Not sampled | Not sampled | Not sampled |
+
+Measurements used headless Chrome 155 on this Mac's Apple M3 Max through ANGLE Metal. They were display-limited and cover the present sparse scene, not a fully modeled cemetery or mid-range hardware. Reports and 14 captures per pilot run are under `.local/browser-smoke-8q2TBd/` and `.local/browser-smoke-AFP1ZD/`; sandbox evidence is under `.local/browser-smoke-lqn40C/`. Both pilot runs passed trusted walk/sprint checks on paving and grass, pointer capture, mouse look and Escape release. No application resource failures or browser errors were recorded.
+
+### Atmosphere, lamp and Blender warnings
+
+The integrated atmosphere changes fix sky/object fog colour conversion, remove zenith crowding in the star distribution and keep point sizes consistent across rotation and DPR. Focused browser comparisons found zero fog-channel mismatch after the fix, stable stars under translation/rotation and no browser errors. The agent also exercised 10,000 and 100,000 star counts, without treating stress counts as a new default. Evidence is under `.local/atmosphere-2026-10-18-r01/`; the existing stars ADR records the implementation.
+
+The lamp's new r03 source provides a sealed inner roof liner and a light 0.45 m below the lantern top. Glass preserves the 0.1/off to 1.5/on emission mapping. Focused source/browser comparisons showed a dark exterior roof and brighter ground/nearby props. The glass alone skips depth-shadow casting because that shadow path does not represent transmission; opaque metal still occludes light. [Lamp notes](assets/street-lamp-scratchpad.md#issue-10-implementation-and-review--2026-10-18) record the source, export, measurements and remaining human art gate.
+
+Seven redundant Blender node-toggle writes were removed on the exercised Blender 5.2.2 path. The vegetation sampler warning refers twice to the same image node for colour and alpha, rather than conflicting settings. Direct-source PNG and exported GLB material comparisons matched exactly in the browser. The warning remains documented, not suppressed; Blender 6 compatibility is not claimed. Evidence is under `.local/blender-warning-20261018-a/` and the [workbench guide](assets/blender-workbench.md).
+
+### Lean review and integration
+
+Independent standards and issue-acceptance reviews covered the session diff from `ae41835`, rather than repeating the original heavy pilot QA. The acceptance review found no missing requirement in the approved scope. The standards review found one transport-cleanup defect: closing a `ws` connection after its opening handshake timed out could emit an unhandled error and leave the temporary profile behind.
+
+The actual smoke CLI reproduced that failure against a temporary stalled handshake endpoint. A lifetime error listener, pending-request cleanup and a closed-socket guard fixed it. The same failure scenario then returned the expected nonzero result after removing the profile, and the reviewer confirmed the correction. `.local/milestone/transport-failure.json` records the check; the temporary endpoint script was removed. All 46 local links/anchors in the eight changed Markdown documents resolved.
+
+The three implementation worktrees were consolidated through their commits. Their new private sources and evidence were copied into the primary workspace and backed up before the worktrees were removed. No new assets were bought, and #16/#17 remain deferred under the approved plan. Final human browser and art review remains outstanding; no merge or deployment was performed.
+
+The final production high-resolution smoke after the cleanup fix also passed at 3456 × 1838, including trusted input and profile shutdown. Its report and captures are under `.local/browser-smoke-B56p4q/`.
