@@ -13,7 +13,11 @@ Reconstruct Neuer Friedhof in Bruchköbel as faithfully as the available evidenc
 
 Prefer reference-backed, agent-authored site geometry. Reuse complex assets where they fit, with source and licence checks. Keep the canonical GeoJSON and stable IDs unchanged. [Blueprint preparation](blueprint-preparation.md) owns the site frame, terrain and corrected photo inputs. The rejected agent tracings remain excluded.
 
+Micha authorizes selective purchases within a EUR 50 total budget for new assets across the project. Agents may select assets that save substantial work, improve achievable quality, reduce iteration or reduce his review burden. Prefer buying suitable complex assets over lengthy hand-authoring when those benefits justify the cost. Track taxes, fees and remaining budget; seek further approval before exceeding EUR 50. Check fit and licence, reuse existing assets where suitable, and request owner attention only for necessary payment/account actions or material unresolved choices. The budget is not a spending target.
+
 Micha reports that the project is about a year old or older, with at least roughly nine months of inactivity before development resumed in recent weeks. Treat inherited technical choices as open to evidence-based improvement, not as fixed requirements or proof that a rewrite is needed. The goal is a coherent, manageable project and useful agent tooling.
+
+The current intention is to build the full game with Three.js. Micha may later consider Unreal Engine or another engine if actual resource scale, visual quality, performance or gameplay needs justify it. This is not a permanent stack commitment, but no engine migration, comparison project or preparatory abstraction is currently requested.
 
 ## Current pilot and review
 
@@ -61,8 +65,8 @@ Then extend connected sections in the same site frame, using instancing for repe
 
 The following issues are retained for the corresponding later need, not as gates for the next session:
 
-- [#16](https://github.com/LLMinem/horror-game-hedwig/issues/16) covers measured loading cost and the bundle warning. Do not add texture conversion or split code merely to silence a warning.
-- [#17](https://github.com/LLMinem/horror-game-hedwig/issues/17) covers vegetation fit when the plant set is expanded. Current forms are approximations, not a species inventory.
+- [#16](https://github.com/LLMinem/horror-game-hedwig/issues/16) stays deferred until the game is worth sharing and loading or package size is a significant problem. Then measure the relevant costs before choosing changes. It is not an automatic optimization gate before sharing, and a build warning alone does not justify texture conversion or code splitting.
+- [#17](https://github.com/LLMinem/horror-game-hedwig/issues/17) covers vegetation fit when the plant set is expanded, using the approved project-wide asset budget where buying provides the stated benefits. Current forms are approximations, not a species inventory.
 - [#18](https://github.com/LLMinem/horror-game-hedwig/issues/18) covers independent backup and recovery. The approved local backup remains valid for current work.
 
 Review HDRI-switch ordering, PMREM ownership and scene disposal when extending the relevant loading or scene lifecycle. Assess seeded variation and wider shadow coverage with the views and area that need them. These are feature-linked design checks, not a new platform rewrite or an exhaustive backlog.
