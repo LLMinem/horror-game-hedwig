@@ -241,3 +241,17 @@ For movement, he rejected a thorough investigation of invisible shapes and appro
 Read-only source research found that the prepared terrain covers the cemetery with margin. The present pilot uses a cropped heightfield and narrower path-derived walking restrictions. The expansion can reuse the existing terrain pipeline and movement interface, but must preserve the local hall platform adjustment. The cemetery boundary guides coverage; it does not authorize another hidden movement boundary inside rendered, supported ground.
 
 These are owner decisions and source-inspection findings, not new runtime evidence. No browser, terrain generation, export or movement verification was performed for this planning checkpoint. The active plan also records the owner's project-history context; the age and long pause alone do not establish that a stack rewrite is needed.
+
+## Owner-accepted backup and project assessment, 2026-10-18
+
+Micha confirmed that he uses an external Time Machine drive and requested closure of [#18](https://github.com/LLMinem/horror-game-hedwig/issues/18). The issue was closed as completed by owner acceptance. No current destination, exclusion or recovery check was performed; the read-only worker could not run the relevant system commands. This limitation is not evidence that a backup is absent. The accepted arrangement does not authorize uploading private references or raw purchased sources to public Git.
+
+The parallel source assessments found no evidence requiring a framework, language or engine migration for the current prototype. The existing world/movement interface and composition remain useful. Existing Python entrypoints already separate standard-library tools, blueprint/image work and Blender's bundled Python. Further environment work belongs in #12 rather than a new universal launcher.
+
+OMP documents language-server support, but the research worker lacked access to the tool device. Parent-session server status and successful language queries remain unverified; the worker limitation must not be described as missing OMP support. Historical dependency/build evidence was reused, not rerun as a fresh audit.
+
+The active plan records the owner's intention to build the full game with Three.js while leaving later engine reassessment open. It also records the deferred loading work and approved asset budget. These decisions do not authorize an engine comparison or speculative optimization now.
+
+The architecture review also identified a possible out-of-order HDRI selection in `src/world/Environment.js` and a question about ownership of generated PMREM render targets. It did not reproduce the ordering problem or establish a resource leak. Existing issues #3, #4, #10 and #16 do not cover those details, but the active plan already retains them for relevant lighting/lifecycle work. No new architecture issue or broad overhaul was created.
+
+Planning verification resolved 37 local links and heading anchors across the five changed entry, plan and reference documents. GitHub API reads verified each updated issue body and state, including the accepted closure of #18 and the new #19 ground issue. No runtime or source assets changed during these interviews.

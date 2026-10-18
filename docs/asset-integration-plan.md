@@ -67,7 +67,6 @@ The following issues are retained for the corresponding later need, not as gates
 
 - [#16](https://github.com/LLMinem/horror-game-hedwig/issues/16) stays deferred until the game is worth sharing and loading or package size is a significant problem. Then measure the relevant costs before choosing changes. It is not an automatic optimization gate before sharing, and a build warning alone does not justify texture conversion or code splitting.
 - [#17](https://github.com/LLMinem/horror-game-hedwig/issues/17) covers vegetation fit when the plant set is expanded, using the approved project-wide asset budget where buying provides the stated benefits. Current forms are approximations, not a species inventory.
-- [#18](https://github.com/LLMinem/horror-game-hedwig/issues/18) covers independent backup and recovery. The approved local backup remains valid for current work.
 
 Review HDRI-switch ordering, PMREM ownership and scene disposal when extending the relevant loading or scene lifecycle. Assess seeded variation and wider shadow coverage with the views and area that need them. These are feature-linked design checks, not a new platform rewrite or an exhaustive backlog.
 
@@ -79,4 +78,4 @@ Keep raw pack files and existing Blender revisions unchanged. Author new revisio
 
 Micha approved local snapshots beneath `/Users/meeq/.backups/horror-game-hedwig/`. Preserve valuable revisions before changing them and back up each reviewable new Blender revision, textures and authoring inputs before session end. Never overwrite the pre-pilot snapshot or silently prune older snapshots. Keep manifests and private recovery evidence local.
 
-The local snapshots protect against working-copy mistakes, not loss of the Mac. The [recorded restore and copy evidence](readiness.md#pilot-approval-and-backup-2026-10-16) remains applicable. Off-device protection is a recommendation tracked in #18, not a reopened pilot approval gate. No automatic backup schedule is established.
+The local snapshots protect against working-copy mistakes, not loss of the Mac. The [recorded restore and copy evidence](readiness.md#pilot-approval-and-backup-2026-10-16) remains applicable. Micha confirms an external Time Machine drive and accepts it as sufficient independent protection. [#18](https://github.com/LLMinem/horror-game-hedwig/issues/18) is closed at his request; no separate backup investigation or restore exercise is required. Current Time Machine coverage and recovery were not verified by the agents. Retain the local snapshots, and keep private or non-redistributable sources out of this public Git repository.

@@ -22,7 +22,7 @@ The reusable [session opener](.prompts/opener.md) and tool-specific commands und
 ## Sources and safety
 
 - The Mac is the development and authoring workstation. No VPS, MCP server or Blender add-on is required.
-- `assets/source/raw/` and `assets/source/working/` are local source material. Keep originals unchanged; author new revisions/copies. Follow the [approved local backup policy](docs/asset-integration-plan.md#before-modifying-sources) and [restore evidence](docs/readiness.md#pilot-approval-and-backup-2026-10-16); off-device protection remains unverified.
+- `assets/source/raw/` and `assets/source/working/` are local source material. Keep originals unchanged; author new revisions/copies. Follow the [approved local backup policy](docs/asset-integration-plan.md#before-modifying-sources) and [recorded restore evidence](docs/readiness.md#pilot-approval-and-backup-2026-10-16).
 - `.local/` holds private reference manifests, photo proxies, exports and smoke evidence. It is ignored by Git and denied by the Vite dev server. Keep private material out of `public/`, `src/` and tracked docs. Ignoring a file is not a backup.
 - `public/` is shipped wholesale. Only reviewed, redistributable runtime artifacts belong there. Raw marketplace content and private photos/GPS/inscriptions do not.
 - The owner confirmed purchase and commercial permission for the cemetery pack. Select assets for visual fit; generic churches/mausoleums do not replace the real site's buildings.

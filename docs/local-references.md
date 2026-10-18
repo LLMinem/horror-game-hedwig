@@ -176,6 +176,8 @@ The source directories and `.local/` are ignored. A Git push does not back up th
 
 For the approved entrance/hall pilot, Micha selected `/Users/meeq/.backups` on 2026-10-16. The [active plan](asset-integration-plan.md#before-modifying-sources) now defines the local snapshot policy, and [readiness](readiness.md#pilot-approval-and-backup-2026-10-16) records the actual restore check and recovery layout. This replaces the old independent-destination blocker for the pilot, without claiming protection from hardware loss. Use only the 98 manifest-listed originals when backing up Photos references; do not copy unrelated library content.
 
+On 2026-10-18, Micha confirmed an external Time Machine drive and accepted it as sufficient independent protection. [#18](https://github.com/LLMinem/horror-game-hedwig/issues/18) is closed by owner acceptance, not by a new agent restore test. Do not reopen backup verification as a modeling prerequisite. Existing local snapshots and the public-repository privacy/licence rules remain in force.
+
 Keep source evidence separate from `public/`. Only deliberately reviewed runtime derivatives should enter the web build. Source-to-runtime conversion needs a recorded source, transform, material/export settings and browser verification within the selected brief. The pilot's Blender/runtime work is approved, but a new section still needs a bounded brief.
 
 ## Evidence and integration checks
