@@ -305,3 +305,9 @@ The actual smoke CLI reproduced that failure against a temporary stalled handsha
 The three implementation worktrees were consolidated through their commits. Their new private sources and evidence were copied into the primary workspace and backed up before the worktrees were removed. No new assets were bought, and #16/#17 remain deferred under the approved plan. Final human browser and art review remains outstanding; no merge or deployment was performed.
 
 The final production high-resolution smoke after the cleanup fix also passed at 3456 × 1838, including trusted input and profile shutdown. Its report and captures are under `.local/browser-smoke-B56p4q/`.
+
+## Mobile reference atlas, 2026-10-19
+
+The owner requested phone viewing of the private layered atlas. The atlas now has persistent map/layer/photo navigation on small screens, direct photo-to-camera navigation, larger controls and a full-screen photo viewer. Existing desktop panels, source limitations and verbatim photo notes remain available. Map geometry and reference data were not changed.
+
+Chrome checks covered 320 × 568, 393 × 852, 852 × 393, 768 × 1024 and 1440 × 900 CSS pixels, with no horizontal overflow. CDP touch input exercised one-finger pan and two-finger zoom without accidental photo selection. Photo navigation, image decoding, full-screen open/close, return to the camera position and raster switching passed without JavaScript exceptions. Private captures and the report are under `.local/atlas-mobile/`. These are emulated mobile checks, not a claim of testing Safari on the owner's iPhone. The embedded atlas data matched `site-local.json`, and the canonical GeoJSON SHA-256 remained unchanged.

@@ -16,6 +16,8 @@ open .local/blueprint/atlas.html
 
 The atlas displays the 140 projected canonical source features without an interpretation layer. Switch between RGB imagery, infrared imagery, terrain shading and surface height. Select a photo to see its effective camera position, direction provenance and the owner's verbatim note. The 13 regional photo-index groups help find photos; they are not verified observations or construction work cards. The existing photo editor remains at `.local/references/map.html`; the atlas is read-only.
 
+On narrow screens, the atlas has separate map, layer and photo panels. The bottom navigation stays visible. Tap a photo marker and "Ansehen" to inspect it, or choose a numbered photo from the list. "Auf Karte" shows its camera position and direction; the image opens in a full-screen viewer. Pinch and drag control the map. The source limits and unchanged owner notes remain available.
+
 The rendered sheets are under `.local/blueprint/derived/`:
 
 | File | Purpose |
