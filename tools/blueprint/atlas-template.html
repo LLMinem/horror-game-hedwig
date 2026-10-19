@@ -521,6 +521,9 @@
     if (!selectedPhoto) return;
     status('Foto ' + photoNumber(selectedPhoto) + ' ausgewählt.' + (!$('show-photos').checked ? ' Fotostandorte sind ausgeblendet.' : '') + (!finite(selectedPhoto.x) || !finite(selectedPhoto.y) ? ' Kein Kartenstandort vorhanden.' : ''));
   }
+  function showPhotoSelection(photo) {
+    showSelection('Foto ' + photoNumber(photo) + (finite(photo.heading) ? ' · Blickrichtung ' + fmt(photo.heading,0) + '°' : ''),'photo-inspection');
+  }
   function selectPhoto(photo) {
     selectedPhoto = photo; const sequence = ++previewSequence;
     photoRecords.forEach(record => { const selected = record.photo===photo; record.marker.classList.toggle('selected',selected); record.ray?.classList.toggle('selected',selected); if (selected) { $('photo-layer').append(record.marker); if (record.ray) $('ray-layer').append(record.ray); } });
@@ -532,7 +535,7 @@
       else if (buttonBox.bottom > box.bottom) list.scrollTop += buttonBox.bottom-box.bottom;
     }
     $('photo-title').replaceChildren(element('span','Foto ' + photoNumber(photo)),element('small',text(photo.id)));
-    showSelection('Foto ' + photoNumber(photo) + (finite(photo.heading) ? ' · Blickrichtung ' + fmt(photo.heading,0) + '°' : ''),'photo-inspection');
+    showPhotoSelection(photo);
     const path = imagePath(photo.proxy), image = $('preview'), link = $('preview-link');
     link.hidden = true; link.removeAttribute('href'); image.removeAttribute('src');
     $('preview-message').textContent = path ? 'Lokale Vorschau wird geladen …' : 'Keine gültige lokale Vorschau angegeben.';
@@ -555,6 +558,7 @@
   }
   function locatePhoto() {
     if (!selectedPhoto || !finite(selectedPhoto.x) || !finite(selectedPhoto.y)) return;
+    showPhotoSelection(selectedPhoto);
     showPanel('map'); $('show-photos').checked = true; updateVisibility();
     fit([selectedPhoto.x-35,selectedPhoto.y-35,selectedPhoto.x+35,selectedPhoto.y+35]); updatePhotoStatus();
   }
@@ -594,7 +598,7 @@
   }
   $('feature-search').addEventListener('input',renderFeatureList);
   $('feature-select').addEventListener('change',() => { const record = featureRecords.find(item => String(item.index)===$('feature-select').value); if (record) selectFeature(record); });
-  $('locate-feature').addEventListener('click',() => { if (selectedFeature) { showPanel('map'); fit(selectedFeature.bounds,1.4); } });
+  $('locate-feature').addEventListener('click',() => { if (selectedFeature) { showSelection(featureLabel(selectedFeature),'feature-inspection'); showPanel('map'); fit(selectedFeature.bounds,1.4); } });
   function referenceButtons(numbers) {
     const row = element('div',undefined,'row');
     for (const number of array(numbers)) {
