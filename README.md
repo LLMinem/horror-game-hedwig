@@ -15,6 +15,8 @@ npm run dev
 
 Open <http://127.0.0.1:3000>. The server is loopback-only, uses a fixed port and does not automatically open a browser. Stop it with Ctrl+C. `npm run build` creates `dist/`; `npm run preview` serves that build at <http://127.0.0.1:4173>. Neither command deploys anything.
 
+The current game runs in the visiting browser. A production build is static HTML, JavaScript and asset files under `dist/`; it needs no game backend or running Vite development process. Private long-term previews can serve a selected build from an always-on host behind Tailscale or authenticated HTTPS. Hosting and access setup for the game remain a separate decision. Vite preview is for local build checks, not a production service.
+
 The default URL and `?mode=pilot` open the pilot. Click the scene for mouse capture; WASD moves, Shift sprints, F toggles the flashlight and Esc releases the mouse. The review panel includes the existing pilot views, a whole-site overhead view and north/east/south/west ground views. Overhead is inspection only, so choose a ground view or "Walk from entrance" to resume walking. Neutral mode removes fog for comparison. The retained GUI supplies lighting controls, and `?mode=sandbox` opens the corrected lamp scene.
 
 For a reproducible Chrome/CDP walkthrough, start `npm run preview` after building, then run `npm run browser:smoke` in another terminal. For the dev server, use `npm run browser:smoke -- http://127.0.0.1:3000/`. The check covers the pilot and wider terrain routes, ground/render agreement, solid obstacles, sliding, all four terrain edges, reset and actual WASD/sprint input on paving and grass. It captures neutral/dusk views and route performance under `.local/browser-smoke-*`. Pass a URL ending in `?mode=sandbox` for the retained sandbox input check.
@@ -51,6 +53,8 @@ npm run blender:smoke                    # disposable CPU render + Draco round t
 ```
 
 The source map is included in Git. This prepared Mac also has **98 JPEG proxies plus their GPS, heading, altitude and camera metadata in ID-linked private JSON sidecars** under `.local/references/`; the HEIC originals stay unchanged in Photos. The JPEGs omit embedded metadata, not the reference dataset. **A fresh clone does not contain the private files, acquired geodata or purchased raw pack.** [Local references](docs/local-references.md) explains commands, correction import and source safety. [Blender workbench](docs/assets/blender-workbench.md) documents executable discovery, read-only source inspection and collection export without an add-on or MCP service.
+
+The private [reference atlas now supports phone viewing](docs/blueprint-preparation.md#private-phone-access), with map/layer/photo navigation and a dedicated Tailscale endpoint. Its page and referenced images are served separately from the game. The phone needs Tailscale, and the hosting Mac must be awake. The linked guide covers refresh and shutdown.
 
 The individual review covers every photo, and Micha's imported corrections are now authoritative wherever supplied. The private photo map keeps original observations, agent estimates and human corrections separate. See [owner corrections](docs/local-references.md#owner-corrections-and-blueprint-preparation).
 
