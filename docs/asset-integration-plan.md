@@ -45,7 +45,7 @@ The approved session combined #12/#13 tooling, #14 Blender warning classificatio
 
 The scene keeps the existing hall platform and site frame. Ground covers the cemetery with an approximately eight-metre margin, without a walking fence along the cemetery polygon. New review views expose distant areas and the full footprint. The expanded area is a ground foundation, not a detailed cemetery reconstruction.
 
-Source and browser evidence, performance conditions and remaining limits belong in [readiness](readiness.md). The review PR does not authorize merging, deployment or public release. The next step is Micha's browser review, followed by the bounded modeling section below.
+Micha reviewed and tested the latest browser version, reported no unusual behavior and explicitly approved merging [PR #20](https://github.com/LLMinem/horror-game-hedwig/pull/20). The milestone is accepted as the current environment prototype, not as a finished detailed reconstruction. Source and browser evidence, performance conditions and remaining limits belong in [readiness](readiness.md). Deployment and public release still require separate authorization. The next production step is to agree the bounded modeling section below.
 
 ## Following production sessions
 

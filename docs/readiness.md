@@ -306,6 +306,8 @@ The three implementation worktrees were consolidated through their commits. Thei
 
 The final production high-resolution smoke after the cleanup fix also passed at 3456 × 1838, including trusted input and profile shutdown. Its report and captures are under `.local/browser-smoke-B56p4q/`.
 
+Micha subsequently reviewed and tested the latest browser version, reported no unusual behavior and explicitly authorized merging PR #20. This accepts the current prototype checkpoint without claiming finished site fidelity or authorizing deployment. The next detailed modeling section still needs a bounded brief.
+
 ## Mobile reference atlas, 2026-10-19
 
 The owner requested phone viewing of the private layered atlas. The atlas now has persistent map/layer/photo navigation on small screens, direct photo-to-camera navigation, larger controls and a full-screen photo viewer. Existing desktop panels, source limitations and verbatim photo notes remain available. Map geometry and reference data were not changed.
