@@ -38,14 +38,12 @@ export function createEnvironment({ renderer, scene, initialHDRI = 'dikhololo_ni
     return `${import.meta.env.BASE_URL}${trimmed}`;
   };
 
-  // =============== THE THREE.JS r179 FIX
-  // CRITICAL: In Three.js r179+, environment maps don't automatically apply
-  // We MUST manually set material.envMap = scene.environment for reflections to work
-  // This is a breaking change from earlier versions where scene.environment was enough
+  // Explicit material binding is this project's convention. Three.js r179
+  // also supports scene.environment without a material-level override.
 
   /**
    * Applies environment map to all materials in the scene
-   * This is the critical r179 fix - without this, materials won't have reflections!
+   * Handles both single materials and glTF mesh material arrays.
    * @param {THREE.Object3D} root - Root object to traverse (usually scene)
    * @param {THREE.Texture} envMap - The environment map texture
    * @param {number} intensity - Environment map intensity (0-1)
@@ -54,20 +52,18 @@ export function createEnvironment({ renderer, scene, initialHDRI = 'dikhololo_ni
     let count = 0;
 
     root.traverse((obj) => {
-      // Check if object is a mesh with a material that supports environment maps
-      if (obj.isMesh && obj.material) {
-        // MeshStandardMaterial and MeshPhysicalMaterial support envMaps
-        if ('envMapIntensity' in obj.material) {
-          // THE FIX: Must explicitly set envMap on each material!
-          obj.material.envMap = envMap;
-          obj.material.envMapIntensity = intensity;
-          obj.material.needsUpdate = true; // Force shader recompilation
-          count++;
-        }
+      if (!obj.isMesh || !obj.material) return;
+      const materials = Array.isArray(obj.material) ? obj.material : [obj.material];
+      for (const material of materials) {
+        if (!('envMapIntensity' in material)) continue;
+        material.envMap = envMap;
+        material.envMapIntensity = intensity;
+        material.needsUpdate = true;
+        count++;
       }
     });
 
-    console.log(`Applied envMap to ${count} materials (r179 fix)`);
+    console.log(`Applied environment map to ${count} materials`);
     return count;
   }
 
@@ -98,9 +94,11 @@ export function createEnvironment({ renderer, scene, initialHDRI = 'dikhololo_ni
     let count = 0;
 
     root.traverse((obj) => {
-      if (obj.isMesh && obj.material && obj.material.envMap) {
-        obj.material.envMapIntensity = intensity;
-        // Note: No needsUpdate required for just changing intensity
+      if (!obj.isMesh || !obj.material) return;
+      const materials = Array.isArray(obj.material) ? obj.material : [obj.material];
+      for (const material of materials) {
+        if (!('envMapIntensity' in material)) continue;
+        material.envMapIntensity = intensity;
         count++;
       }
     });
@@ -140,7 +138,7 @@ export function createEnvironment({ renderer, scene, initialHDRI = 'dikhololo_ni
           // Clean up the original HDR texture (we only need the processed envMap)
           hdrTexture.dispose();
 
-          // CRITICAL: Apply the r179 fix - set envMap on all materials!
+          // Keep explicitly registered materials in sync with scene lighting.
           applyEnvMapToMaterials(scene, envMap, currentEnvIntensity);
 
           // Ensure every registered asset also picks up the new map
@@ -240,12 +238,14 @@ export function createEnvironment({ renderer, scene, initialHDRI = 'dikhololo_ni
 
   // =============== INITIALIZE
   // Load the initial HDRI
-  loadHDRI(initialHDRI).catch(error => {
+  const ready = loadHDRI(initialHDRI);
+  ready.catch(error => {
     console.error('Failed to load initial HDRI:', error);
   });
 
   // =============== PUBLIC API
   return {
+    ready,
     loadHDRI,
     switchHDRI,
     setEnvIntensity,

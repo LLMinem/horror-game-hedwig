@@ -11,8 +11,7 @@ import { loadStreetLampInstance } from './Assets.js';
 
 const bounds = new Box3();
 const center = new Vector3();
-// TODO(#10): Drop the offset back inside the lantern once we add a sealed blocker in Blender.
-const DEFAULT_LAMP_LIGHT_OFFSET = 0.22; // Quick fix: keep bulb slightly above roof for now
+const DEFAULT_LAMP_LIGHT_OFFSET = DEFAULTS.devRoomLampLightOffset;
 const MIN_EMISSIVE_INTENSITY = 0.1; // Matches Blender's "lamp off" baseline
 const DEFAULT_LIGHT_INTENSITY = DEFAULTS.devRoomLampLightIntensity; // 35
 const DEFAULT_EMISSIVE_INTENSITY = 1.5; // Lamp glass glow for "on"
@@ -30,9 +29,13 @@ export function createDevRoom({ scene, world, environment }) {
   lampLight.name = 'DevRoom_LampLight';
   lampLight.visible = false; // toggled via GUI
   lampLight.castShadow = true;
-  lampLight.shadow.mapSize.set(512, 512);
-  lampLight.shadow.bias = -0.0005;
-  lampLight.shadow.normalBias = 0.015;
+  lampLight.shadow.mapSize.set(1024, 1024);
+  // The roof liner is only 15 cm above the bulb. The default 50 cm near
+  // plane clips it out of the shadow map, allowing light onto the roof.
+  lampLight.shadow.camera.near = 0.02;
+  lampLight.shadow.camera.far = lampLight.distance;
+  lampLight.shadow.bias = -0.0001;
+  lampLight.shadow.normalBias = 0.002;
   root.add(lampLight);
 
   const state = {
@@ -95,13 +98,17 @@ export function createDevRoom({ scene, world, environment }) {
       // Ensure the prop participates in lighting.
       lampScene.traverse((child) => {
         if (child.isMesh) {
-          child.castShadow = true;
+          // Frosted/emissive panes transmit the bulb light. Three's depth
+          // shadow pass treats transmission as opaque, so only metal blocks it.
+          child.castShadow = child.name !== 'SM_StreetLamp_Glass';
           child.receiveShadow = true;
 
           if (child.material) {
             const materials = Array.isArray(child.material) ? child.material : [child.material];
             materials.forEach((mat) => {
-              if (mat && typeof mat === 'object' && 'emissiveIntensity' in mat) {
+              // The inward-facing sealed liner must occlude rays from either side.
+              mat.shadowSide = THREE.DoubleSide;
+              if (mat?.name === 'MAT_StreetLamp_Glass') {
                 lampMaterials.add(mat);
               }
             });
@@ -155,6 +162,8 @@ export function createDevRoom({ scene, world, environment }) {
       }
       if (distance !== undefined) {
         lampLight.distance = distance;
+        lampLight.shadow.camera.far = distance;
+        lampLight.shadow.camera.updateProjectionMatrix();
       }
       if (decay !== undefined) {
         lampLight.decay = decay;

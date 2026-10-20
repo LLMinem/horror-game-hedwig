@@ -1,9 +1,8 @@
 ---
 type: scratchpad
-status: historical
+status: verified-runtime
 created: 2025-09-30
-last_verified: 2025-10-09
-last_verified_commit: e34e6d4
+last_verified: 2026-10-18
 owned_by: human
 supersedes: []
 superseded_by: []
@@ -11,10 +10,11 @@ superseded_by: []
 
 # Street Lamp Scratchpad (SM_StreetLamp_Simple)
 
-Historical observations, not an active task list. Runtime emissive binding now exists; the light-offset workaround remains. Inspect current source copies with the [Blender workbench](blender-workbench.md) before acting on any old export instruction. Source materials may differ from the shipped GLB.
+Issue #10 is implemented in the `r03` source revision below. Older sections retain the original authoring history, not current export instructions. The lamp remains a disposable sandbox asset, not a reference for the real cemetery.
 
 ## Asset Summary
-- **Source blend**: `assets/source/working/cemetery-pack/street-lamp-simple.blend`
+- **Current source**: `assets/source/working/street-lamp/r03/street-lamp.blend`; five dependencies beside it under `textures/`, referenced with source-relative `//textures/` paths.
+- **Original source, unchanged**: `assets/source/working/cemetery-pack/street-lamp-simple.blend`
 - **Export target**: `public/assets/models/props/SM_StreetLamp_Simple.glb`
 - **Associated preset**: Hedwig Draco Export (glTF Binary, selected objects, tangents, Draco compression)
 - **Related docs**: `docs/archive/street-lamp-assembly-plan.md`, `docs/assets/pipeline-guide.md`, `docs/archive/street-lamp-session-notes.md`
@@ -103,7 +103,7 @@ Historical observations, not an active task list. Runtime emissive binding now e
 - To-do: capture on/off viewport renders during next Blender session.
 - 🔄 Runtime follow-up: bind Dev Room GUI lamp slider directly to material emissive intensity (0.1 ↔ 1.5) and re-test point-light offset once new GLB lands.
 
-## Upcoming Blender Fix – Internal Light Blocker (planned 2025-10-07)
+## Historical Internal Light Blocker Proposal (2025-10-07; resolved below)
 - **Tracking:** GitHub issue #10.
 - **Problem:** With the point light positioned inside the lantern, the outer roof still catches harsh highlights; current blocker panes are single surfaces so light reaches the same triangles that form the roof shell.
 - **Goal:** Add a shallow sealed “cap” inside the lantern so the bulb can sit at physical height (~0.45) without lighting the exterior metal.
@@ -115,5 +115,40 @@ Historical observations, not an active task list. Runtime emissive binding now e
   5. Re-export `SM_StreetLamp_Simple.glb` with the Hedwig Draco preset once satisfied and log results below.
 - **Post-export test checklist:** In the Dev Room set lamp light height to 0.45, intensity 35; confirm roof stays dark while glass + emissive glow remain convincing.
 
-### Temporary Engine Workaround (2025-10-09)
-- Point light height offset is clamped to 0.22 in the Dev Room so the bulb sits above the roof and no longer blows out the metal. This keeps the lamp readable but introduces a mild self-shadow; resolve once issue #10 lands.
+### Historical Engine Workaround (2025-10-09; superseded)
+- The former 0.22 m light offset placed the bulb above the glass cage. The r03 revision and current default restore the 0.45 m offset.
+
+## Issue #10 implementation and review — 2026-10-18
+
+### Source and runtime changes
+
+- Read-only inspection found the root empty was not a collection. `StreetLamp_Work` also contained hidden alternate meshes; the reference camera was outside it. The new `EXPORT_StreetLamp` contains only the root, base, metal lantern, separated glass, bottom cap and new roof liner. Neither alternates, reference camera nor the superseded top pane enter the GLB.
+- `tools/blender/street_lamp.py` creates a new revision directory and refuses an existing one. It copies all five source images and retains relative dependencies without changing the original blend/raw textures. The emission-mask UV samples identify exactly twelve glass triangles. Glass now has its own material; metal uses the original base-colour, roughness, metalness and OpenGL normal images directly instead of the old unsupported mixed shader graph.
+- The sealed hexagonal roof liner spans source Z 4.118–4.132 m, radius 0.195 m, overlapping the measured inner roof lip while staying inside the 0.22 m exterior eaves. It has twenty triangles, nondegenerate UVs and inward-facing normals. Inspection confirmed a closed manifold and negative signed volume. It uses a non-emissive opaque material, not the old cap UVs that accidentally sampled the glass emission mask.
+- The runtime bulb is at Y 3.965830 m: 0.45 m below the 4.415830 m lantern top, inside the glass cage. A 0.02 m shadow-camera near plane includes the liner only about 0.15 m above the bulb; Three.js's default 0.5 m would clip it. The shadow map is 1024² with small depth/normal bias and two-sided metal occlusion.
+- Glass is transmissive in the source/export (0.7 transmission, 0.12 roughness). Three.js depth shadows do not model material transmission, so only the separated glass mesh skips shadow casting; all metal, including the physical liner, still casts and receives shadows. This is not whole-lamp shadow disabling or an exterior roof material hack.
+- Only `MAT_StreetLamp_Glass` receives the existing intensity mapping: off = 0.1, on at light intensity 35 = 1.5. The exterior roof stays non-emissive.
+
+### Reproduce authoring and export
+
+Choose a new revision name rather than overwriting r03:
+
+```sh
+/Applications/Blender.app/Contents/MacOS/Blender --background --factory-startup --disable-autoexec \
+  --python-exit-code 1 --python tools/blender/street_lamp.py -- \
+  --source assets/source/working/cemetery-pack/street-lamp-simple.blend \
+  --revision-dir assets/source/working/street-lamp/NEW_REVISION
+bash tools/blender/run.sh export \
+  --source assets/source/working/street-lamp/NEW_REVISION/street-lamp.blend \
+  --collection EXPORT_StreetLamp --output .local/exports/street-lamp-NEW_REVISION.glb
+```
+
+The exercised r03 export used Blender **5.2.2 LTS**, Draco level 6, five meshes/primitives, three materials and an 18,379,836-byte GLB. The approved derivative replaces the actual loader path `public/assets/models/props/SM_StreetLamp_Simple.glb`. All runtime images are embedded; source dependencies remain separate and backed up. One exporter sampler-consolidation warning remains when merging the roughness/metalness images; both image nodes have the same Linear/REPEAT sampler settings. It was not suppressed. The new liner exports with tangents and no triangulation warning.
+
+### Exercised acceptance and limits
+
+- Saved-source Cycles off/on renders at 768² and source topology/dependency report are local under `.local/lamp-review/`. These are source review evidence, not a claim of identical Blender/Three.js photometry or human art acceptance.
+- Actual Chrome **148.0.0.0**, Apple M3 Max, sandbox at port 3103: the real GUI toggled the lamp off/on at intensity 35 and offset 0.45. Captured render buffers are **1280 × 800**, DPR 1; the browser screenshot preview's backing scale is not used as the measurement.
+- Runtime material snapshots confirm glass 0.1 → 1.5 and the unchanged bulb position. The close exterior-roof pixel region has exactly zero RGB change between off/on; mean lit roof RGB is approximately 4.90/7.77/11.91 (8-bit). The sampled ground region brightens from mean RGB 11.04/29.46/9.04 to 45.46/71.78/17.66. Separate legacy-prop off/on captures show illuminated nearby mesh faces. The cage casts visible radial frame shadows; these are physical occluders, not a fully black ground patch.
+- The GLB and Draco resources loaded through the actual asset system; browser errors were empty. A 120-frame sandbox sample measured median 16.7 ms, p95 16.8 ms, 15 draw calls and 6,732 rendered triangles. This is one lamp sandbox measurement, not full-cemetery performance acceptance.
+- Local snapshots under the approved `/Users/meeq/.backups/horror-game-hedwig/` policy preserve the original source dependencies and the complete r03 revision, authoring script and review evidence. Git contains only code, these notes and the redistributable GLB; it is not the source backup. Human final art acceptance remains separate.

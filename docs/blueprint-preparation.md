@@ -2,9 +2,9 @@
 
 Micha authorized reference preparation on 2026-10-16, excluding Blender construction and runtime work. He subsequently rejected the 113 agent-drawn interpretations as broadly inaccurate and worse than the canonical GeoJSON, including urn bays, lawns and canopy geometry. That assessment is the current basis for preparation. Technical checks of files, coordinates and browser controls never proved visual accuracy.
 
-The active atlas uses only the 140 canonical source features, official aerial imagery, numeric terrain and corrected private photo links. The canonical map is a working baseline with local uncertainty, not a survey or an approved production plan. Pause whole-site map expansion and do not attempt another full redraw. Preparation should support a small diagnostic pilot chosen by Micha.
+The active atlas uses only the 140 canonical source features, official aerial imagery, numeric terrain and corrected private photo links. The canonical map is a working baseline with local uncertainty, not a survey or an approved production plan. Use it for bounded corrections and later sections, rather than another whole-site redraw.
 
-Micha subsequently approved the [entrance/hall pilot](asset-integration-plan.md#approved-entrance-and-hall-pilot), including Blender authoring and runtime changes, on 2026-10-16. Implementation starts next session and stops at the first textured, walkable browser checkpoint for his visual review. The source rules on this page remain binding. The earlier preparation-only restriction and urn-bay suggestion do not override this approval.
+Micha approved the entrance/hall pilot, including Blender and runtime work, on 2026-10-16. The first checkpoint is implemented, and he considers it a useful basis with open modeling and path/collision limits. The [active plan](asset-integration-plan.md#current-pilot-and-review) owns the current scope and linked issues. The source rules on this page remain binding; the earlier preparation-only restriction does not override the pilot approval.
 
 ## Start here
 
@@ -15,6 +15,16 @@ open .local/blueprint/atlas.html
 ```
 
 The atlas displays the 140 projected canonical source features without an interpretation layer. Switch between RGB imagery, infrared imagery, terrain shading and surface height. Select a photo to see its effective camera position, direction provenance and the owner's verbatim note. The 13 regional photo-index groups help find photos; they are not verified observations or construction work cards. The existing photo editor remains at `.local/references/map.html`; the atlas is read-only.
+
+On narrow screens, the atlas has separate map, layer and photo panels. The bottom navigation stays visible. Tap a photo marker and "Ansehen" to inspect it, or choose a numbered photo from the list. "Auf Karte" shows its camera position and direction; the image opens in a full-screen viewer. Pinch and drag control the map. The source limits and unchanged owner notes remain available.
+
+Refresh the HTML after a presentation-only change without rebuilding rasters or geometry:
+
+```sh
+python3 tools/blueprint/atlas.py render
+```
+
+This uses the existing private `site-local.json`. Regenerate placements and run the full builder below when the reference data itself changes. The page embeds its map data and code, but loads the raster images and JPEG previews from adjacent private directories. Copying the HTML alone does not include those images.
 
 The rendered sheets are under `.local/blueprint/derived/`:
 
@@ -28,6 +38,41 @@ The rendered sheets are under `.local/blueprint/derived/`:
 | `terrain-local.npz`, `terrain-local.csv`, `terrain-grid.json` | Numeric local ground elevations and their grid contract. The coloured preview is not the height data. |
 
 Keep the images without annotation for Blender reference planes. The bordered plan sheets are review documents, not textures that can be assigned the same bounds as the unbordered rasters.
+
+## Private phone access
+
+The owner authorized private phone viewing on 2026-10-19. `atlas.py serve` delivers the read-only atlas and only the five raster previews and 98 JPEG proxies referenced by its existing `site-local.json`. It rewrites image URLs in memory, binds to loopback and has no directory browsing or write endpoint. Unknown paths and symlinks are refused. It does not expose the repository, the photo editor, raw rasters, original photos or metadata sidecars. Reference notes and positions remain embedded in the private page.
+
+For an interactive session, run the server and, in another terminal, add a dedicated private HTTPS endpoint:
+
+```sh
+python3 tools/blueprint/atlas.py serve --port 4184
+tailscale serve status
+tailscale serve --bg --https=9443 http://127.0.0.1:4184
+```
+
+Check that port 9443 is unused before adding it, and preserve existing Serve routes. Open the HTTPS address printed by Tailscale on the phone with Tailscale connected. Serve uses the existing tailnet access policy; this is not an individual account login or a public link. Do not use Funnel for this private reference pack. The Mac must remain awake and online.
+
+For the current session, the server runs independently of the coding terminal as `local.hedwig.private-atlas` under the user's launchd session. Its configuration and logs are private under `.local/atlas-mobile/`. It is not installed as a login item. To refresh the served page after template or derived-data changes, restart that job:
+
+```sh
+launchctl kickstart -k gui/$(id -u)/local.hedwig.private-atlas
+```
+
+After logout or restart, start the interactive server above, or reload the existing local job:
+
+```sh
+launchctl bootstrap gui/$(id -u) "$PWD/.local/atlas-mobile/local.hedwig.private-atlas.plist"
+```
+
+To remove this session's endpoint and background server, without resetting any other Tailscale service:
+
+```sh
+tailscale serve --https=9443 off
+launchctl bootout gui/$(id -u)/local.hedwig.private-atlas
+```
+
+The service snapshots its page and file allowlist at startup. Rebuild the reference data before restarting when photo corrections change. Images remain the existing working copies. Nothing is uploaded to a hosting provider or added to `public/`. A fresh clone still lacks the private inputs. Exercise the serving boundary with `python3 -m unittest discover -s tools/blueprint -p 'test_atlas.py'`.
 
 ## Why a layered plan
 
@@ -96,7 +141,7 @@ Keep `data/cemetery_final.geojson` unchanged as the baseline. Retain its stable 
 
 Use this guide as the handoff; do not create another competing plan. Assemble the following package for one proposed region:
 
-1. Include the approved brief and explicit scope from the [active plan](asset-integration-plan.md#approved-entrance-and-hall-pilot). The project aims to reproduce the actual cemetery at dusk or night, with an environment prototype before gameplay. Name the approved pilot's bounds, requested outputs and exclusions. Broader site expansion still requires review.
+1. Include the selected issue and current scope from the [active plan](asset-integration-plan.md). The [archived pilot brief](archive/entrance-hall-pilot-plan-2026-10-16.md#decision-and-scope) retains the original bounds and exclusions. The project still aims to reproduce the actual cemetery at dusk or night, with an environment prototype before gameplay. Name the requested outputs for the current section rather than treating the old implementation sequence as new work.
 2. Include the canonical GeoJSON and `site-local.json`, with the relevant stable source IDs. Include unannotated RGB/CIR, their capture dates and visibility limits, plus `site-frame.json` and the DGM grid contract above. Use source-only sheets for orientation, not as new measured evidence.
 3. Include effective photo placements and verbatim owner notes, with original metadata and provenance available. Use `.local/blueprint/photo-index.json` to select a small region-specific photo set, then inspect those photos directly. The 13 groups contain only IDs, labels and photo numbers; the atlas embeds them as `data.photo_index`, not `photo_evidence`.
 4. Include a short uncertainty list tied to source IDs and photo numbers. For each item, state the question, supporting or conflicting evidence and the human decision needed. If an object has no source ID, identify the nearby source feature and photo without inventing a footprint. Unknown areas need written limits, not speculative polygons.
@@ -109,7 +154,7 @@ First, compare the selected canonical features against RGB alone and the small p
 
 Second, apply the approved pilot's observable acceptance criteria. Require a neutral overhead source comparison and ground-level comparisons from named photo stations for the selected area. List supported local corrections and unresolved details. A visually plausible result without those comparisons is not acceptance.
 
-Third, begin source authoring next session under the approved brief and [owner-selected local backup policy](asset-integration-plan.md#before-modifying-sources). Read the recorded restore evidence rather than reopening the old independent-destination blocker. Keep existing Blender files unchanged and work in a new revision. No add-on or GIS server is needed.
+Third, make authorized source changes in a new revision under the [local backup policy](asset-integration-plan.md#before-modifying-sources). Start from the current pilot, not the pre-implementation sandbox. Read the recorded restore evidence rather than reopening the old independent-destination blocker. Keep existing Blender files unchanged. No add-on or GIS server is needed.
 
 For an authorized pilot, preserve the reference setup:
 

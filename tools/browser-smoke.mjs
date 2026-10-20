@@ -1,4 +1,4 @@
-// Local Chrome/CDP smoke, using Node's built-in WebSocket. No user profile or app edits.
+// Local Chrome/CDP smoke. Isolated profile; ws handles full-resolution screenshot frames.
 import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
 import { once } from 'node:events';
@@ -7,9 +7,24 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { setTimeout as delay } from 'node:timers/promises';
+import { parseArgs } from 'node:util';
+import WebSocket from 'ws';
+import { exercisePilot } from './pilot-scenarios.mjs';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
-const url = new URL(process.argv[2] ?? 'http://127.0.0.1:4173/');
+const { values: options, positionals } = parseArgs({
+  allowPositionals: true,
+  options: { width: { type: 'string', default: '1280' }, height: { type: 'string', default: '720' }, dpr: { type: 'string', default: '1' }, headless: { type: 'boolean', default: false } },
+});
+assert(positionals.length <= 1, 'Pass at most one local URL.');
+const width = Number(options.width), height = Number(options.height), dpr = Number(options.dpr);
+assert(Number.isInteger(width) && width >= 800 && Number.isInteger(height) && height >= 600,
+  'Viewport must be integer CSS dimensions of at least 800 × 600.');
+assert(Number.isFinite(dpr) && dpr > 0 && dpr <= 2, 'DPR must be greater than zero and at most 2 (the renderer cap).');
+const expectedBuffer = [Math.floor(width * dpr), Math.floor(height * dpr)];
+const captures = [];
+const url = new URL(positionals[0] ?? 'http://127.0.0.1:4173/');
+const isPilot = url.searchParams.get('mode') !== 'sandbox';
 assert(url.protocol === 'http:' && ['127.0.0.1', 'localhost', '[::1]'].includes(url.hostname),
   'Use a local HTTP dev/preview URL. This smoke does not visit remote sites.');
 await fetch(url, { signal: AbortSignal.timeout(5000) });
@@ -22,7 +37,8 @@ const profile = await mkdtemp(path.join(tmpdir(), 'hedwig-chrome-'));
 const child = spawn(chrome, [
   `--user-data-dir=${profile}`, '--remote-debugging-address=127.0.0.1',
   '--remote-debugging-port=0', '--no-first-run', '--no-default-browser-check',
-  '--window-size=1280,800', '--new-window', 'about:blank',
+  ...(options.headless ? ['--headless=new'] : []),
+  `--window-size=${width},${height + 100}`, '--new-window', 'about:blank',
 ], { stdio: ['ignore', 'ignore', 'pipe'] });
 let launchError;
 child.on('error', error => { launchError = error; });
@@ -33,6 +49,12 @@ let nextId = 0;
 const pending = new Map();
 const logs = [], errors = [], responses = [];
 const deadline = Date.now() + 20000;
+let pilotEvidence = null;
+
+function rejectPending(error) {
+  for (const request of pending.values()) { clearTimeout(request.timer); request.reject(error); }
+  pending.clear();
+}
 
 async function evaluate(expression) {
   const result = await send('Runtime.evaluate', { expression, awaitPromise: true, returnByValue: true });
@@ -40,16 +62,25 @@ async function evaluate(expression) {
   return result.result.value;
 }
 function send(method, params = {}) {
+  if (ws?.readyState !== WebSocket.OPEN) return Promise.reject(Error('CDP connection is not open.'));
   return new Promise((resolve, reject) => {
     const id = ++nextId;
-    const timer = setTimeout(() => { pending.delete(id); reject(Error(`CDP timeout: ${method}`)); }, 15000);
+    const timer = setTimeout(() => { pending.delete(id); reject(Error(`CDP timeout: ${method}`)); }, 60000);
     pending.set(id, { resolve, reject, timer });
     ws.send(JSON.stringify({ id, method, params }));
   });
 }
 async function screenshot(name) {
-  const result = await send('Page.captureScreenshot', { format: 'png' });
-  await writeFile(path.join(output, name), Buffer.from(result.data, 'base64'));
+  const result = await send('Page.captureScreenshot', {
+    format: 'png', captureBeyondViewport: true,
+    clip: { x: 0, y: 0, width, height, scale: 1 },
+  });
+  const png = Buffer.from(result.data, 'base64');
+  assert(png.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10])), 'Capture is not PNG.');
+  const dimensions = [png.readUInt32BE(16), png.readUInt32BE(20)];
+  assert.deepEqual(dimensions, expectedBuffer, `Unexpected PNG dimensions: ${name}`);
+  await writeFile(path.join(output, name), png);
+  captures.push({ name, dimensions });
 }
 const twoFrames = 'new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))';
 
@@ -65,6 +96,9 @@ try {
   const target = pages.find(page => page.type === 'page');
   assert(target, 'Chrome did not create a page.');
   ws = new WebSocket(target.webSocketDebuggerUrl);
+  // Keep this listener through close(), including an aborted opening handshake.
+  ws.on('error', rejectPending);
+  ws.on('close', () => rejectPending(Error('CDP connection closed.')));
   await once(ws, 'open', { signal: AbortSignal.timeout(10000) });
   ws.addEventListener('message', event => {
     const message = JSON.parse(event.data);
@@ -87,7 +121,7 @@ try {
   await send('Page.enable');
   await send('Runtime.enable');
   await send('Network.enable');
-  await send('Emulation.setDeviceMetricsOverride', { width: 1280, height: 720, deviceScaleFactor: 1, mobile: false });
+  await send('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: dpr, mobile: false });
   await send('Page.addScriptToEvaluateOnNewDocument', { source: `
     window.__hedwigSmoke = { pointer: [], moves: [], keys: [] };
     document.addEventListener('pointerlockchange', () => __hedwigSmoke.pointer.push(!!document.pointerLockElement));
@@ -97,9 +131,21 @@ try {
   await send('Page.navigate', { url: url.href });
   await send('Page.bringToFront');
   const loadDeadline = Date.now() + 20000;
-  while (!logs.some(row => row.text.includes('Dev Room ready')) || !logs.some(row => row.text.includes('HDRI loaded and applied'))) {
+  while (await evaluate('document.querySelector("#pilot-review")?.dataset.state') !== 'ready') {
     assert(Date.now() < loadDeadline && errors.length === 0, 'Scene did not finish loading. See report.json.');
     await delay(100);
+  }
+  if (isPilot) {
+    pilotEvidence = await evaluate(`(${exercisePilot.toString()})()`);
+    for (const view of await evaluate('__pilotReview.world.views.map(view => view.id)')) {
+      await evaluate(`__pilotReview.setView(${JSON.stringify(view)})`);
+      await evaluate(twoFrames);
+      await screenshot(`pilot-neutral-${view}.png`);
+    }
+    await evaluate('__pilotReview.setView("approach"); __pilotReview.setLighting("dusk")');
+    await evaluate(twoFrames);
+    await screenshot('pilot-dusk-approach.png');
+    await evaluate('__pilotReview.setLighting("neutral"); __pilotReview.reset()');
   }
   await screenshot('initial.png');
   for (const type of ['mouseMoved', 'mousePressed', 'mouseReleased']) {
@@ -107,6 +153,29 @@ try {
   }
   await evaluate(twoFrames);
   assert(await evaluate('document.pointerLockElement === document.querySelector("canvas")'), 'Pointer Lock failed.');
+  if (isPilot) {
+    const travel = async (sprint, grass = false) => {
+      await evaluate(grass
+        ? '__pilotReview.player.setView({x:27,z:-60,yaw:Math.PI/2,pitch:0})'
+        : '__pilotReview.reset()');
+      const before = await evaluate('__pilotReview.snapshot().position');
+      if (sprint) await send('Input.dispatchKeyEvent', { type: 'keyDown', key: 'Shift', code: 'ShiftLeft', windowsVirtualKeyCode: 16 });
+      await send('Input.dispatchKeyEvent', { type: 'keyDown', key: 'w', code: 'KeyW', windowsVirtualKeyCode: 87 });
+      await delay(1000);
+      await send('Input.dispatchKeyEvent', { type: 'keyUp', key: 'w', code: 'KeyW', windowsVirtualKeyCode: 87 });
+      if (sprint) await send('Input.dispatchKeyEvent', { type: 'keyUp', key: 'Shift', code: 'ShiftLeft', windowsVirtualKeyCode: 16 });
+      const after = await evaluate('__pilotReview.snapshot().position');
+      return Math.hypot(after[0] - before[0], after[2] - before[2]);
+    };
+    pilotEvidence.trustedWalkMetres = await travel(false);
+    pilotEvidence.trustedSprintMetres = await travel(true);
+    assert(pilotEvidence.trustedWalkMetres > 2.5 && pilotEvidence.trustedWalkMetres < 3.8, 'Trusted WASD did not walk at the configured speed.');
+    assert(pilotEvidence.trustedSprintMetres > pilotEvidence.trustedWalkMetres * 1.3, 'Shift did not increase actual walking distance.');
+    pilotEvidence.trustedGrassWalkMetres = await travel(false, true);
+    pilotEvidence.trustedGrassSprintMetres = await travel(true, true);
+    assert(pilotEvidence.trustedGrassWalkMetres > 2.5 && pilotEvidence.trustedGrassWalkMetres < 3.8, 'Trusted walking stopped on grass or at the former pilot edge.');
+    assert(pilotEvidence.trustedGrassSprintMetres > pilotEvidence.trustedGrassWalkMetres * 1.3, 'Trusted sprinting stopped on grass.');
+  }
   await send('Input.dispatchMouseEvent', { type: 'mouseMoved', x: 520, y: 360 });
   await evaluate(twoFrames);
   await screenshot('mouse-look.png');
@@ -115,6 +184,11 @@ try {
   }
   await evaluate(twoFrames);
   assert(await evaluate('document.pointerLockElement === null'), 'Escape did not release Pointer Lock.');
+  if (isPilot) {
+    const stopped = await evaluate('__pilotReview.snapshot().position');
+    await delay(200);
+    assert.deepEqual(await evaluate('__pilotReview.snapshot().position'), stopped, 'Player continued moving after Escape.');
+  }
   const state = await evaluate(`(() => {
     const canvas = document.querySelector('canvas'), gl = canvas.getContext('webgl2');
     const ext = gl.getExtension('WEBGL_debug_renderer_info');
@@ -122,17 +196,19 @@ try {
       gpu:ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : null,ua:navigator.userAgent,
       visibility:document.visibilityState,focused:document.hasFocus(),input:__hedwigSmoke};
   })()`);
-  assert.deepEqual(state.buffer, [1280, 720]);
+  assert.deepEqual(state.viewport, [width, height], 'CSS viewport differs from request.');
+  assert.equal(state.dpr, dpr, 'DPR differs from request.');
+  assert.deepEqual(state.buffer, expectedBuffer, 'Drawing buffer differs from request.');
   assert(state.input.moves.some(move => move.trusted && (move.x || move.y)), 'No trusted mouse movement observed.');
   assert(errors.length === 0 && !logs.some(row => row.level === 'error'), 'Browser errors occurred.');
   assert(!responses.some(row => row.status >= 400 && !row.url.endsWith('/favicon.ico')), 'A browser resource failed.');
-  await writeFile(path.join(output, 'report.json'), JSON.stringify({ result: 'PASS', url: url.href, state, logs, errors, responses }, null, 2));
+  await writeFile(path.join(output, 'report.json'), JSON.stringify({ result: 'PASS', url: url.href, requested: { width, height, dpr }, headless: options.headless, captures, state, pilot: pilotEvidence, logs, errors, responses }, null, 2));
   console.log(JSON.stringify({ result: 'PASS', output, pointerLock: true, trustedMouseMovement: true, escapeRelease: true, buffer: state.buffer }, null, 2));
 } catch (error) {
-  await writeFile(path.join(output, 'report.json'), JSON.stringify({ result: 'FAIL', error: String(error), logs, errors, responses, chromeLog }, null, 2));
+  await writeFile(path.join(output, 'report.json'), JSON.stringify({ result: 'FAIL', error: String(error), pilot: pilotEvidence, logs, errors, responses, chromeLog }, null, 2));
   throw error;
 } finally {
-  for (const request of pending.values()) { clearTimeout(request.timer); request.reject(Error('Chrome smoke ended.')); }
+  rejectPending(Error('Chrome smoke ended.'));
   ws?.close();
   if (child.pid && child.exitCode === null) {
     const exited = once(child, 'exit');

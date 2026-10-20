@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' file:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
 <title>Bestandsatlas · Private Vorbereitung</title>
 <style>
@@ -12,18 +12,48 @@
 @media(max-width:1100px){.workspace{grid-template-columns:230px minmax(320px,1fr)}.inspection{grid-column:1/-1;max-height:none;display:grid;grid-template-columns:1fr 1fr;border-left:0;border-top:1px solid var(--line)}.inspection>.block{border-right:1px solid var(--line)}.controls{max-height:none}.map-column{position:sticky;top:0}.map-wrap{height:65svh;min-height:480px}}
 @media(max-width:650px){header{padding:12px}.workspace{display:flex;flex-direction:column}.map-column{order:0;width:100%;position:static}.controls{order:1;width:100%;border-right:0}.inspection{order:2;display:block;width:100%}.map-wrap{height:60svh;min-height:340px}.toolbar{padding:8px}.toolbar button{font-size:12px}.map-footer{padding:8px 10px}.coordinates{font-size:10px;right:8px;bottom:10px}.scale{left:8px;bottom:10px}.block{padding:14px}.photo-list{max-height:145px}.controls .layer-options{display:grid;grid-template-columns:1fr 1fr;gap:0 15px}.inspection>.block{border-right:0}#preview{max-height:55svh}}
 @media(prefers-reduced-motion:no-preference){button{transition:background .12s,border-color .12s}}
+
+/* Mobile panels keep the map and the selected photo one tap apart. */
+.mobile-nav{display:none}.selection-card{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 12px;background:var(--raised);border-top:1px solid var(--line)}
+.selection-card span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.photo-actions{margin:10px 0}.photo-actions button{flex:1}#photo-title small{display:block;font-size:11px;font-weight:400;color:var(--muted);margin-top:5px}
+#photo-viewer{padding:0;border:1px solid var(--line);background:var(--bg);color:var(--ink);width:min(1100px,100%);max-width:100%;height:100dvh;max-height:100dvh}
+#photo-viewer::backdrop{background:#000d}.viewer-layout{height:100%;display:flex;flex-direction:column;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+.viewer-toolbar{display:flex;gap:8px;align-items:center;padding:10px}.viewer-toolbar strong{flex:1}.viewer-toolbar button{min-height:44px;min-width:44px}
+#viewer-image{display:block;flex:1;min-height:0;width:100%;object-fit:contain}.viewer-caption{padding:10px;margin:0;color:var(--muted)}
+@media(max-width:900px), (max-height:500px) and (max-width:1100px){
+  body{height:100svh;height:100dvh;display:grid;grid-template-rows:auto minmax(0,1fr) auto;overflow:hidden}
+  header{padding:calc(8px + env(safe-area-inset-top)) max(12px,env(safe-area-inset-right)) 8px max(12px,env(safe-area-inset-left));max-height:35dvh;overflow:auto}
+  header h1{font-size:18px;margin:0}header .eyebrow{font-size:10px;margin-bottom:2px}header summary{font-size:12px;font-weight:400;color:var(--muted)}
+  header details p{font-size:12px}.workspace{display:block;min-height:0;height:100%;overflow:hidden}
+  .workspace>.controls,.workspace>.inspection,.workspace>.map-column{display:none;width:100%;height:100%;max-height:none;min-height:0;border:0;position:static;overflow:auto;padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right)}
+  body[data-panel="layers"] .controls{display:block}body[data-panel="photos"] .inspection{display:flex;flex-direction:column}
+  body[data-panel="map"] .map-column{display:flex;flex-direction:column;overflow:hidden}
+  .map-wrap{flex:1;height:auto;min-height:100px}.toolbar{flex:none;padding:6px;gap:5px}.toolbar button{font-size:12px;padding:6px 8px}.toolbar .zoom{min-width:44px}
+  #locate-photo{display:none}.map-footer{flex:none;padding:5px 10px}.map-footer .legend,.map-footer>p:last-child{display:none}#map-status{margin:0;font-size:11px}
+  .coordinates{display:none}.north{top:8px;right:8px;padding:4px 6px}.north b{font-size:19px}.north small{font-size:9px}.scale{left:8px;bottom:8px;padding:4px 6px}
+  .mobile-nav{display:flex;gap:6px;border-top:1px solid var(--line);background:var(--panel);padding:6px max(8px,env(safe-area-inset-right)) calc(6px + env(safe-area-inset-bottom)) max(8px,env(safe-area-inset-left))}
+  .mobile-nav button{flex:1;font-size:13px}.block{padding:14px}.inspection>.block{flex:none;border-right:0}
+  #photo-inspection{order:-2}#photo-catalog{order:-1}#preview{max-height:45dvh}#photo-title{font-size:17px}#photo-title small{font-size:11px;font-weight:400;color:var(--muted);display:block}
+  button,.check,summary{min-height:44px}input[type="search"],select{font-size:16px;min-height:44px}input[type="range"]{min-height:44px}input[type="checkbox"]{width:20px;height:20px}
+  .controls .layer-options{display:block}.photo-list{max-height:230px}.photo-button{min-height:44px}.photo-actions{position:sticky;top:0;background:var(--panel);padding:6px 0;z-index:1}
+}
+@media(max-height:500px) and (max-width:1100px){
+  header .eyebrow{display:none}header h1{font-size:16px}header summary{min-height:0;padding:0}
+  .map-footer{display:none}.selection-card{padding:4px 10px}
+}
 </style>
 </head>
-<body>
+<body data-panel="map">
 <header>
-<div class="eyebrow">Private Arbeitsreferenz · Offline · Nur Lesen</div>
+<div class="eyebrow">Private Arbeitsreferenz · Nur Lesen</div>
 <h1 id="atlas-title">Bestandsatlas</h1>
-<p class="warning"><strong>Die früheren Agent-Zeichnungen wurden nach Michas Prüfung zurückgezogen.</strong> Sie sind archiviert und keine Bauvorlage. Das ursprüngliche GeoJSON bleibt die Arbeitsgrundlage, mit bekannten Lücken und lokalen Fehlern. Es ist keine Vermessung.</p>
-<p class="help">Nur projizierte Quellgeometrie, amtliche Raster und Fotoreferenzen. Originale und menschliche Korrekturen bleiben unverändert; keine kalibrierte Kamerarekonstruktion.</p>
+<details><summary>Quellenstand und Grenzen</summary><p class="warning"><strong>Die früheren Agent-Zeichnungen wurden nach Michas Prüfung zurückgezogen.</strong> Sie sind archiviert und keine Bauvorlage. Das ursprüngliche GeoJSON bleibt die Arbeitsgrundlage, mit bekannten Lücken und lokalen Fehlern. Es ist keine Vermessung.</p>
+<p class="help">Nur projizierte Quellgeometrie, amtliche Raster und Fotoreferenzen. Originale und menschliche Korrekturen bleiben unverändert; keine kalibrierte Kamerarekonstruktion.</p></details>
 </header>
 <noscript>Für die eingebettete Karte wird JavaScript benötigt. Es werden keine Daten an einen Server gesendet.</noscript>
 <main class="workspace">
-<aside class="controls" aria-label="Kartenebenen und Quellen">
+<aside id="layers-panel" class="controls" aria-label="Kartenebenen und Quellen">
 <section class="block">
 <h2>Hintergrund</h2>
 <label class="field" for="raster"><span>Rasterquelle</span><select id="raster"><option value="">Ohne Raster</option></select></label>
@@ -55,10 +85,11 @@
 </section>
 <section class="block"><details><summary>Stand der Vorbereitung</summary><div id="summary"></div></details></section>
 </aside>
-<section class="map-column" aria-label="Interaktive Bestandskarte">
+<section id="map-panel" class="map-column" aria-label="Interaktive Bestandskarte">
 <div class="toolbar">
 <button id="fit-site" type="button">Friedhof einpassen</button>
 <button id="fit-context" type="button">Gesamter Kontext</button>
+<button id="toggle-photos" type="button" aria-pressed="false">Fotostandorte</button>
 <button id="locate-photo" type="button" disabled>Zum Foto</button>
 <button id="zoom-in" class="zoom" type="button" aria-label="Karte vergrößern">+</button>
 <button id="zoom-out" class="zoom" type="button" aria-label="Karte verkleinern">−</button>
@@ -77,13 +108,14 @@
 <div class="map-decoration scale"><div id="scale-text"></div><div id="scale-bar"></div><div id="grid-text"></div></div>
 <div id="coordinates" class="map-decoration coordinates" aria-live="off">x → Ost · y ↑ Nord</div>
 </div>
+<div id="selection-card" class="selection-card" hidden><span id="selection-label"></span><button id="inspect-selection" type="button">Ansehen</button></div>
 <div class="map-footer">
 <p id="map-status" class="help" role="status" aria-live="polite">Karte wird vorbereitet.</p>
 <div class="legend"><span class="legend-item"><i class="line-sample"></i>Quelle, nicht vermessen</span><span class="legend-item"><i class="point-sample"></i>Standort menschlich bestätigt</span><span class="legend-item"><i class="point-sample unconfirmed"></i>Standort unbestätigt</span></div>
 <p class="help" style="margin:6px 0 0">Ziehen / ein Finger: verschieben · Mausrad / zwei Finger: zoomen · Kartenfokus: Pfeile, +, −, F · Keine Bearbeitung oder Speicherung.</p>
 </div>
 </section>
-<aside class="inspection" aria-label="Foto- und Objektinspektion">
+<aside id="photos-panel" class="inspection" aria-label="Foto- und Objektinspektion">
 <section class="block" id="photo-index" hidden>
 <details open>
 <summary>Regionaler Fotoindex <span id="region-count" class="badge"></span></summary>
@@ -92,16 +124,17 @@
 <div id="region-card"></div>
 </details>
 </section>
-<section class="block">
+<section class="block" id="photo-catalog">
 <h2>Fotoreferenzen <span id="photo-count" class="badge"></span></h2>
 <label class="field" for="photo-search"><span>Nummer, ID oder Notiz suchen</span><input id="photo-search" type="search" placeholder="z. B. Tor oder 42" autocomplete="off"></label>
 <label class="field" for="photo-filter"><span>Auswahl eingrenzen</span><select id="photo-filter"><option value="all">Alle Fotos</option><option value="confirmed">Standort menschlich bestätigt</option><option value="unconfirmed">Standort nicht menschlich bestätigt</option><option value="pending">Offene Prüfpunkte</option><option value="notes">Mit Notiz</option></select></label>
 <div id="photo-list" class="photo-list" aria-label="Nummerierte Fotos"></div>
 <p id="photo-list-status" class="help"></p>
-<div class="row"><button id="previous-photo" type="button" disabled>← Vorheriges</button><button id="next-photo" type="button" disabled>Nächstes →</button></div>
+
 </section>
 <section class="block" id="photo-inspection">
 <h2 id="photo-title">Foto auswählen</h2>
+<div class="row photo-actions"><button id="previous-photo" type="button" disabled>← Zurück</button><button id="photo-location" type="button" disabled>Auf Karte</button><button id="next-photo" type="button" disabled>Weiter →</button></div>
 <a id="preview-link" target="_blank" rel="noopener noreferrer" hidden><img id="preview" alt="" decoding="async"></a>
 <p id="preview-message" class="help">Nummer auf der Karte oder in der Fotoliste auswählen.</p>
 <p id="photo-pending" class="warning help" hidden></p>
@@ -110,7 +143,7 @@
 <details id="photo-evidence-wrap" hidden style="margin-top:12px"><summary>Belege und zusätzliche Angaben</summary><div id="photo-evidence"></div></details>
 <p class="help" style="margin-top:12px">Bestätigte Position und bestätigte Richtung sind getrennte Aussagen. Auch eine menschliche Bestätigung ist keine Vermessung. Der Quellwinkel bleibt unverändert sichtbar. Für die Karte wird, sofern geliefert, der auf UTM-Gitternord umgerechnete Winkel verwendet; andernfalls bleibt die Strahlrichtung eine Näherung.</p>
 </section>
-<section class="block">
+<section class="block" id="feature-inspection">
 <h2>Objektinspektion</h2>
 <label class="field" for="feature-search"><span>Objekt, ID oder Eigenschaft suchen</span><input id="feature-search" type="search" autocomplete="off" placeholder="z. B. Hecke oder way/"></label>
 <label class="field" for="feature-select"><span>Sichtbare Objekte</span><select id="feature-select" size="5" aria-label="Sichtbare Kartenobjekte"></select></label>
@@ -122,6 +155,15 @@
 </section>
 </aside>
 </main>
+<nav class="mobile-nav" aria-label="Atlasansicht">
+<button type="button" data-panel-target="map" aria-controls="map-panel" aria-pressed="true">Karte</button>
+<button type="button" data-panel-target="layers" aria-controls="layers-panel" aria-pressed="false">Ebenen</button>
+<button type="button" data-panel-target="photos" aria-controls="photos-panel" aria-pressed="false">Fotos / Objekte</button>
+</nav>
+<dialog id="photo-viewer" aria-labelledby="viewer-title">
+<div class="viewer-layout"><div class="viewer-toolbar"><strong id="viewer-title">Fotoreferenz</strong><button id="close-viewer" type="button" autofocus>Schließen</button></div>
+<img id="viewer-image" alt=""><p class="viewer-caption">Private Fotoreferenz. Arbeitskopie mit unverändertem Bildinhalt.</p>
+</div></dialog>
 <script id="site-data" type="application/json">__SITE_JSON__</script>
 <script>
 'use strict';
@@ -220,6 +262,25 @@
   function hasPending(photo) {
     return Array.isArray(photo.pending) ? photo.pending.length > 0 : !!photo.pending && (typeof photo.pending !== 'object' || Object.keys(photo.pending).length > 0);
   }
+  const mobile = matchMedia('(max-width:900px), (max-height:500px) and (max-width:1100px)');
+  function showPanel(name, target) {
+    document.body.dataset.panel = name;
+    document.querySelectorAll('[data-panel-target]').forEach(button => button.setAttribute('aria-pressed',String(button.dataset.panelTarget === name)));
+    if (name === 'map') resize();
+    if (target) $(target).scrollIntoView({block:'start'});
+  }
+  document.querySelectorAll('[data-panel-target]').forEach(button => button.addEventListener('click',() => showPanel(button.dataset.panelTarget)));
+  let selectionTarget = 'photo-inspection';
+  function showSelection(label, target) {
+    selectionTarget = target; $('selection-card').hidden = false; $('selection-label').textContent = label;
+  }
+  $('inspect-selection').addEventListener('click',() => showPanel('photos',selectionTarget));
+  $('preview-link').addEventListener('click',event => {
+    event.preventDefault(); $('viewer-image').src = $('preview').src; $('viewer-image').alt = $('preview').alt;
+    $('viewer-title').textContent = 'Foto ' + photoNumber(selectedPhoto); $('photo-viewer').showModal();
+  });
+  $('close-viewer').addEventListener('click',() => $('photo-viewer').close());
+  $('photo-viewer').addEventListener('close',() => $('viewer-image').removeAttribute('src'));
   const map = $('map');
   let view = {x:0,y:0,width:1,height:1}, metersPerPixel = 1, selectedPhoto = null, selectedFeature = null;
   let pixelWidth = 1, pixelHeight = 1;
@@ -288,6 +349,7 @@
   function visible(record) { return categoryInputs.get(record.category)?.checked && $('show-source').checked; }
   function updateVisibility() {
     featureRecords.forEach(record => { record.group.style.display = visible(record) ? '' : 'none'; });
+    $('toggle-photos').setAttribute('aria-pressed',String($('show-photos').checked));
     $('photo-layer').style.display = $('show-photos').checked ? '' : 'none';
     $('ray-layer').style.display = $('show-photos').checked && $('show-rays').checked ? '' : 'none';
     $('grid').style.display = $('show-grid').checked ? '' : 'none';
@@ -295,6 +357,7 @@
     if (selectedPhoto) updatePhotoStatus();
   }
   ['show-source','show-photos','show-rays','show-grid'].forEach(id => $(id).addEventListener('change',updateVisibility));
+  $('toggle-photos').addEventListener('click',() => { $('show-photos').checked = !$('show-photos').checked; updateVisibility(); });
   let rasterNode = null;
   rasters.forEach((raster,index) => { const option = element('option',raster.label || raster.id || 'Raster ' + (index + 1)); option.value = String(index); $('raster').append(option); });
   function chooseRaster() {
@@ -436,7 +499,7 @@
       const button = element('button',photoNumber(photo),'photo-button'+(confirmed(photo)?' confirmed':'')+(hasPending(photo)?' pending':''));
       button.type = 'button'; button.setAttribute('aria-label','Foto '+photoNumber(photo)+' · '+provenance(photo.position_source));
       button.title = 'Foto '+photoNumber(photo)+' · '+text(photo.id); button.setAttribute('aria-pressed',String(photo===selectedPhoto));
-      button.addEventListener('click',() => selectPhoto(photo)); $('photo-list').append(button); photoButtons.set(photo,button);
+      button.addEventListener('click',() => { selectPhoto(photo); if (mobile.matches) showPanel('photos','photo-inspection'); }); $('photo-list').append(button); photoButtons.set(photo,button);
     });
     $('photo-list-status').textContent = filteredPhotos.length + ' von ' + photos.length + ' Fotos in der Liste. Alle Standorte bleiben auf der Karte sichtbar, sofern aktiviert.';
     updatePhotoNavigation();
@@ -458,6 +521,9 @@
     if (!selectedPhoto) return;
     status('Foto ' + photoNumber(selectedPhoto) + ' ausgewählt.' + (!$('show-photos').checked ? ' Fotostandorte sind ausgeblendet.' : '') + (!finite(selectedPhoto.x) || !finite(selectedPhoto.y) ? ' Kein Kartenstandort vorhanden.' : ''));
   }
+  function showPhotoSelection(photo) {
+    showSelection('Foto ' + photoNumber(photo) + (finite(photo.heading) ? ' · Blickrichtung ' + fmt(photo.heading,0) + '°' : ''),'photo-inspection');
+  }
   function selectPhoto(photo) {
     selectedPhoto = photo; const sequence = ++previewSequence;
     photoRecords.forEach(record => { const selected = record.photo===photo; record.marker.classList.toggle('selected',selected); record.ray?.classList.toggle('selected',selected); if (selected) { $('photo-layer').append(record.marker); if (record.ray) $('ray-layer').append(record.ray); } });
@@ -468,11 +534,12 @@
       if (buttonBox.top < box.top) list.scrollTop -= box.top-buttonBox.top;
       else if (buttonBox.bottom > box.bottom) list.scrollTop += buttonBox.bottom-box.bottom;
     }
-    $('photo-title').textContent = 'Foto ' + photoNumber(photo) + ' · ' + text(photo.id);
+    $('photo-title').replaceChildren(element('span','Foto ' + photoNumber(photo)),element('small',text(photo.id)));
+    showPhotoSelection(photo);
     const path = imagePath(photo.proxy), image = $('preview'), link = $('preview-link');
     link.hidden = true; link.removeAttribute('href'); image.removeAttribute('src');
     $('preview-message').textContent = path ? 'Lokale Vorschau wird geladen …' : 'Keine gültige lokale Vorschau angegeben.';
-    image.onload = () => { if (sequence!==previewSequence) return; link.hidden = false; $('preview-message').textContent = 'Foto anklicken: unveränderte lokale Arbeitskopie in einem neuen Tab öffnen.'; };
+    image.onload = () => { if (sequence!==previewSequence) return; link.hidden = false; $('preview-message').textContent = 'Foto antippen oder anklicken, um es groß zu öffnen.'; };
     image.onerror = () => { if (sequence!==previewSequence) return; link.hidden = true; $('preview-message').textContent = 'Vorschau nicht lesbar: ' + path + '. Position und Belege bleiben verfügbar.'; };
     image.alt = 'Fotoreferenz '+photoNumber(photo)+' · '+text(photo.id);
     if (path) { link.href = path; image.src = path; }
@@ -486,10 +553,16 @@
     $('photo-note-wrap').hidden = !photo.note; $('photo-note').textContent = photo.note || '';
     const extras = Object.fromEntries(Object.entries(photo).filter(([key]) => !['number','id','x','y','heading','grid_heading','position_source','heading_source','note','proxy'].includes(key)));
     $('photo-evidence-wrap').hidden = !Object.keys(extras).length; $('photo-evidence').replaceChildren(valueNode(extras));
-    $('locate-photo').disabled = !finite(photo.x)||!finite(photo.y);
+    $('locate-photo').disabled = $('photo-location').disabled = !finite(photo.x)||!finite(photo.y);
     updatePhotoNavigation(); updatePhotoStatus();
   }
-  $('locate-photo').addEventListener('click',() => { if (!selectedPhoto || !finite(selectedPhoto.x) || !finite(selectedPhoto.y)) return; fit([selectedPhoto.x-35,selectedPhoto.y-35,selectedPhoto.x+35,selectedPhoto.y+35]); updatePhotoStatus(); });
+  function locatePhoto() {
+    if (!selectedPhoto || !finite(selectedPhoto.x) || !finite(selectedPhoto.y)) return;
+    showPhotoSelection(selectedPhoto);
+    showPanel('map'); $('show-photos').checked = true; updateVisibility();
+    fit([selectedPhoto.x-35,selectedPhoto.y-35,selectedPhoto.x+35,selectedPhoto.y+35]); updatePhotoStatus();
+  }
+  $('locate-photo').addEventListener('click',locatePhoto); $('photo-location').addEventListener('click',locatePhoto);
   function featureLabel(record) { return text(record.feature.properties?.label || categoryName(record.category)) + ' · ' + text(record.feature.id) + ' · Quelle'; }
   function renderFeatureList() {
     const query = $('feature-search').value.trim().toLocaleLowerCase('de');
@@ -515,6 +588,7 @@
     $('selection-layer').append(shape);
   }
   function selectFeature(record) {
+    showSelection(featureLabel(record),'feature-inspection');
     selectedFeature = record; $('feature-title').textContent = featureLabel(record); $('feature-warning').textContent = featureWarning(record);
     const dl = $('feature-details'); dl.replaceChildren();
     addDetail(dl,'ID',record.feature.id); addDetail(dl,'Objektart',categoryName(record.category)); addDetail(dl,'Geometrie',record.feature.geometry.type);
@@ -524,7 +598,7 @@
   }
   $('feature-search').addEventListener('input',renderFeatureList);
   $('feature-select').addEventListener('change',() => { const record = featureRecords.find(item => String(item.index)===$('feature-select').value); if (record) selectFeature(record); });
-  $('locate-feature').addEventListener('click',() => { if (selectedFeature) fit(selectedFeature.bounds,1.4); });
+  $('locate-feature').addEventListener('click',() => { if (selectedFeature) { showSelection(featureLabel(selectedFeature),'feature-inspection'); showPanel('map'); fit(selectedFeature.bounds,1.4); } });
   function referenceButtons(numbers) {
     const row = element('div',undefined,'row');
     for (const number of array(numbers)) {
@@ -533,7 +607,7 @@
       if (photo) {
         button.addEventListener('click',() => {
           selectPhoto(photo);
-          $('photo-inspection').scrollIntoView({block:'nearest',inline:'nearest'});
+          showPanel('photos','photo-inspection');
         });
       } else {
         button.disabled = true; button.title = 'Diese Fotoreferenz ist nicht im eingebetteten Atlas enthalten.';
@@ -564,7 +638,9 @@
     $('region-select').addEventListener('change',() => renderRegion(regions[Number($('region-select').value)]));
     renderRegion(regions[0]);
   }
+  if (mobile.matches) $('show-photos').checked = true;
   renderPhotoList(); updateVisibility();
+  if (photos.length) selectPhoto(photos[0]);
   if (rasters.length) $('raster').value = '0';
   chooseRaster(); resize(); new ResizeObserver(resize).observe(map);
   status(featureRecords.length+' Quellobjekte · '+photos.length+' Fotoreferenzen. Foto oder Objekt auswählen; lokale Unsicherheiten und Quellen beachten.');

@@ -1,12 +1,12 @@
-# Repository readiness, 2026-10-10
+# Repository readiness
 
 ## Assessment
 
-Micha approved the [entrance and hall pilot](asset-integration-plan.md#approved-entrance-and-hall-pilot), including Blender authoring and runtime changes, on 2026-10-16. Implementation begins next session and stops at the first textured, walkable browser checkpoint for his visual review. The owner-selected local backup and restore evidence are recorded below. [Blueprint preparation](blueprint-preparation.md) owns the source contract. The rejected 113 agent interpretations remain excluded. No cemetery model or runtime integration was created during planning or session closure.
+The entrance/hall pilot at `981fd64` is a useful foundation according to Micha's review, not finished or fully accurate modeling. Jagged path sections and irregular invisible barriers remain open; suspected foliage collision has not been established. The approved next work covers agent tooling, movement over all supported ground and a whole-cemetery ground foundation, as defined by the [active plan](asset-integration-plan.md). These changes are not implemented yet. Separate final source/browser art acceptance is not recorded. [Blueprint preparation](blueprint-preparation.md) owns the source contract, and the rejected 113 agent interpretations remain excluded.
 
 The historical October 10 assessment below started from `main` at `3ec81deef975981d46279e4be8480308638905b2`. It used the October 4 strand note, revival handoff, technical readiness report and linked map/photo/material research. That preparation made no changes to `src/`, the canonical GeoJSON, existing Blender sources or the shipped lamp, and performed no commit, upload or deployment. Those statements describe that historical task, not later integration activity.
 
-## Findings and changes
+## Historical preparation findings
 
 | Area | Initial problem | Preparation |
 | --- | --- | --- |
@@ -19,9 +19,9 @@ The historical October 10 assessment below started from `main` at `3ec81deef9759
 
 The workstation's npm minimum-release-age policy rejected Vite 7.3.7 because it was published on October 6. The preparation respected that policy and selected 7.3.6 rather than weakening global npm settings. Updating compatible transitive dependencies removed the advisory findings observed during installation.
 
-## Source inventory and access
+## Historical preparation inventory
 
-[Local references](local-references.md) contains commands, paths and privacy rules. The current inventory is:
+[Local references](local-references.md) contains source access and privacy rules. The following inventory describes preparation before pilot implementation, not the current runtime content:
 
 | Material | Available locally | In the browser runtime |
 | --- | --- | --- |
@@ -36,11 +36,11 @@ The workstation's npm minimum-release-age policy rejected Vite 7.3.7 because it 
 
 Photo metadata does not prove complete coverage or calibrated pose. The initial October10 preparation did not visually interpret photos; the later authorized reviews are recorded below. Raw assets, photographs and private derived maps remain outside Git and the web build.
 
-## Code assessment
+## Historical pre-pilot code assessment
 
-The current module split is adequate for the next bounded implementation. `src/main.js` provides a clear composition root, asset loading has one shared path, and atmosphere/lighting can be retained while replacing the flat sandbox world. A framework migration, ECS or broad refactor would add risk without resolving the missing reference and coordinate decisions.
+The preparation assessment found the existing module split adequate for bounded implementation. It recommended retaining the renderer, atmosphere and shared loaders while replacing the flat sandbox assumptions. A framework migration or ECS was not required.
 
-The actual development work should address these seams when introducing the corresponding feature:
+The following were pre-pilot change points, not a current task list. Later implementation and verification are recorded below:
 
 - **Site geometry and movement:** `World.js` constructs a flat plane and sample props. `PlayerController.js` fixes camera height and clamps a rectangle. Terrain sampling, placement and collision must share one site frame and height contract. No existing module supplies that contract.
 - **Content loading and lifecycle:** `main.js` only logs lamp readiness/failure. `Environment.js` handles HDRIs separately and has no request-order guard for rapid switches. Its material traversal assumes a single material, and PMREM render-target lifetime needs review when asset loading is expanded. The explicit environment binding is a repo convention, not a general Three.js r179 requirement.
@@ -77,14 +77,9 @@ Reference/privacy and Blender tooling received separate read-only code reviews. 
 
 Final housekeeping removed disposable source fixtures and stopped the preparation dev/preview servers. Browser smoke processes closed their temporary profiles; private reference copies and local test evidence remain available. Git ignore checks covered 109 private/source paths, with no private source files tracked. Local Markdown links in the eleven current entry/workflow documents resolved.
 
-## Remaining prerequisites, not hidden setup tasks
+## Current session handoff
 
-1. Implement the approved entrance/hall pilot from the [active plan](asset-integration-plan.md#approved-entrance-and-hall-pilot). The brief and first review checkpoint no longer need approval. Use the source-only atlas and selected photos; regional index labels remain navigation aids, not evidence.
-2. Use the acquired terrain and documented frame. Compare relevant stable source IDs with aerial imagery and corrected photos. Record uncertainty and make only evidence-supported local corrections. Runtime terrain and coordinate integration remain to be implemented within the pilot.
-3. Preserve new source revisions through the [owner-approved local backup policy](asset-integration-plan.md#before-modifying-sources). The old independent-destination blocker is superseded; protection against loss of this Mac remains outside the verified backup.
-4. Agree target hardware/browser/resolution and later measure the actual route. Before public release, reconcile code-licence metadata and grass/HDRI provenance. The pack's commercial permission is already confirmed.
-
-For a new session, start with `README.md` and the [active plan](asset-integration-plan.md). Source access and Blender setup no longer require rediscovering paths from old conversations. Fresh clones still need the private source workspace or the documented recovery steps; private material is deliberately not part of Git.
+Use `README.md`, the [active plan](asset-integration-plan.md) and its selected GitHub Issue for current work. The first pilot implementation is complete as a checkpoint; the remaining path/collision observations and agent-tooling limits are not dismissed by that result. Reuse existing source/setup evidence. Fresh clones still need the private workspace or documented recovery steps.
 
 ## Follow-up: photo metadata and authoring direction
 
@@ -163,3 +158,164 @@ The initial session closure changed only documentation and private backup/eviden
 ### Version-control handoff
 
 Micha subsequently requested commits and a push of the completed preparation, an annotated pre-implementation checkpoint, and a separate implementation branch. The checkpoint is named `checkpoint/pre-entrance-hall-pilot`; implementation belongs on `feat/entrance-hall-pilot`. Root `AGENTS.md` owns the Git workflow, and root `CLAUDE.md` is its symlink rather than a second policy file. The private backup above remains immutable and predates this Git handoff; Git does not replace snapshots of private sources.
+
+## Initial pilot implementation check, 2026-10-16
+
+The first source checkpoint is `r02/entrance-hall.blend` under `assets/source/working/entrance-hall-pilot/`. Its separate `entrance-hall-review.blend` includes vegetation for Blender inspection. The reusable vegetation source is `vegetation-r04/vegetation-r04.blend`. Sources, packed private reference planes, texture copies and authoring inputs remain ignored. The runtime contains only the two selected GLBs and `walk.json` under `public/assets/models/pilot/`.
+
+The source authoring scripts preserved the canonical hall footprint and site frame. They use the actual DGM sample centres and one standard Blender-to-glTF axis conversion. The authored hall platform and paving share their ground calculation with movement. The pilot includes the approach, forecourt and a connected walk around the hall. It does not reconstruct the surrounding grave fields or interior.
+
+The first actual Chrome route check passed in `.local/browser-smoke-IqU5Gg/report.json`. It crossed 21 route stations and compared 61 decoded terrain samples with the movement sampler, with a maximum discrepancy of 0.00272 m. The check exercised hall collision, sliding, supported limits, overhead-to-walk reset, trusted WASD and sprint input, mouse look and Escape. Walk and sprint travelled 3.10 m and 4.61 m respectively during one-second input windows, including acceleration.
+
+The first build passed with the existing large-chunk warning. The retained production-preview sandbox passed its input check in `.local/browser-smoke-cLfxMQ/`. Blocking the hall GLB request in the production preview produced a visible failure message, disabled the player and added no pilot or substitute scene. The private failure evidence is `.local/pilot/loading-error.json`.
+
+The first source renders are in `.local/pilot/r02/`, and the matching browser views are in `.local/browser-smoke-IqU5Gg/`. The private aerial crop is `.local/pilot/aerial-pilot.png`. Source and browser materials need separate visual acceptance. The initial route timing overlapped source rendering, so it is not the final performance measurement.
+
+No installation, Blender capability smoke, reference regeneration or backup-restore setup was repeated. New source authoring, selected FBX inspection, source renders, GLB export and the changed browser paths were exercised directly.
+
+## Final pilot checkpoint and single QA, 2026-10-16
+
+The review revision is `r05/entrance-hall.blend`, with `r05/entrance-hall-review.blend` for combined inspection and `vegetation-r06/vegetation-r06.blend` as the reusable vegetation source. All paths are under `assets/source/working/entrance-hall-pilot/`. Earlier revisions remain intact. The active plan records the selected scope, paths and unresolved estimates.
+
+One read-only `gpt-6-astra` QA, with high reasoning, inspected the private atlas, nine relevant photos, aerial alignment, source renders and saved browser evidence. It did not perform an independent interactive browser run. Its report is `.local/pilot/qa-review.md`. All five bounded findings were addressed:
+
+- Dense gable shrubs now have a smaller, ground-reaching opaque inner crown; masked leaf cards retain the close silhouette without losing the whole mass at distance.
+- A framed diamond joins the sloping gable window bands, with a central facade joint and varied lead subdivisions.
+- Roof courses follow the eaves; paving UVs follow the approach/hall frame instead of world axes.
+- Tower lamellae overlap rather than leaving large gaps. A visible soil bed, stone edge and shrubs explain the existing tower obstruction.
+- A dedicated dusk preset retains readable architecture. Isolated browser probes left the paving bands unchanged with normal strength zero but removed them when shadow receiving was disabled. Raising the pilot's shadow normal bias to 55 mm resolved that artifact without disabling normal maps or shadows.
+
+The gate comparison view was added, and ground-view source cameras now share the browser's 55-degree vertical field of view. Final source renders and the same-extent aerial/overhead comparison are in `.local/pilot/r05/`; final neutral/dusk browser captures are in `.local/browser-smoke-DoagFO/`. Fix verification was performed by the implementation agent. There was no second QA round and no human art acceptance.
+
+### Exercised runtime and measurements
+
+`npm run build` passed. `npm run browser:smoke -- 'http://127.0.0.1:4173/?mode=pilot'` passed against the final production preview. It exercised 21 route stations, ground contact, 61 decoded terrain comparisons, closed hall collision, angled-wall sliding, gate barriers, supported limits, overhead reset, trusted mouse/WASD/sprint and Escape. The final input windows travelled 3.07 m walking and 4.62 m sprinting; they include acceleration. The maximum decoded-ground/sampler discrepancy remained 0.00272 m. Required assets returned HTTP 200, with no browser warnings or JavaScript errors. The earlier sandbox and blocked-GLB failure checks remain applicable; those paths were not changed by the QA fixes.
+
+The live review panel was also exercised through actual buttons and the view selector: neutral gate view, dusk lighting, overhead forcing neutral inspection, and reset returning to the supported entrance spawn. The only HTTP 404 in the final trace was the browser's automatic `/favicon.ico` request, not an application asset.
+
+Hardware: Apple M3 Max, macOS 25.6, Chrome 155, ANGLE Metal. Both neutral-route measurements ran without concurrent Blender rendering, with 453 frame samples each:
+
+| Render buffer | CSS viewport / DPR | Mean frame interval | p95 frame interval | Maximum draw calls |
+| --- | --- | --- | --- | --- |
+| 1280 × 720 | 1280 × 720 / 1 | 8.33 ms | 9.90 ms | 24 |
+| 3456 × 1838 | 1728 × 919 / 2 | 8.33 ms | 9.90 ms | 24 |
+
+These are browser `requestAnimationFrame` intervals, approximately 120 Hz, not GPU timer-query results. The route uses accelerated bounded spatial steps; trusted walking speed is checked separately. The second run reproduces the initially observed inspection window with explicit CDP metrics; its report is `.local/pilot/inspection-route.json`. The full-resolution dusk capture is `.local/pilot/inspection-dusk.png`. Neither result guarantees full-cemetery performance.
+
+The final production request trace recorded 14,894,464 transferred bytes for the app bundle, shared HDRI, decoder and pilot resources, including browser-reported response overhead. The pilot resources account for 8,423,429 transferred bytes. Their uncompressed GLBs are 6,328,324 bytes for the hall/ground and 2,074,356 bytes for vegetation; images are embedded. The shared HDRI remains the other large download. No new external asset service or texture-compression toolchain was introduced.
+
+### Private backup and operational limits
+
+The final snapshot is `/Users/meeq/.backups/horror-game-hedwig/entrance-hall-r05-2026-10-16-l4gpd73o/`. Its manifest covers 204 files and 284,883,227 bytes: source revisions, textures, inputs, authoring scripts, runtime derivatives and private review evidence. Every copied file was compared by SHA-256. `.local/pilot/backup-r05.json` records the snapshot summary. The pre-pilot and first `r02` snapshots were not overwritten. This is same-filesystem protection, not an off-device backup or a new restore exercise.
+
+No hard operational blocker remained. The following workarounds and warnings are relevant to future sessions:
+
+- The general Python tool environment lacks Pillow. Image/terrain preparation used the existing `.local/blueprint-venv/`; no package installation or repeated setup smoke was needed.
+- Native browser helper viewport requests did not reliably equal the observed viewport, and inspection screenshots may be downscaled by the helper. The issue was reported to the tool provider. Use the existing Chrome/CDP smoke for the fixed buffer; for another size, set CDP metrics and assert CSS size, DPR and renderer buffer within the same session. Direct CDP PNG capture preserves the render resolution.
+- No language server was configured for this repository. Existing module seams and direct source inspection were used; no new tooling dependency was added.
+- Blender 5.2.2 emitted `use_nodes` deprecation warnings for Blender 6 and a shared-image-sampler export warning. Export and browser loading succeeded; the warnings were not suppressed. Vite retained its greater-than-500-kB chunk warning (735.51 kB minified / 205.09 kB gzip).
+- The inspected pack did not supply a faithful birch or the required clipped vegetation forms. Selected broadleaf meshes and authored conifer/shrub/hedge geometry are silhouette approximations, not species-accurate reconstructions. Source and browser look remain separate human review gates.
+
+## Owner review and planning handoff, 2026-10-17
+
+Micha described the pilot as good progress and a useful first version to build on. He did not approve every modeled detail or request an exhaustive polish inventory. He reported jagged path sections and irregular invisible barriers. Possible collision around tree foliage was his impression without clear evidence, so the cause remains open. The earlier passing route covered selected positions and does not establish correctness across the full supported area.
+
+The next session is reserved for agent-tooling improvements and focused path/collision work before further production. GitHub Issues now own concrete tasks and status:
+
+- #12 covers Python environment selection and language-server access; #13 covers reliable browser metrics and captures.
+- #14 covers Blender API/sampler warnings; #15 groups path contours, unexpected barriers and the tree-collision suspicion.
+- #16 covers measured loading cost, #17 vegetation fit and #18 independent backup. They are deferred rather than new prerequisites for the pilot.
+
+The active plan links each issue and defines order and scope. The former first-pilot plan and Markdown backlog were archived. GitHub proposals #1, #5, #7 and #9 were closed as superseded or not planned, not as fully implemented. Historical reports #3, #4 and #10 remain deferred and were not re-diagnosed.
+
+This handoff changed planning, guidance and issue state only. No runtime, authored geometry, source assets or canonical map data changed. No new browser benchmark, setup smoke or heavy QA was run. The prior source backup and measured evidence remain historical records, with the new owner feedback recorded separately.
+
+Planning verification resolved 74 local Markdown links and heading anchors across 11 affected or linked documents. GitHub API reads confirmed the seven new issue bodies, titles, labels and states, plus the intended closure/deferment of the historical issues. No obsolete references to the removed standalone backlog or retired pilot-plan anchor remained in the repository search.
+
+## Movement and ground planning decisions, 2026-10-18
+
+Micha approved configuring OMP's browser where practical and retaining the existing Chrome check for useful project checks or gaps. He accepted focused Blender script/export fixes with documented warnings that are verified harmless. The agreed approaches are recorded in issues #13 and #14; neither issue is implemented or closed.
+
+For movement, he rejected a thorough investigation of invisible shapes and approved walking across all supported ground with sensible solid-object collisions. [#15](https://github.com/LLMinem/horror-game-hedwig/issues/15) was revised accordingly. He also requested [#19](https://github.com/LLMinem/horror-game-hedwig/issues/19) for ground across the entire cemetery before detailed modeling expands.
+
+Read-only source research found that the prepared terrain covers the cemetery with margin. The present pilot uses a cropped heightfield and narrower path-derived walking restrictions. The expansion can reuse the existing terrain pipeline and movement interface, but must preserve the local hall platform adjustment. The cemetery boundary guides coverage; it does not authorize another hidden movement boundary inside rendered, supported ground.
+
+These are owner decisions and source-inspection findings, not new runtime evidence. No browser, terrain generation, export or movement verification was performed for this planning checkpoint. The active plan also records the owner's project-history context; the age and long pause alone do not establish that a stack rewrite is needed.
+
+## Owner-accepted backup and project assessment, 2026-10-18
+
+Micha confirmed that he uses an external Time Machine drive and requested closure of [#18](https://github.com/LLMinem/horror-game-hedwig/issues/18). The issue was closed as completed by owner acceptance. No current destination, exclusion or recovery check was performed; the read-only worker could not run the relevant system commands. This limitation is not evidence that a backup is absent. The accepted arrangement does not authorize uploading private references or raw purchased sources to public Git.
+
+The parallel source assessments found no evidence requiring a framework, language or engine migration for the current prototype. The existing world/movement interface and composition remain useful. Existing Python entrypoints already separate standard-library tools, blueprint/image work and Blender's bundled Python. Further environment work belongs in #12 rather than a new universal launcher.
+
+OMP documents language-server support, but the research worker lacked access to the tool device. Parent-session server status and successful language queries remain unverified; the worker limitation must not be described as missing OMP support. Historical dependency/build evidence was reused, not rerun as a fresh audit.
+
+The active plan records the owner's intention to build the full game with Three.js while leaving later engine reassessment open. It also records the deferred loading work and approved asset budget. These decisions do not authorize an engine comparison or speculative optimization now.
+
+The architecture review also identified a possible out-of-order HDRI selection in `src/world/Environment.js` and a question about ownership of generated PMREM render targets. It did not reproduce the ordering problem or establish a resource leak. Existing issues #3, #4, #10 and #16 do not cover those details, but the active plan already retains them for relevant lighting/lifecycle work. No new architecture issue or broad overhaul was created.
+
+Planning verification resolved 37 local links and heading anchors across the five changed entry, plan and reference documents. GitHub API reads verified each updated issue body and state, including the accepted closure of #18 and the new #19 ground issue. No runtime or source assets changed during these interviews.
+
+## Whole-cemetery ground milestone, 2026-10-18
+
+The owner approved implementation of #3, #4, #10, #12, #13, #14, #15 and #19, with #16 and #17 left deferred. The changes were consolidated on `feat/entrance-hall-pilot`. They provide a walkable ground foundation and retain the detailed entrance/hall section, not a finished cemetery model.
+
+### Ground, movement and source preservation
+
+The new `r06-site` revision contains a 239 × 253 sample grid at one-metre spacing. Its runtime bounds are X −108.5 to 129.5 m and Z −120.5 to 131.5 m, covering the canonical cemetery with approximately eight metres of margin. Numeric comparison of every old pilot sample found **zero height change**. The hall platform remains at 0.118 m in the existing local frame. The canonical map was not edited.
+
+`walk.json` version 2 removes the path-derived walking mask. Hall, tower bed, trunks and represented entrance barriers remain solid; the grid boundary supplies outer-edge safety. Two entrance-path width changes now taper over at most two metres while retaining the centreline and intentional corners. No foliage-mesh collision defect is claimed. Amber review-limit bars are gone.
+
+Actual browser checks covered the retained 21-station pilot route, eight wider ground stations, all four terrain edges, hall sliding, trunk exclusion, reset and decoded terrain agreement. Trusted keyboard input walked and sprinted on grass across the old pilot edge. At the tested samples, decoded terrain disagreement was at most 0.00543 m. The whole-site overhead initially exposed depth fighting between ground and 25 mm raised paving; increasing the inspection camera's near plane to 1 m fixed the visible conflict. Walking/reset restores 0.1 m.
+
+Source Cycles comparisons are under `.local/pilot/r06-site/`, including pilot/whole-site overhead and dusk approach. Runtime comparisons are in the production smoke directories below. The new source, combined review blend, textures, inputs and script copies remain private. Consolidation preserved the warning fixture and lamp r03 source as well. A new approved local snapshot contains **58 files, 97,418,161 bytes**, with SHA-256 comparison for every copy; `.local/milestone/source-backup.json` records its location and manifest. No Time Machine restore test was performed or required.
+
+### Tooling and browser evidence
+
+The selected blueprint interpreter performed a Pillow resize and PNG round trip with checked dimensions and colour. The development-only TypeScript server and `jsconfig.json` provide JavaScript project navigation without a TypeScript migration. A live OMP references query for `createPilotMovement` returned the declaration, import and caller in `PilotWorld.js`.
+
+Native OMP viewport/capture helpers did not retain the requested dimensions in this session. A screenshot helper saved 756 × 413 pixels despite a previously observed 3456 × 1838 buffer. The exercised workaround applies CDP metrics before loading and captures with an explicit viewport clip inside the same native `tab.run`. Both requested sizes below matched CSS viewport, DPR, canvas and PNG headers, with pointer lock and trusted walking in each session. `.local/milestone/native-browser.json` records the results; tool-provider reports were submitted.
+
+The existing Chrome smoke now accepts size/DPR and optional headless arguments and checks every PNG header. Large PNG replies stalled with Node 24.15.0's built-in WebSocket across Chrome 148 and 155, while the same path worked with Bun's transport. Switching the Node tool to the small development-only `ws` package resolved the stalls without adding another browser framework. Saved images and model-visible previews remain separate; crop a saved image for close inspection.
+
+`npm run build` passed with Vite 7.3.6. The existing chunk-size warning remains visible, as agreed for #16. The build was exercised through `npm run preview`, not only the dev server:
+
+| Production check | Render buffer | Result | Mean frame time | p95 frame time | Maximum draw calls |
+| --- | --- | --- | --- | --- | --- |
+| Pilot and whole-ground routes, DPR 1 | 1280 × 720 | PASS | 16.67 ms | 16.80 ms | 23 |
+| Pilot and whole-ground routes, DPR 2 | 3456 × 1838 | PASS | 16.67 ms | 16.70 ms | 23 |
+| Sandbox input and loading, DPR 1 | 1280 × 720 | PASS | Not sampled | Not sampled | Not sampled |
+
+Measurements used headless Chrome 155 on this Mac's Apple M3 Max through ANGLE Metal. They were display-limited and cover the present sparse scene, not a fully modeled cemetery or mid-range hardware. Reports and 14 captures per pilot run are under `.local/browser-smoke-8q2TBd/` and `.local/browser-smoke-AFP1ZD/`; sandbox evidence is under `.local/browser-smoke-lqn40C/`. Both pilot runs passed trusted walk/sprint checks on paving and grass, pointer capture, mouse look and Escape release. No application resource failures or browser errors were recorded.
+
+### Atmosphere, lamp and Blender warnings
+
+The integrated atmosphere changes fix sky/object fog colour conversion, remove zenith crowding in the star distribution and keep point sizes consistent across rotation and DPR. Focused browser comparisons found zero fog-channel mismatch after the fix, stable stars under translation/rotation and no browser errors. The agent also exercised 10,000 and 100,000 star counts, without treating stress counts as a new default. Evidence is under `.local/atmosphere-2026-10-18-r01/`; the existing stars ADR records the implementation.
+
+The lamp's new r03 source provides a sealed inner roof liner and a light 0.45 m below the lantern top. Glass preserves the 0.1/off to 1.5/on emission mapping. Focused source/browser comparisons showed a dark exterior roof and brighter ground/nearby props. The glass alone skips depth-shadow casting because that shadow path does not represent transmission; opaque metal still occludes light. [Lamp notes](assets/street-lamp-scratchpad.md#issue-10-implementation-and-review--2026-10-18) record the source, export, measurements and remaining human art gate.
+
+Seven redundant Blender node-toggle writes were removed on the exercised Blender 5.2.2 path. The vegetation sampler warning refers twice to the same image node for colour and alpha, rather than conflicting settings. Direct-source PNG and exported GLB material comparisons matched exactly in the browser. The warning remains documented, not suppressed; Blender 6 compatibility is not claimed. Evidence is under `.local/blender-warning-20261018-a/` and the [workbench guide](assets/blender-workbench.md).
+
+### Lean review and integration
+
+Independent standards and issue-acceptance reviews covered the session diff from `ae41835`, rather than repeating the original heavy pilot QA. The acceptance review found no missing requirement in the approved scope. The standards review found one transport-cleanup defect: closing a `ws` connection after its opening handshake timed out could emit an unhandled error and leave the temporary profile behind.
+
+The actual smoke CLI reproduced that failure against a temporary stalled handshake endpoint. A lifetime error listener, pending-request cleanup and a closed-socket guard fixed it. The same failure scenario then returned the expected nonzero result after removing the profile, and the reviewer confirmed the correction. `.local/milestone/transport-failure.json` records the check; the temporary endpoint script was removed. All 46 local links/anchors in the eight changed Markdown documents resolved.
+
+The three implementation worktrees were consolidated through their commits. Their new private sources and evidence were copied into the primary workspace and backed up before the worktrees were removed. No new assets were bought, and #16/#17 remain deferred under the approved plan. Final human browser and art review remains outstanding; no merge or deployment was performed.
+
+The final production high-resolution smoke after the cleanup fix also passed at 3456 × 1838, including trusted input and profile shutdown. Its report and captures are under `.local/browser-smoke-B56p4q/`.
+
+Micha subsequently reviewed and tested the latest browser version, reported no unusual behavior and explicitly authorized merging PR #20. This accepts the current prototype checkpoint without claiming finished site fidelity or authorizing deployment. The next detailed modeling section still needs a bounded brief.
+
+## Mobile reference atlas, 2026-10-19
+
+The owner requested phone viewing of the private layered atlas. The atlas now has persistent map/layer/photo navigation on small screens, direct photo-to-camera navigation, larger controls and a full-screen photo viewer. Existing desktop panels, source limitations and verbatim photo notes remain available. Map geometry and reference data were not changed.
+
+Chrome checks covered 320 × 568, 393 × 852, 852 × 393, 768 × 1024 and 1440 × 900 CSS pixels, with no horizontal overflow. CDP touch input exercised one-finger pan and two-finger zoom without accidental photo selection. Photo navigation, image decoding, full-screen open/close, return to the camera position and raster switching passed without JavaScript exceptions. Private captures and the report are under `.local/atlas-mobile/`. These are emulated mobile checks, not a claim of testing Safari on the owner's iPhone. The embedded atlas data matched `site-local.json`, and the canonical GeoJSON SHA-256 remained unchanged.
+
+The dedicated atlas server was then exercised through private Tailscale HTTPS. All 103 referenced images decoded, and the page retained all 98 photos, five rasters and 140 source features. Four synthetic boundary tests passed for exact file delivery, HTML-safe embedded data, traversal/unknown-path refusal, cross-site request refusal and symlink rejection before and after startup. The first test attempt failed because its HTTP client helper incorrectly used a context manager; the helper was corrected before the passing run. Actual HTTPS requests for repository and metadata paths returned 404. The two pre-existing Serve routes were compared before/after and remained unchanged; Funnel was absent. The game was not deployed.
+
+The atlas server runs as a private launchd job for the current login session, independently of the coding terminal. The [phone-access guide](blueprint-preparation.md#private-phone-access) records restart and teardown commands. The owner still needs to confirm actual iPhone Safari behaviour and reachability from the phone.
+
+A final interaction check found that returning to a previously selected photo or object could leave the other selection in the map card. The location buttons now restore the matching card and inspection target. Alternating object selection, photo location, photo inspection and object location passed through the served page.

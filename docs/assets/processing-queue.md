@@ -1,14 +1,16 @@
 ---
 type: checklist
 status: active
-last_verified: 2026-10-10
+last_verified: 2026-10-17
 ---
 
 # Asset candidates, not a production order
 
-Start with photo location/coverage review in [the active plan](../asset-integration-plan.md), then choose assets for a bounded production brief. Prefer agent-authored site geometry; complex vegetation is a reasonable pack candidate. Additional textures/models may be sourced when needed with licence and fit checks. This is not a pack-conversion backlog.
+Use the current scope and issue links in [the active plan](../asset-integration-plan.md). Corrected photo inputs and the first entrance/hall pilot already exist. Prefer agent-authored site geometry; complex vegetation may come from the pack where it fits. Additional assets need a concrete brief and licence/fit checks. This page is a source-selection guide, not a second task backlog.
 
 ## Runtime proof
+
+The entrance/hall pilot has selected runtime derivatives and reusable vegetation prototypes. The active plan identifies their current sources. Further vegetation-fit work is deferred in [#17](https://github.com/LLMinem/horror-game-hedwig/issues/17), rather than requiring another general pack inventory.
 
 - `public/assets/models/props/SM_StreetLamp_Simple.glb`: disposable pipeline test with Draco and emissive controls, not a required cemetery asset. Existing lamp Blender files and sample props are not authoritative modelling references. Preserve the working sandbox until deliberately replacing it; do not polish this lamp merely because it already exists. [Historical scratchpad](street-lamp-scratchpad.md).
 

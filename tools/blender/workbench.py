@@ -200,7 +200,6 @@ def smoke(args):
     cube = bpy.context.object
     cube.name = "HedwigSmokeCube"
     material = bpy.data.materials.new("HedwigSmokeMaterial")
-    material.use_nodes = True
     material.node_tree.nodes["Principled BSDF"].inputs["Base Color"].default_value = (0.18, 0.4, 0.15, 1)
     cube.data.materials.append(material)
     camera_data = bpy.data.cameras.new("SmokeCamera")

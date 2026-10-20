@@ -1,6 +1,6 @@
 # Neuer Friedhof source GeoJSON
 
-Read the root `AGENTS.md` and `docs/asset-integration-plan.md`. `cemetery_final.geojson` is an unchanged WGS84 `[longitude, latitude]` source map, **not yet consumed by the game**. Use `tools/map/index.html` for offline inspection; that viewer embeds a 2026-10-04 snapshot and is not a live importer.
+Read the root `AGENTS.md` and `docs/asset-integration-plan.md`. `cemetery_final.geojson` is an unchanged WGS84 `[longitude, latitude]` source map. The entrance/hall pilot uses a bounded projected derivative, not a direct full-site runtime import. Use `tools/map/index.html` for offline inspection; that viewer embeds a 2026-10-04 snapshot and is not a live importer.
 
 ## Verified inventory
 
