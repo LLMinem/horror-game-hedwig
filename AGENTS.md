@@ -39,7 +39,19 @@ The reusable [session opener](.prompts/opener.md) and tool-specific commands und
 
 ## Agent skills
 
-The selected Matt Pocock skills are installed locally in `.agents/skills/` and versioned with their provenance in `skills-lock.json`. Use these project copies rather than assuming the full suite is installed globally.
+Use the project skills in `.agents/skills/`; provenance is recorded in `skills-lock.json`.
+
+### Issue tracker
+
+Use GitHub Issues. See `docs/agents/issue-tracker.md` for tracker operations.
+
+### Triage labels
+
+Use the five default triage labels. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Use a single root glossary and `docs/adr/`. See `docs/agents/domain.md` for consumer rules.
 
 ## Git workflow
 
