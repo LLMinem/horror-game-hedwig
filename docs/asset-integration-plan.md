@@ -2,14 +2,14 @@
 type: plan
 status: active
 created: 2025-09-23
-last_verified: 2026-10-18
+last_verified: 2026-10-21
 ---
 
 # Hedwig environment direction and next sessions
 
 ## Accepted direction
 
-Reconstruct Neuer Friedhof in Bruchköbel as faithfully as the available evidence and browser performance allow, at dusk or night. The current milestone is a walkable environment prototype. A whole-cemetery ground foundation is approved separately from detailed modeling. Gameplay, NPCs, interiors and a complete detailed cemetery model are outside the current work. Deployment and public release require separate authorization.
+Reconstruct Neuer Friedhof in Bruchköbel as faithfully as the available evidence and browser performance allow, at dusk or night. The entrance/hall and whole-cemetery ground prototype is accepted. Micha has approved planning the next milestone: a complete exterior environment at quality option B, with convincing materials and vegetation, varied representative grave fields, and high detail fidelity for the funeral hall/chapel, large wooden bell tower and other recognizable landmarks. Desktop/laptop browsers are the target, not mobile devices. Gameplay, NPCs and interiors remain outside this milestone. Deployment and public release require separate authorization.
 
 Prefer reference-backed, agent-authored site geometry. Reuse complex assets where they fit, with source and licence checks. Keep the canonical GeoJSON and stable IDs unchanged. [Blueprint preparation](blueprint-preparation.md) owns the site frame, terrain and corrected photo inputs. The rejected agent tracings remain excluded.
 
@@ -45,22 +45,24 @@ The approved session combined #12/#13 tooling, #14 Blender warning classificatio
 
 The scene keeps the existing hall platform and site frame. Ground covers the cemetery with an approximately eight-metre margin, without a walking fence along the cemetery polygon. New review views expose distant areas and the full footprint. The expanded area is a ground foundation, not a detailed cemetery reconstruction.
 
-Micha reviewed and tested the latest browser version, reported no unusual behavior and explicitly approved merging [PR #20](https://github.com/LLMinem/horror-game-hedwig/pull/20). The milestone is accepted as the current environment prototype, not as a finished detailed reconstruction. Source and browser evidence, performance conditions and remaining limits belong in [readiness](readiness.md). Deployment and public release still require separate authorization. The next production step is to agree the bounded modeling section below.
+Micha reviewed and tested the latest browser version, reported no unusual behavior and explicitly approved merging [PR #20](https://github.com/LLMinem/horror-game-hedwig/pull/20), which is now merged. The milestone is accepted as the current environment prototype, not as a finished detailed reconstruction. Source and browser evidence, performance conditions and remaining limits belong in [readiness](readiness.md). Deployment and public release still require separate authorization. The next step is review of the new milestone spec below, not immediate scene production.
 
 ## Following production sessions
 
-After the movement changes and whole-cemetery ground foundation, continue detailed modeling from the pilot rather than rebuilding it. Select one small adjoining path section with a representative grave-row edge from the existing photo coverage. Confirm that bounded brief before authoring it. The purpose is to prove a reusable grave/edge/material set on the already walkable ground, not to fill the entire cemetery at once.
+The [whole-cemetery specification, #21](https://github.com/LLMinem/horror-game-hedwig/issues/21), is the single detailed milestone spec. Micha has accepted its direction and the proposed session sequence; the synthesized spec and its explicit defaults still await his review. It is labelled `needs-triage`, not `ready-for-agent`. Do not create session tickets until he authorizes that decomposition, and do not treat this planning approval as permission to start modeling.
 
-Then extend connected sections in the same site frame, using instancing for repeated content. Improve local proportions and materials where new evidence or a selected view requires it. Minor remaining art defects need not block all progress, but basic walkability and source safety remain requirements.
+The accepted strategy is a bounded whole-site structural pass, a small adjoining grave/path/vegetation section demonstrating the intended finished browser quality, a first larger area with early realistic-density checks, then connected regional completion and final cohesion. Preserve and improve the existing pilot rather than rebuilding it. Each production package includes source work, export, browser integration and local polish. Landmark fidelity has its own acceptance gate; representative ordinary graves do not lower that requirement.
 
-The following issues are retained for the corresponding later need, not as gates for the next session:
+The spec contains the thirteen proposed session outcomes and split conditions. The earlier estimate of roughly twelve to sixteen sessions is conditional, not a measured forecast or upper bound. Re-estimate after the accepted quality section and first larger area. Later tickets use native GitHub sub-issues and genuine blocking dependencies under the configured tracker workflow; this document does not duplicate their checklist.
+
+The existing follow-up issues remain unchanged while the spec is under review:
 
 - [#16](https://github.com/LLMinem/horror-game-hedwig/issues/16) stays deferred until the game is worth sharing and loading or package size is a significant problem. Then measure the relevant costs before choosing changes. It is not an automatic optimization gate before sharing, and a build warning alone does not justify texture conversion or code splitting.
-- [#17](https://github.com/LLMinem/horror-game-hedwig/issues/17) covers vegetation fit when the plant set is expanded, using the approved project-wide asset budget where buying provides the stated benefits. Current forms are approximations, not a species inventory.
+- [#17](https://github.com/LLMinem/horror-game-hedwig/issues/17) covers vegetation fit and becomes relevant in the representative quality section of the proposed milestone. Reuse or explicitly incorporate it during the approved ticket decomposition rather than create a duplicate. Its current deferred status is not changed by spec publication. Use the approved project-wide asset budget where buying provides the stated benefits; current forms remain approximations, not a species inventory.
 
 Review HDRI-switch ordering, PMREM ownership and scene disposal when extending the relevant loading or scene lifecycle. Assess seeded variation and wider shadow coverage with the views and area that need them. These are feature-linked design checks, not a new platform rewrite or an exhaustive backlog.
 
-Agree target hardware, browser and resolution before claiming broader performance acceptance. Reconcile shipped grass/HDRI provenance, code-licence metadata and attribution before public release. Existing pack commercial permission does not establish the fit of every asset. Audio remains a separate scope choice.
+Micha accepted a mid-range performance reference for desktop/laptop browsers. The spec proposes concrete hardware, resolution and frame-time defaults for review; access to the reference device is not established. M3 Max measurements do not prove that target. Reconcile shipped grass/HDRI provenance, code-licence metadata and attribution before public release. Existing pack commercial permission does not establish the fit of every asset. Audio remains outside this milestone.
 
 ## Before modifying sources
 
