@@ -37,6 +37,10 @@ The reusable [session opener](.prompts/opener.md) and tool-specific commands und
 - 60 FPS and at most 400 draw calls are provisional targets, not achieved full-level guarantees. State hardware, browser and render resolution with measurements. Use instancing for repeated content; keep fog intentional rather than hiding unfinished work.
 - Update the existing authoritative doc when scope or a workflow changes. Deployment and public release require explicit authorization; committing and pushing to the configured repository do not authorize either.
 
+## Agent skills
+
+The selected Matt Pocock skills are installed locally in `.agents/skills/` and versioned with their provenance in `skills-lock.json`. Use these project copies rather than assuming the full suite is installed globally.
+
 ## Git workflow
 
 - Commit completed, verified changes at meaningful checkpoints during a session. Each commit must contain one logical, independently understandable change and its directly related documentation/tests. Prefer several atomic commits over one session-sized bundle.
