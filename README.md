@@ -28,11 +28,11 @@ A clone includes runtime derivatives, not the private photographs, acquired refe
 | Understand a consequential technical choice | [Decision records](docs/adr/) |
 | Read or develop the provisional story | [Story draft](docs/lore-backstory.md) |
 | Use private photographs, corrections or the Atlas | [Local references](docs/local-references.md) |
-| Interpret the source map, coordinates or terrain | [Site data contract](data/CLAUDE.md) |
+| Interpret the source map, coordinates or terrain | [Site data contract](data/README.md) |
 | Author sources, export assets or verify their browser appearance | [Blender and asset workflow](docs/assets/blender-workbench.md) |
 
 Documentation and new planning/issue text use English. Existing German issues may remain German. Project-language policy does not change the German setting or require immediate game localization.
 
 ## Attribution and rights
 
-Source map: © [OpenStreetMap contributors](https://www.openstreetmap.org/copyright), ODbL. Terrain derives from Hessen HVBG DGM1 under [dl-zero-de/2.0](https://www.govdata.de/dl-de/zero-2-0), with a locally adjusted Chapel platform. The [site data contract](data/CLAUDE.md) explains source provenance and redistribution boundaries. Other asset permissions and release checks belong to the [asset workflow](docs/assets/blender-workbench.md).
+Source map: © [OpenStreetMap contributors](https://www.openstreetmap.org/copyright), ODbL. Terrain derives from Hessen HVBG DGM1 under [dl-zero-de/2.0](https://www.govdata.de/dl-de/zero-2-0), with a locally adjusted Chapel platform. The [site data contract](data/README.md) explains source provenance and redistribution boundaries. Other asset permissions and release checks belong to the [asset workflow](docs/assets/blender-workbench.md).

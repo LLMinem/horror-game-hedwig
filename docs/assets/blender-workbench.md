@@ -2,7 +2,7 @@
 
 Use this guide for authorized source changes, exports and visual review on the Mac. The selected issue and its parent specification supply the bounded task. Tool capability is not permission to expand scope, publish or deploy. [AGENTS.md](../../AGENTS.md) owns project authorization and verification policy.
 
-[The data contract](../../data/CLAUDE.md) owns source authority, frame, terrain and geometry interpretation. [Private reference operations](../local-references.md) owns discovery, correction and privacy. Start with relevant source IDs/photos and explicit uncertainties; a purchased church or mausoleum is not a substitute for the site's Chapel.
+[The data contract](../../data/README.md) owns source authority, frame, terrain and geometry interpretation. [Private reference operations](../local-references.md) owns discovery, correction and privacy. Start with relevant source IDs/photos and explicit uncertainties; a purchased church or mausoleum is not a substitute for the site's Chapel.
 
 ## Source preservation and recovery
 
@@ -41,7 +41,7 @@ For the existing cemetery authoring entrypoints, `tools/blender/pilot_inputs.py 
 
 ## Prepare materials and export
 
-Use metre-scale geometry and scene scale 1, with a deliberately grounded origin. A unit setting does not establish the actual scale of imported FBX: measure a known dimension. Follow the [frame/ground contract](../../data/CLAUDE.md#metric-frame-and-raster-placement); do not apply another axis rotation or height offset. Preserve assembled hierarchies rather than blindly applying every transform.
+Use metre-scale geometry and scene scale 1, with a deliberately grounded origin. A unit setting does not establish the actual scale of imported FBX: measure a known dimension. Follow the [frame/ground contract](../../data/README.md#metric-frame-and-raster-placement); do not apply another axis rotation or height offset. Preserve assembled hierarchies rather than blindly applying every transform.
 
 - Base-colour and emission-colour images normally use sRGB; roughness, metalness, AO, normal and numeric masks use Non-Color. An emission mask is not emission colour.
 - Prefer OpenGL normal maps for Blender/glTF. DirectX maps require the appropriate green-channel conversion, not blind substitution.
@@ -97,4 +97,4 @@ Record hardware/GPU, browser, rendering mode, route, resolution, DPR, duration a
 
 Owner-confirmed purchase/commercial-use permission for the existing pack is not a missing-paperwork blocker and does not establish asset fit. Inspect reused geometry/materials against the selected evidence. New assets need source and licence checks; consult the purchasing authorization in [#21](https://github.com/LLMinem/horror-game-hedwig/issues/21) and [#17](https://github.com/LLMinem/horror-game-hedwig/issues/17) for the project-wide budget and owner-only payment/account actions.
 
-Preserve OSM and HVBG attribution/provenance under the [data contract](../../data/CLAUDE.md#rebuild-and-provenance). Existing sandbox grass/HDRI provenance and the intended code licence remain unresolved; historical ISC metadata in `package.json` does not establish a project-code licence grant. [The retained rights findings in #33](https://github.com/LLMinem/horror-game-hedwig/issues/33#issuecomment-6343457870) own those open limits. Names, legacy recommendations and successful loading are not licence evidence. Public redistribution requires its own authorization and resolution of applicable rights requirements.
+Preserve OSM and HVBG attribution/provenance under the [data contract](../../data/README.md#rebuild-and-provenance). Existing sandbox grass/HDRI provenance and the intended code licence remain unresolved; historical ISC metadata in `package.json` does not establish a project-code licence grant. [The retained rights findings in #33](https://github.com/LLMinem/horror-game-hedwig/issues/33#issuecomment-6343457870) own those open limits. Names, legacy recommendations and successful loading are not licence evidence. Public redistribution requires its own authorization and resolution of applicable rights requirements.

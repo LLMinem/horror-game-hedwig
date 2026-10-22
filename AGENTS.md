@@ -13,7 +13,7 @@ This is the canonical agent entry. Root `CLAUDE.md` is a relative symlink to it;
 | Trigger | Required context |
 | --- | --- |
 | Photos, corrections, private sources or Atlas access | [Local references](docs/local-references.md) |
-| Site layout, source-map interpretation, terrain or spatial placement | [Site data contract](data/CLAUDE.md), including excluded interpretations and uncertainty |
+| Site layout, source-map interpretation, terrain or spatial placement | [Site data contract](data/README.md), including excluded interpretations and uncertainty |
 | Source changes, Blender, materials, export or source/browser visual review | [Blender and asset workflow](docs/assets/blender-workbench.md), including backup and acceptance rules |
 | Domain language or a consequential design change | [Domain documentation rules](docs/agents/domain.md), the relevant glossary terms and ADRs |
 | Story or character design | [Story draft](docs/lore-backstory.md); it is not a gameplay implementation report |

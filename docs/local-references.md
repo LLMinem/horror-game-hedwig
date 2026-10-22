@@ -1,6 +1,6 @@
 # Private reference operations
 
-Use this guide to find photos, import camera corrections or open the Atlas. Tools prepare access; they do not approve interpretations, assets or construction. [The data contract](../data/CLAUDE.md) owns evidence priority, geometry, coordinates and terrain. [The Blender guide](assets/blender-workbench.md#source-preservation-and-recovery) owns backup/recovery. The selected issue and its parent specification supply the next work.
+Use this guide to find photos, import camera corrections or open the Atlas. Tools prepare access; they do not approve interpretations, assets or construction. [The data contract](../data/README.md) owns evidence priority, geometry, coordinates and terrain. [The Blender guide](assets/blender-workbench.md#source-preservation-and-recovery) owns backup/recovery. The selected issue and its parent specification supply the next work.
 
 ## Open existing evidence
 
@@ -18,7 +18,7 @@ The public offline source-map viewer embeds a snapshot without photographs or ex
 
 The Atlas is read-only: select layers and photos to compare canonical features, official imagery, terrain and effective camera positions/notes. Regional groups only navigate photos. On a phone, the bottom navigation switches map/layers/photos; the photo viewer and camera-location action are distinct. The editable photo map remains `.local/references/map.html`.
 
-For presentation-only changes, `python3 tools/blueprint/atlas.py render` uses existing private `site-local.json`. Data changes require the [full rebuild](../data/CLAUDE.md#rebuild-and-provenance). The HTML alone is insufficient: adjacent raster previews and photo proxies are dependencies.
+For presentation-only changes, `python3 tools/blueprint/atlas.py render` uses existing private `site-local.json`. Data changes require the [full rebuild](../data/README.md#rebuild-and-provenance). The HTML alone is insufficient: adjacent raster previews and photo proxies are dependencies.
 
 ## Refresh and make working copies
 
@@ -30,7 +30,7 @@ python3 tools/references/references.py proxies
 python3 tools/references/references.py map
 ```
 
-Refresh reads only known paths in `photos.json`, preserves IDs/manual corrections and previous metadata for missing originals, and updates `cached-exif.json`. It never expands the photo set. The map uses cached metadata and source geometry, not image inspection or a Photos query. Its configurable error threshold groups device-reported accuracy only; see the [data contract](../data/CLAUDE.md#photo-observations-and-corrections) for interpretation.
+Refresh reads only known paths in `photos.json`, preserves IDs/manual corrections and previous metadata for missing originals, and updates `cached-exif.json`. It never expands the photo set. The map uses cached metadata and source geometry, not image inspection or a Photos query. Its configurable error threshold groups device-reported accuracy only; see the [data contract](../data/README.md#photo-observations-and-corrections) for interpretation.
 
 Proxies are local JPEG derivatives, with orientation applied to pixels before embedded metadata are stripped. Rich metadata remain in the manifest/cache. Existing proxies are reused: changing `--size` does not resize them. To change size, remove only the selected generated JPEGs and regenerate. Use CLI options for selecting manifest entries. Per-photo failures appear in `proxy-report.json`; unavailable originals do not trigger cloud export. Output symlink directories are refused and originals are never overwritten.
 
@@ -45,7 +45,7 @@ python3 tools/references/references.py import-positions .local/references/photo-
 python3 tools/references/references.py map
 ```
 
-Import the editor's complete versioned export; the CLI validates its schema and bounds before replacing anything. [The data contract](../data/CLAUDE.md#photo-observations-and-corrections) owns correction precedence and null-heading semantics.
+Import the editor's complete versioned export; the CLI validates its schema and bounds before replacing anything. [The data contract](../data/README.md#photo-observations-and-corrections) owns correction precedence and null-heading semantics.
 
 **Imports replace the entire correction set**, not just changed rows. Validation completes before atomic replacement, so invalid input leaves `positions.json` untouched. An empty `photos` array explicitly clears it. Missing corrections mean no corrections; malformed existing corrections fail visibly—preserve the file for recovery, then repair it. Browser edits alone never save into the workspace; keep the downloaded JSON until imported. Refresh, map generation and reindexing preserve corrections, and reindexing refuses to orphan IDs. Rebuild the Atlas after changing reference data.
 
