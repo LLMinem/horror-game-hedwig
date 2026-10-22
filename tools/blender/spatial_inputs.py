@@ -97,8 +97,18 @@ def prepare(args):
         if not polygon.is_valid or not bounds.covers(polygon):
             raise ValueError(f'Invalid or unsupported solid {identifier}')
         coords = list(polygon.exterior.coords)[:-1]
-        base = [sample_ground(ground, x, y) for x, y in coords]
-        top = [max(base) + height] * len(base) if kind == 'utility' else [z + height for z in base]
+        corner_ground = [sample_ground(ground, x, y) for x, y in coords]
+        west, south, east, north = polygon.bounds
+        step, columns = ground['step'], ground['columns']
+        col0, col1 = math.floor((west - ground['x0']) / step), math.ceil((east - ground['x0']) / step)
+        row0, row1 = math.floor((-north - ground['z0']) / step), math.ceil((-south - ground['z0']) / step)
+        # Piecewise-linear terrain cannot fall below these covering grid nodes.
+        # Bury the complete bottom, rather than bridging hollows between corners.
+        bottom = min(ground['heights'][row * columns + col]
+                     for row in range(max(0, row0), min(ground['rows'] - 1, row1) + 1)
+                     for col in range(max(0, col0), min(columns - 1, col1) + 1)) - .05
+        base = [bottom] * len(coords)
+        top = [max(corner_ground) + height] * len(coords) if kind == 'utility' else [z + height for z in corner_ground]
         solids.append({'id': identifier, 'polygon': coords, 'base': base, 'top': top,
                        'material': material, 'kind': kind, 'provenance': provenance})
         walk['obstacles'].append({'id': identifier, 'polygon': runtime_ring(coords)})

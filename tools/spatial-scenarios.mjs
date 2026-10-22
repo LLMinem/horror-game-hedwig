@@ -22,6 +22,30 @@ export async function exerciseSpatial() {
   const wallStop = api.snapshot();
   check(wallStop.supported && Math.hypot(wallStop.position[0] - 14, wallStop.position[2] + 6) > 3,
     'Walking penetrated the eastern utility building.');
+  // Regression station where a corner-only wall bottom bridged a terrain hollow.
+  const wall = api.scene.getObjectByName('PROVISIONAL_spatial-yard-F006-2');
+  check(wall?.isMesh, 'The southern storage partition is missing.');
+  wall.updateWorldMatrix(true, false);
+  const positions = wall.geometry.attributes.position, indices = wall.geometry.index;
+  const vertices = [api.camera.position.clone(), api.camera.position.clone(), api.camera.position.clone()];
+  const x = 58.63, z = 52.44;
+  let bottom = Infinity;
+  for (let i = 0; i < (indices?.count ?? positions.count); i += 3) {
+    for (let j = 0; j < 3; j++) {
+      vertices[j].fromBufferAttribute(positions, indices ? indices.getX(i + j) : i + j).applyMatrix4(wall.matrixWorld);
+    }
+    const [a, b, c] = vertices;
+    const determinant = (b.z - c.z) * (a.x - c.x) + (c.x - b.x) * (a.z - c.z);
+    if (Math.abs(determinant) < 1e-8) continue;
+    const u = ((b.z - c.z) * (x - c.x) + (c.x - b.x) * (z - c.z)) / determinant;
+    const v = ((c.z - a.z) * (x - c.x) + (a.x - c.x) * (z - c.z)) / determinant;
+    if (Math.min(u, v, 1 - u - v) >= -1e-5) {
+      bottom = Math.min(bottom, u * a.y + v * b.y + (1 - u - v) * c.y);
+    }
+  }
+  const wallGroundGap = bottom - api.sampleHeight(x, z);
+  check(Number.isFinite(wallGroundGap) && wallGroundGap <= .025,
+    `The southern storage wall floats ${wallGroundGap.toFixed(3)} m above supported ground.`);
   api.reset();
-  return { courtyard: courtyard.position, utilityWallStop: wallStop.position };
+  return { courtyard: courtyard.position, utilityWallStop: wallStop.position, wallGroundGap };
 }
