@@ -6,6 +6,6 @@ Canonical roles map directly to GitHub label names.
 | --- | --- |
 | `needs-triage` | Needs maintainer evaluation |
 | `needs-info` | Waiting for reporter information |
-| `ready-for-agent` | Fully specified; ready for agent implementation |
+| `ready-for-agent` | Specified for agent work, subject to blockers and required approvals |
 | `ready-for-human` | Requires human implementation |
 | `wontfix` | Will not be actioned |

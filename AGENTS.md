@@ -1,61 +1,57 @@
-# Hedwig — agent entry
+# Hedwig agent entry
 
-`AGENTS.md` is the canonical entry point for agents; root `CLAUDE.md` is a relative symlink to it. `README.md` is the human entry point.
+This is the canonical agent entry. Root `CLAUDE.md` is a relative symlink to it; [README.md](README.md) is the human entry.
 
-## Direction
+## Start from the selected issue
 
-Build a faithful, beautiful, walkable **Neuer Friedhof, Bruchköbel** at dusk/night. The current milestone is an **environment prototype**, not the former game MVP. Read [the active plan](docs/asset-integration-plan.md) for direction and session scope. GitHub Issues own concrete work packages and status; `docs/archive/` and the lore are historical context.
+1. Read the README and the selected GitHub issue, including comments, its parent specification and native blockers. Follow recorded approvals rather than an obsolete status paragraph. A `ready-for-agent` label does not override blockers or required human acceptance.
+2. Inspect existing working-tree changes and preserve unrelated work. Read the relevant modules, starting at `src/main.js` for runtime composition. Use `package.json`, configuration and tool help for executable facts rather than maintaining parallel prose inventories.
+3. State the bounded task and verification. Work within its authorization; a tool being available does not authorize scene production, purchases beyond approved limits, deployment or public release.
 
-The default app combines the textured entrance/hall pilot with walkable ground across the whole cemetery. The original sandbox remains at `?mode=sandbox`. The tooling, supported-ground movement and terrain milestone is implemented; detailed graves, planting and additional buildings are not. Read the active plan and readiness evidence before extending the model. Micha's final visual acceptance remains separate from agent verification.
+## Read when needed
 
-The lamp and sample props are disposable pipeline tests, not production references or mandatory assets. Prefer agent-authored, photo-backed geometry for the actual site; reusable complex vegetation may come from the local pack. Additional models/textures may be acquired when needed, with fit and licence checks.
+| Trigger | Required context |
+| --- | --- |
+| Photos, corrections, private sources or Atlas access | [Local references](docs/local-references.md) |
+| Site layout, source-map interpretation, terrain or spatial placement | [Site data contract](data/README.md), including excluded interpretations and uncertainty |
+| Source changes, Blender, materials, export or source/browser visual review | [Blender and asset workflow](docs/assets/blender-workbench.md), including backup and acceptance rules |
+| Domain language or a consequential design change | [Domain documentation rules](docs/agents/domain.md), the relevant glossary terms and ADRs |
+| Story or character design | [Story draft](docs/lore-backstory.md); it is not a gameplay implementation report |
 
-## Start a session
+Private source material stays outside `public/`, `src/`, tracked documents and public tracker attachments. `public/` is shipped wholesale. Follow the linked reference and asset contracts before preparing anything for publication.
 
-1. Read `README.md`, `package.json`, the active plan and the issue selected for the session; inspect existing working-tree changes before editing.
-2. For photos, map, source assets or texture work, read `docs/local-references.md`. For terrain, site layout or Blender preparation, read `docs/blueprint-preparation.md`, including the owner's rejection of the earlier agent tracings. For Blender work, also read `docs/assets/blender-workbench.md` and `docs/assets/pipeline-guide.md`.
-3. Read only the modules needed for the task; `src/main.js` is the composition root. `docs/readiness.md` records verified preparation and remaining gaps.
-4. State the bounded task and verification. Follow the user's authorization: autonomous preparation may proceed end-to-end; scene production and art-direction choices need a specific brief. Explain new Three.js concepts briefly to Michael.
+## Engineering and verification
 
-The reusable [session opener](.prompts/opener.md) and tool-specific commands under `.claude/commands/` lead to this policy. The repo needs no MCP servers or automatic formatting hooks. Machine-specific permissions belong in untracked `.claude/settings.local.json`.
+Reuse existing module boundaries; avoid an engine/framework rewrite or speculative abstraction without a concrete approved need. Explain unfamiliar Three.js concepts briefly to Micha.
 
-## Sources and safety
-
-- The Mac is the development and authoring workstation. No VPS, MCP server or Blender add-on is required.
-- `assets/source/raw/` and `assets/source/working/` are local source material. Keep originals unchanged; author new revisions/copies. Follow the [approved local backup policy](docs/asset-integration-plan.md#before-modifying-sources) and [recorded restore evidence](docs/readiness.md#pilot-approval-and-backup-2026-10-16).
-- `.local/` holds private reference manifests, photo proxies, exports and smoke evidence. It is ignored by Git and denied by the Vite dev server. Keep private material out of `public/`, `src/` and tracked docs. Ignoring a file is not a backup.
-- `public/` is shipped wholesale. Only reviewed, redistributable runtime artifacts belong there. Raw marketplace content and private photos/GPS/inscriptions do not.
-- The owner confirmed purchase and commercial permission for the cemetery pack. Select assets for visual fit; generic churches/mausoleums do not replace the real site's buildings.
-- Preserve `data/cemetery_final.geojson` and its feature IDs. Read `data/CLAUDE.md` before interpreting geometry. Missing heights, widths and photo coverage are uncertainty, not permission to invent measured facts.
-
-## Engineering and acceptance
-
-- Vanilla JavaScript, Three.js r179.1 and Vite. Reuse the existing module seams; no framework/ECS rewrite ahead of an actual need.
-- Blender sources produce GLB runtime assets, not vice versa. Base colour/emission are colour data; roughness/metalness/normal maps are non-colour data. Blender renders do not prove browser material fidelity or performance.
-- Run the relevant commands and exercise changed behavior in the actual browser/CLI. Record failures and limits; a build is not visual acceptance. Use the coding agent's available native browser tooling. `npm run browser:smoke` provides an optional verified Chrome/CDP input check against a running local server.
-- Preserve source look and browser look as separate human art gates. For the first reference-backed section, provide neutral comparison, dusk/night view and measured browser performance.
-- 60 FPS and at most 400 draw calls are provisional targets, not achieved full-level guarantees. State hardware, browser and render resolution with measurements. Use instancing for repeated content; keep fog intentional rather than hiding unfinished work.
-- Update the existing authoritative doc when scope or a workflow changes. Deployment and public release require explicit authorization; committing and pushing to the configured repository do not authorize either.
+Exercise changed behavior in the actual browser or CLI. A build is not visual acceptance. After runtime changes, build and inspect relevant loading, controls and rendering; after tool changes, exercise the affected path with disposable outputs. Reuse existing setup evidence instead of repeating unrelated heavy QA. Record the commands, results and limits in the issue/PR. Source and browser art acceptance remain separate from agent verification; the asset workflow owns their procedure.
 
 ## Agent skills
 
-Use the project skills in `.agents/skills/`; provenance is recorded in `skills-lock.json`.
+Use the installed project skills in `.agents/skills/`; `skills-lock.json` records their provenance.
 
 ### Issue tracker
 
-Use GitHub Issues. See `docs/agents/issue-tracker.md` for tracker operations.
+Use GitHub Issues. See [tracker operations](docs/agents/issue-tracker.md).
 
 ### Triage labels
 
-Use the five default triage labels. See `docs/agents/triage-labels.md`.
+Use the configured [label mapping](docs/agents/triage-labels.md).
 
 ### Domain docs
 
-Use a single root glossary and `docs/adr/`. See `docs/agents/domain.md` for consumer rules.
+Use the single glossary and ADR collection configured in [domain documentation rules](docs/agents/domain.md).
+
+## Documentation maintenance
+
+Keep each statement with one information owner. Specs, tasks, session status, measurements and approvals belong in Issues/PRs; private evidence stays local. Repository docs contain durable context and necessary working contracts, not a second backlog or session diary. The README owns project-language policy.
+
+Update or remove the affected contract when behavior changes. A new document needs a named purpose, an information responsibility not already covered elsewhere, and a clear reading trigger. Preserve original creative content, source provenance and licence evidence according to their purpose rather than deleting them as ordinary old notes.
 
 ## Git workflow
 
-- Commit completed, verified changes at meaningful checkpoints during a session. Each commit must contain one logical, independently understandable change and its directly related documentation/tests. Prefer several atomic commits over one session-sized bundle.
-- Inspect the working tree and intended diff before staging. Stage explicit paths or hunks; preserve unrelated user work and keep ignored private sources, references and backups out of Git. Commit messages describe the change and its purpose.
-- Push completed commits to the configured remote at session end by default, not after every edit. Push intended checkpoint tags explicitly. Report any failed commit/push and the remaining local state; never force-push or rewrite shared history without explicit approval.
-- Implement modeling and related runtime/tooling changes on a feature branch, not `main`. The approved entrance/hall pilot uses `feat/entrance-hall-pilot`, starting at annotated tag `checkpoint/pre-entrance-hall-pilot`. Keep that tag fixed as the pre-implementation baseline; merge back only when Micha requests it.
+Use a task branch for changes; merge back only when Micha requests it. Preserve existing checkpoint tags, including `checkpoint/pre-entrance-hall-pilot`.
+
+Commit completed, verified work at meaningful checkpoints as logical, independently understandable changes. Inspect the intended diff before staging explicit paths or hunks. Use conventional commit messages with a relevant scope. Keep ignored sources, references and backups out of Git.
+
+Push completed commits to the configured remote at session end, not after every edit. Push intended checkpoint tags explicitly. Report any failed commit/push and remaining local state. Never force-push or rewrite shared history without explicit approval. A repository push or merge does not authorize deployment or public release.

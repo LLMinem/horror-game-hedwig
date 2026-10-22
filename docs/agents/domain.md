@@ -6,5 +6,8 @@ Before exploring an area, read the glossary if present and relevant ADRs.
 Missing domain docs are not a blocker; proceed without scaffolding them.
 Use `/domain-modeling` to record terms and decisions when they are resolved.
 
+Continue the existing three-digit ADR sequence from the highest number.
+Preserve record identities and numbering gaps; do not renumber older decisions.
+
 Use glossary terms consistently in issues, proposals, code and tests.
 Surface contradictions with an ADR explicitly rather than silently overriding it.
