@@ -39,7 +39,7 @@ A ticket is runnable only when all blockers are closed and required external or
 human prerequisites are satisfied. `ready-for-agent` means specified, not
 unconditionally authorized. The parent specification need not be closed first.
 
-## Wayfinding
+## Wayfinding operations
 
 Use one map issue labelled `wayfinder:map`, with child tickets labelled
 `wayfinder:research`, `wayfinder:prototype`, `wayfinder:grilling` or
