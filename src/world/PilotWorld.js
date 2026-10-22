@@ -4,7 +4,7 @@ import { createPilotMovement } from './PilotMovement.js';
 
 export function createPilotWorld({ scene, environment }) {
   const root = new THREE.Group();
-  root.name = 'EntranceHallPilot';
+  root.name = 'CemeteryReviewCandidate';
   let status = 'loading';
   let error = null;
   let data = null;

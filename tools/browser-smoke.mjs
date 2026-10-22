@@ -10,6 +10,7 @@ import { setTimeout as delay } from 'node:timers/promises';
 import { parseArgs } from 'node:util';
 import WebSocket from 'ws';
 import { exercisePilot } from './pilot-scenarios.mjs';
+import { exerciseSpatial } from './spatial-scenarios.mjs';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const { values: options, positionals } = parseArgs({
@@ -137,6 +138,7 @@ try {
   }
   if (isPilot) {
     pilotEvidence = await evaluate(`(${exercisePilot.toString()})()`);
+    pilotEvidence.spatial = await evaluate(`(${exerciseSpatial.toString()})()`);
     for (const view of await evaluate('__pilotReview.world.views.map(view => view.id)')) {
       await evaluate(`__pilotReview.setView(${JSON.stringify(view)})`);
       await evaluate(twoFrames);

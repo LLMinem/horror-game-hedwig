@@ -5,9 +5,9 @@ export function createPilotReview({ mode, onView, onLighting, onReset }) {
   panel.setAttribute('aria-label', 'Environment review');
   panel.style.cssText = 'position:fixed;top:12px;left:12px;z-index:20;max-width:min(390px,calc(100vw - 32px));padding:14px;background:rgba(16,23,28,.92);color:#edf2f5;font:13px/1.5 system-ui,sans-serif;border:1px solid #647581;border-radius:6px;box-sizing:border-box';
   const title = document.createElement('strong');
-  title.textContent = mode === 'pilot' ? 'Entrance / hall — prototype review' : 'Look-development sandbox';
+  title.textContent = mode === 'pilot' ? 'Cemetery — spatial review candidate' : 'Look-development sandbox';
   const links = document.createElement('nav');
-  for (const [name, label] of [['pilot', 'Pilot'], ['sandbox', 'Sandbox']]) {
+  for (const [name, label] of [['pilot', 'Cemetery'], ['sandbox', 'Sandbox']]) {
     const link = document.createElement('a');
     link.href = `?mode=${name}`;
     link.textContent = label;
@@ -40,7 +40,12 @@ export function createPilotReview({ mode, onView, onLighting, onReset }) {
   help.style.margin = '8px 0 0';
   help.textContent = 'Click scene to capture · WASD walk · Shift sprint · F flashlight · Esc release. Overhead is inspection only; choose a ground view to walk.';
   panel.append(title, links, status);
-  if (mode === 'pilot') panel.append(controls);
+  if (mode === 'pilot') {
+    const scope = document.createElement('p');
+    scope.style.margin = '8px 0';
+    scope.textContent = 'Issue #22 · New paths, facilities and planting are provisional. Grave fields are not yet modeled. Source and browser acceptance pending.';
+    panel.append(scope, controls);
+  }
   panel.append(help);
   document.body.append(panel);
 
@@ -50,7 +55,7 @@ export function createPilotReview({ mode, onView, onLighting, onReset }) {
     status.setAttribute('role', state === 'error' ? 'alert' : 'status');
     for (const control of controls.children) control.disabled = state !== 'ready';
   }
-  setStatus('loading', mode === 'pilot' ? 'Loading pilot geometry, walking data and lighting…' : 'Loading sandbox…');
+  setStatus('loading', mode === 'pilot' ? 'Loading cemetery geometry, walking data and lighting…' : 'Loading sandbox…');
   return {
     setStatus,
     setViews(items) {

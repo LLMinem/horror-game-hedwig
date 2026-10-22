@@ -113,13 +113,16 @@ export async function loadStreetLampInstance() {
 
 export async function loadPilot() {
   if (!initialized) throw new Error('initAssetSystem() must be called before loading assets.');
-  const path = resolvePublicAsset('assets/models/pilot/walk.json');
+  const path = resolvePublicAsset('assets/models/spatial/walk.json');
   if (!jsonCache.has(path)) jsonCache.set(path, jsonLoader.loadAsync(path));
-  const [gltf, data] = await Promise.all([
+  const [gltf, spatial, data] = await Promise.all([
     loadGltf('assets/models/pilot/entrance-hall.glb'),
+    loadGltf('assets/models/spatial/layout.glb'),
     jsonCache.get(path),
   ]);
-  return { ...cloneGltfScene(gltf), data };
+  const loaded = cloneGltfScene(gltf);
+  loaded.scene.add(cloneGltfScene(spatial).scene);
+  return { ...loaded, data };
 }
 
 export async function loadPilotVegetation() {
