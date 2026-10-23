@@ -50,7 +50,7 @@ Use unannotated RGB/CIR with their `.pgw`/`.prj` placement for reference planes,
 
 ## Derived ground is not source terrain
 
-Keep acquired rasters unchanged. `tools/blender/pilot_inputs.py` prepares new revision inputs; source revision `inputs.json` records dimensions, stable IDs, provenance and uncertainty. Runtime `public/assets/models/pilot/walk.json` is a derived contract, not an authoritative measurement of the site.
+Keep acquired rasters unchanged. `tools/blender/pilot_inputs.py` prepares new pilot inputs; `spatial_inputs.py` prepares additive revisions from a private plan while copying the accepted ground/platform unchanged. Each source revision's `inputs.json` records dimensions, stable IDs, provenance and uncertainty. Runtime `public/assets/models/spatial/walk.json` is the integrated derived contract, not an authoritative measurement of the site. The accepted pilot contract remains preserved under `public/assets/models/pilot/`.
 
 Its version-2 finite heightfield, paving offsets, solid obstacles and review views replace the obsolete path-derived walking mask. Runtime rejects version 1. Rendered ground and movement sampling must use the same north-west to south-east triangle diagonal, frame and height offset; paving follows those triangles at the recorded offset. Preserve deliberate platform adjustments and existing samples when extending ground. Platforms, kerbs and steps need separate evidence, not DOM or false-colour previews. Grid bounds define supported ground; the cemetery boundary is not permission to add invisible internal walking restrictions.
 

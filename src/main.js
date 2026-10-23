@@ -1,4 +1,4 @@
-// Composition root: pilot review by default, original sandbox via ?mode=sandbox.
+// Composition root: cemetery review by default, original sandbox via ?mode=sandbox.
 import { SCENE_CONSTANTS, DEFAULTS } from './config/Constants.js';
 import { createEngine } from './core/Engine.js';
 import { createAtmosphere } from './atmosphere/Atmosphere.js';
@@ -73,7 +73,7 @@ const ready = Promise.all([pilot ? pilot.ready : devRoom.ready, environment.read
   reviewStatus = 'error';
   reviewError = error instanceof Error ? error.message : String(error);
   player.setEnabled(false);
-  review.setStatus('error', `${mode === 'pilot' ? 'Pilot' : 'Sandbox'} failed to load: ${reviewError}. No fallback scene. Reload after correcting the asset error.`);
+  review.setStatus('error', `${mode === 'pilot' ? 'Cemetery' : 'Sandbox'} failed to load: ${reviewError}. No fallback scene. Reload after correcting the asset error.`);
   console.error(`${mode} review failed`, error);
   throw error;
 });

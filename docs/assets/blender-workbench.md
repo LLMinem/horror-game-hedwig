@@ -39,6 +39,10 @@ Inspection neither renders nor repairs/saves the source. An object name is not n
 
 For the existing cemetery authoring entrypoints, `tools/blender/pilot_inputs.py --help` uses `.local/blueprint-venv/bin/python`; `pilot_scene.py`, `pilot_vegetation.py` and `pilot_render.py` run in Blender. Discover their arguments through their CLI in the appropriate interpreter. Revision preparation refuses existing destinations; choose a new revision. `inputs.json` records authored parameters and uncertainty. Rendering a saved source is distinct from saving a separate review blend. Current revision names and outputs belong to the selected issue, not permanent command examples.
 
+For additive spatial revisions, `tools/blender/spatial_inputs.py --help` uses the same blueprint interpreter; `spatial_scene.py --help` runs through Blender's `--python` entry. Preparation consumes a private evidence-backed plan and copies the accepted ground contract into a new revision. The source scene retains the pilot, while `EXPORT_Spatial` exports only the additions; review vegetation and reference imagery stay outside that collection. Runtime combines the unchanged pilot GLB with the spatial derivative and its paired walking data. The owning issue/private source record identifies the plan and revision. Rounded foliage envelopes represent coarse massing only and do not infer hidden trunks or add invisible ground barriers.
+
+Solid footprints keep their authored wall/roof tops, but their bottoms extend below the minimum terrain nodes covering the footprint. Sampling only polygon corners can leave daylight under a wall across a terrain hollow; do not flatten the accepted ground to hide that separation.
+
 ## Prepare materials and export
 
 Use metre-scale geometry and scene scale 1, with a deliberately grounded origin. A unit setting does not establish the actual scale of imported FBX: measure a known dimension. Follow the [frame/ground contract](../../data/README.md#metric-frame-and-raster-placement); do not apply another axis rotation or height offset. Preserve assembled hierarchies rather than blindly applying every transform.
