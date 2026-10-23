@@ -435,8 +435,8 @@ def safe_output(path):
     require(not any(p.is_symlink() for p in (path, *path.parents)), 'Output must not traverse symlinks')
     require(path.is_dir(), 'Output directory must already exist (created by the private review caller)')
     resolved = path.resolve()
-    require(not resolved.is_relative_to(ROOT) or resolved.is_relative_to(ROOT / '.local'),
-            'Private audit output inside this repository must be under .local/')
+    require(resolved.is_relative_to(ROOT / '.local') and resolved != ROOT / '.local',
+            'Private audit output must be below this repository\'s .local/')
     require(not any((path / name).exists() or (path / name).is_symlink() for name in ('audit.json', 'source-overlay.svg')),
             'Refusing to overwrite existing audit evidence')
     return path

@@ -105,11 +105,13 @@ npm run review:spatial -- --preset whole-site --require-complete
 npm run review:spatial -- --preset all --require-complete
 ```
 
-Use `--help` for explicit source/station/output overrides. The private `.local/spatial-review/config.json` selects `source_dir` (the authored revision) and `stations` (the photo manifest). Preparation of those stations belongs to [local references](../local-references.md#reproducible-photo-stations). Without `--url`, the command starts and stops its own loopback Vite server; an explicitly supplied loopback server remains caller-owned.
+Use `--help` for explicit source/station/assignment/output overrides. The private `.local/spatial-review/config.json` selects `source_dir` (the authored revision), `stations` (the photo manifest) and `assignment` (the regional responsibility manifest). Preparation of stations belongs to [local references](../local-references.md#reproducible-photo-stations). Without `--url`, the command starts and stops its own loopback Vite server; an explicitly supplied loopback server remains caller-owned.
 
 Open the printed private `index.html`. It contains a north-up orthographic runtime view and an independent aerial/source view with the **same metric bounds**; category toggles and source-over-render expose omissions. The Atlas preset captures every canonical geometry layer. Photo pairs preserve each original's oriented aspect, including portrait photos, instead of imposing 16:9. The manifest's pose assumptions remain visible. All browser captures verify CSS viewport, DPR, drawing buffer and saved pixel dimensions.
 
 The audit enumerates every canonical route, including routes absent from the authoring plan. It compares selected line coverage, authored paving, derived walk surfaces and **world-space triangles decoded by the running browser**. Geometry outside supported terrain is reported separately; the cemetery polygon does not silently trim the requested network. Explicit, reasoned solid/pad exceptions must name a bounded target. Unknown widths and source accuracy remain unknown; the 1 cm export tolerance is only a technical comparison threshold.
+
+Regional ownership appears separately, using the existing private responsibility manifest. Every canonical feature is listed with its responsible regions/tickets beside independently computed route coverage; the original assignment and segment geometry are copied into the private report. Assignment frame/source geometry must match the current canonical data. Planning ownership does not count as physical paving, prove current scene fidelity or authorize downstream work.
 
 `--require-complete` exits nonzero on geometric gaps or export mismatch while retaining readable evidence. Success does **not** certify visibility through foliage, every local surface height, collision, measured widths, calibrated cameras, boundary material or human art acceptance. Browser smoke and direct inspection remain separate.
 

@@ -17,12 +17,13 @@ node tools/review-spatial.mjs --preset whole-site|photos|atlas|all [options]
   --url URL             Existing loopback HTTP Vite/preview server; never stopped
   --source-dir PATH     Authored revision containing inputs.json and walk.json
   --stations PATH       Private schemaVersion:1 photo station manifest (subsets allowed)
+  --assignment PATH     Private regional responsibility manifest (not geometry proof)
   --output PATH         New directory inside this repository's .local/; must not exist
   --require-complete    Exit nonzero for incomplete geometry, retaining full evidence
   --help                Print this help without starting servers or reading private data
 
-Defaults: preset all; source_dir/stations from .local/spatial-review/config.json.
-Without --url an owned ephemeral loopback Vite server is started and stopped.
+Defaults: preset all; source_dir/stations/assignment from .local/spatial-review/config.json.
+Without --url an owned temporary loopback Vite server is started and stopped.
 Chrome is isolated/headless; CHROME_BIN overrides its executable. All captures DPR2.
 Photos use CSS width1600 and original oriented aspect; overview1600x1200; Atlas1800x1200.
 Audit Python: SPATIAL_PYTHON or .local/blueprint-venv/bin/python.
@@ -30,7 +31,7 @@ Outputs are private evidence only. Provisional camera poses remain explicitly la
 `;
 const { values: options } = parseArgs({ options: {
   preset: { type: 'string', default: 'all' }, url: { type: 'string' }, 'source-dir': { type: 'string' },
-  stations: { type: 'string' }, output: { type: 'string' }, 'require-complete': { type: 'boolean', default: false },
+  stations: { type: 'string' }, assignment: { type: 'string' }, output: { type: 'string' }, 'require-complete': { type: 'boolean', default: false },
   help: { type: 'boolean', default: false },
 } });
 if (options.help) { console.log(help); process.exit(0); }
@@ -48,6 +49,52 @@ async function privateInput(filename) {
   await noSymlinks(resolved);
   assert((await stat(resolved)).isFile(), `Required private file is missing: ${resolved}`);
   return resolved;
+}
+
+async function loadOwnership(filename, site) {
+  assert(filename, 'Missing regional assignment. Pass --assignment PATH or set assignment in .local/spatial-review/config.json.');
+  const source = await privateInput(filename), bytes = await readFile(source);
+  const assignment = JSON.parse(bytes);
+  assert.equal(assignment.schema, 'hedwig-private-responsibility-v1', 'Unsupported regional assignment schema.');
+  for (const key of ['epsg', 'origin']) assert.deepEqual(assignment.coordinate_system[key], site.frame[key], `Assignment ${key} differs from current site.`);
+  assert(Array.isArray(assignment.regions) && assignment.regions.length, 'Assignment has no regions.');
+  const regions = assignment.regions.map(({ id, name, production_issue, description }) => ({ id, name, production_issue, description }));
+  const regionMap = new Map(regions.map(region => [region.id, region]));
+  assert.equal(regionMap.size, regions.length, 'Assignment has duplicate region IDs.');
+  const canonical = new Map(site.features.map(feature => [feature.properties.source_id, feature]));
+  assert(Array.isArray(assignment.canonical_features) && assignment.canonical_features.length === canonical.size, 'Assignment must account for every current canonical feature.');
+  const seen = new Set();
+  const features = assignment.canonical_features.map(feature => {
+    assert(!seen.has(feature.source_id) && canonical.has(feature.source_id), `Duplicate/unknown assignment source: ${feature.source_id}`);
+    seen.add(feature.source_id);
+    assert.deepEqual(feature.source_geometry, canonical.get(feature.source_id).geometry, `Assignment source geometry is stale: ${feature.source_id}`);
+    assert(Array.isArray(feature.segments) && feature.segments.length, `Unassigned feature: ${feature.source_id}`);
+    const owners = new Set();
+    for (const segment of feature.segments) {
+      const region = regionMap.get(segment.owner);
+      assert(region && region.production_issue === segment.production_issue, `Invalid segment ownership: ${segment.id}`);
+      owners.add(segment.owner);
+    }
+    return { id: feature.id, source_id: feature.source_id, owners: [...owners].sort() };
+  });
+  return { source, sha256: sha256(bytes), revision: assignment.revision, status: assignment.status, regions, features };
+}
+
+function ownershipHTML(ownership, audit) {
+  const routes = new Map(audit.routes.map(route => [route.source_id, route]));
+  const regions = new Map(ownership.regions.map(region => [region.id, region]));
+  return `<section id="regional-ownership"><h2>Regional responsibility — not represented geometry</h2>
+    <p>${escape(ownership.status)} Revision: ${escape(ownership.revision)}.
+    Assignment does not count as paving, authorize production or confer acceptance.
+    <a href="responsibility.json">Original assignment, segment geometry and provenance</a>.</p>
+    <table><thead><tr><th>Region</th><th>Responsibility</th><th>Production issue</th></tr></thead><tbody>
+    ${ownership.regions.map(region => `<tr><td>${escape(region.id)}</td><td>${escape(region.name)}</td><td>#${escape(region.production_issue)}</td></tr>`).join('')}</tbody></table>
+    <details><summary>Every canonical feature: ownership versus actual route coverage</summary>
+    <table><thead><tr><th>Source</th><th>Responsible regions / tickets</th><th>Geometry audit</th><th>Selected metres</th><th>Decoded paving gap metres</th></tr></thead><tbody>
+    ${ownership.features.map(feature => {
+      const route = routes.get(feature.source_id);
+      return `<tr><td>${escape(feature.id)} · ${escape(feature.source_id)}</td><td>${feature.owners.map(id => `${escape(id)} / #${escape(regions.get(id).production_issue)}`).join(', ')}</td><td>${route ? escape(route.status) : 'Not a route; not audited as paving'}</td><td>${route ? route.selected_length_m.toFixed(2) : '—'}</td><td>${route?.runtime ? route.runtime.technical_gap_length_m.toFixed(4) : '—'}</td></tr>`;
+    }).join('')}</tbody></table></details></section>`;
 }
 
 async function runAudit(source, output, runtime) {
@@ -181,8 +228,36 @@ function sourceSVG(features, bounds, raster) {
 
 function reportHTML(evidence, audit, overviewSVG) {
   const photos = evidence.photos ?? [];
+  const ownership = ownershipHTML(evidence.ownership, audit);
   const whole = overviewSVG ? `<section><h2>Whole-site: actual orthographic scene / independent source + aerial</h2><p>Same north-up metre frame on both sides. All canonical features are present, regardless of authored selection. Overview fog is disabled; geometry is not altered.</p><div class="controls"><label><input id="overlay" type="checkbox"> Source over render</label><label><input id="aerial" type="checkbox" checked> Aerial</label>${[...new Set(audit.features.map(f => f.category ?? 'unknown'))].sort().map(category => `<label><input type="checkbox" checked data-category-toggle="${escape(category)}"> ${escape(category)}</label>`).join('')}</div><div class="pair"><figure><div class="stack"><img src="whole-site-render.png" alt="Actual rendered scene"><div id="scene-overlay" hidden>${overviewSVG.replace(/<image\b[^>]*\/>/, '')}</div></div><figcaption>Actual decoded runtime geometry; north up</figcaption></figure><figure>${overviewSVG}<figcaption>Independent complete canonical source and official aerial; not survey accuracy</figcaption></figure></div></section>` : '';
-  return `<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src 'self' file:; style-src 'unsafe-inline'; script-src 'unsafe-inline'; object-src 'none'; base-uri 'none'"><title>Private spatial review</title><style>body{background:#141b20;color:#edf2f5;font:16px/1.5 system-ui;margin:24px}h1,h2{line-height:1.2}.warning{background:#523e13;padding:14px}a{color:#91d6ff}.pair{display:grid;grid-template-columns:1fr 1fr;gap:12px}figure{margin:0;min-width:0}img,svg{width:100%;display:block}figcaption{padding:8px}.stack{position:relative}.stack>div{position:absolute;inset:0}.controls{display:flex;gap:15px;flex-wrap:wrap;margin:15px 0}section{margin:35px 0}pre{white-space:pre-wrap;overflow-wrap:anywhere}table{border-collapse:collapse}td,th{padding:7px;border:1px solid #52616b;text-align:left}@media(max-width:800px){.pair{grid-template-columns:1fr}}</style><h1>Private spatial review — ${escape(evidence.preset)}</h1><p class="warning">Not visual acceptance. Geometry complete: <strong>${audit.complete ? 'YES' : 'NO'}</strong>. Camera calibration, source uncertainty, occlusion and visual quality require human review. Private references must not be published.</p><p>DPR2 throughout; actual CSS, drawing buffer and PNG dimensions recorded in <a href="report.json">report.json</a>. <a href="audit.json">Full geometry audit</a> · <a href="source-overlay.svg">Complete source overlay</a> · <a href="runtime-mesh.json">Decoded paving geometry</a></p><details><summary>Geometry summary and limits</summary><pre>${escape(JSON.stringify({ summary: audit.summary, limits: audit.limits }, null, 2))}</pre></details>${whole}${evidence.atlas ? '<section><h2>Full private Atlas — all source / orientation toggles enabled</h2><a href="atlas.png"><img src="atlas.png" alt="Full Atlas screenshot with source layers and orientation toggles"></a><p>RGB aerial selected. All layer checkboxes enabled; metadata and source panels expanded.</p></section>' : ''}${photos.map(photo => `<section><h2>Photo ${escape(photo.station.photo_number)} · ${escape(photo.station.id)}</h2><p class="warning">${escape(photo.station.pose_status.toUpperCase())} POSE — ${escape(typeof photo.station.uncertainty === 'string' ? photo.station.uncertainty : JSON.stringify(photo.station.uncertainty))}</p><div class="pair"><figure><img src="${photo.reference}" alt="Private reference photo ${escape(photo.station.photo_number)}"><figcaption>Original oriented aspect ${photo.station.width}:${photo.station.height}; working proxy, no forced crop</figcaption></figure><figure><img src="${photo.render}" alt="Pose-matched runtime render"><figcaption>Fixed station; neutral light; pose not optimized against the changing scene</figcaption></figure></div><details><summary>Pose and anchors</summary><pre>${escape(JSON.stringify(photo.station, null, 2))}</pre></details></section>`).join('')}<script>document.querySelector('#overlay')?.addEventListener('change',e=>{document.querySelector('#scene-overlay').hidden=!e.target.checked});document.querySelector('#aerial')?.addEventListener('change',e=>{document.querySelectorAll('[data-aerial]').forEach(x=>x.style.display=e.target.checked?'':'none')});document.querySelectorAll('[data-category-toggle]').forEach(input=>input.addEventListener('change',()=>{document.querySelectorAll('[data-category]').forEach(group=>{if(group.dataset.category===input.dataset.categoryToggle)group.style.display=input.checked?'':'none'})}));</script></html>`;
+  return `<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src 'self' file:; style-src 'unsafe-inline'; script-src 'unsafe-inline'; object-src 'none'; base-uri 'none'">
+    <title>Private spatial review</title><style>
+    body{background:#141b20;color:#edf2f5;font:16px/1.5 system-ui;margin:24px}h1,h2{line-height:1.2}.warning{background:#523e13;padding:14px}a{color:#91d6ff}
+    .pair{display:grid;grid-template-columns:1fr 1fr;gap:12px}figure{margin:0;min-width:0}img,svg{width:100%;display:block}figcaption{padding:8px}
+    .stack{position:relative}.stack>div{position:absolute;inset:0}.controls{display:flex;gap:15px;flex-wrap:wrap;margin:15px 0}
+    section{margin:35px 0}pre{white-space:pre-wrap;overflow-wrap:anywhere}table{border-collapse:collapse}td,th{padding:7px;border:1px solid #52616b;text-align:left}
+    @media(max-width:800px){.pair{grid-template-columns:1fr}}</style>
+    <h1>Private spatial review — ${escape(evidence.preset)}</h1>
+    <p class="warning">Not visual acceptance. Geometry complete: <strong>${audit.complete ? 'YES' : 'NO'}</strong>.
+    Camera calibration, source uncertainty, occlusion and visual quality require human review. Private references must not be published.</p>
+    <p>DPR2 throughout; actual CSS, drawing buffer and PNG dimensions recorded in <a href="report.json">report.json</a>.
+    <a href="audit.json">Full geometry audit</a> · <a href="source-overlay.svg">Complete source overlay</a> · <a href="runtime-mesh.json">Decoded paving geometry</a></p>
+    <details><summary>Geometry summary and limits</summary><pre>${escape(JSON.stringify({ summary: audit.summary, limits: audit.limits }, null, 2))}</pre></details>
+    ${whole}${ownership}
+    ${evidence.atlas ? '<section><h2>Private Atlas — all canonical source layers</h2><a href="atlas.png"><img src="atlas.png" alt="Atlas with every canonical geometry layer"></a><p>RGB aerial and metric grid enabled. Photo locations and direction rays hidden for legibility.</p></section>' : ''}
+    ${photos.map(photo => `<section><h2>Photo ${escape(photo.station.photo_number)} · ${escape(photo.station.id)}</h2>
+      <p class="warning">${escape(photo.station.pose_status.toUpperCase())} POSE — ${escape(typeof photo.station.uncertainty === 'string' ? photo.station.uncertainty : JSON.stringify(photo.station.uncertainty))}</p>
+      <div class="pair"><figure><img src="${photo.reference}" alt="Private reference photo ${escape(photo.station.photo_number)}">
+      <figcaption>Original oriented aspect ${photo.station.width}:${photo.station.height}; working proxy, no forced crop</figcaption></figure>
+      <figure><img src="${photo.render}" alt="Pose-matched runtime render"><figcaption>Fixed station; neutral light; pose not optimized against the changing scene</figcaption></figure></div>
+      <details><summary>Pose and anchors</summary><pre>${escape(JSON.stringify(photo.station, null, 2))}</pre></details></section>`).join('')}
+    <script>
+    document.querySelector('#overlay')?.addEventListener('change',e=>{document.querySelector('#scene-overlay').hidden=!e.target.checked});
+    document.querySelector('#aerial')?.addEventListener('change',e=>{document.querySelectorAll('[data-aerial]').forEach(x=>x.style.display=e.target.checked?'':'none')});
+    document.querySelectorAll('[data-category-toggle]').forEach(input=>input.addEventListener('change',()=>{
+      document.querySelectorAll('[data-category]').forEach(group=>{if(group.dataset.category===input.dataset.categoryToggle)group.style.display=input.checked?'':'none'})
+    }));</script></html>`;
 }
 
 let session, sessionStart, server, output;
@@ -202,6 +277,7 @@ try {
   const inputs = await json(path.join(source, 'inputs.json'));
   const sitePath = await privateInput('.local/blueprint/site-local.json');
   const site = await json(sitePath);
+  evidence.ownership = await loadOwnership(options.assignment ?? config.assignment, site);
   let stations = [];
   if (wants('photos')) {
     const stationOption = options.stations ?? config.stations;
@@ -223,6 +299,8 @@ try {
   }
   output = await privateOutput(root, options.output);
   evidence.output = output; evidence.source = source;
+  await copyFile(evidence.ownership.source, path.join(output, 'responsibility.json'));
+  await chmod(path.join(output, 'responsibility.json'), 0o600);
   let url;
   if (options.url) url = localURL(options.url);
   else {

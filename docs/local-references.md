@@ -30,7 +30,7 @@ npm run review:stations -- --photos 1,28,47,65,91 --output .local/spatial-review
 
 This creates a new private manifest and refuses to overwrite existing calibration. It seeds effective camera position/grid heading, oriented photo dimensions and lens-derived field of view. Eye height 1.7 m and zero pitch/roll are labelled assumptions, not measurements. Owner notes and source hashes remain attached.
 
-Select the authored revision and station manifest in `.local/spatial-review/config.json`, with keys `source_dir` and `stations`, both repository-relative paths. `npm run review:spatial -- --preset photos` produces local side-by-side pairs; `--preset all` also includes the registered whole-site comparison and Atlas. See the [comparison contract](assets/blender-workbench.md#whole-site-and-photo-comparison) for output/privacy and completion limits.
+Select the authored revision, station manifest and existing regional responsibility manifest in `.local/spatial-review/config.json`, with repository-relative keys `source_dir`, `stations` and `assignment`. `npm run review:spatial -- --preset photos` produces local side-by-side pairs; `--preset all` also includes the registered whole-site comparison and Atlas. See the [comparison contract](assets/blender-workbench.md#whole-site-and-photo-comparison) for output/privacy and completion limits.
 
 Calibrate by preserving the private manifest and recording visible anchors, pose adjustments and remaining uncertainty. A plausible position/heading or matching aspect ratio alone is not a calibrated camera. Unresolved photo coverage, width measurements and targeted new photos belong in [#38](https://github.com/LLMinem/horror-game-hedwig/issues/38); do not regenerate over reviewed stations.
 

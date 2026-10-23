@@ -82,6 +82,17 @@ class SpatialAuditCLI(unittest.TestCase):
         report = json.loads((output / 'audit.json').read_text())
         return result, report, output
 
+    def test_direct_cli_refuses_external_output_without_writing_evidence(self):
+        self.invoke()  # Materialize only synthetic inputs under .local.
+        with tempfile.TemporaryDirectory(prefix='hedwig-external-output-', dir=Path(tempfile.gettempdir()).resolve()) as directory:
+            result = subprocess.run(
+                [sys.executable, str(CLI), 'audit', '--source-dir', str(self.source),
+                 '--site', str(self.root / 'site.json'), '--output', directory],
+                capture_output=True, text=True, check=False)
+            self.assertEqual(result.returncode, 2, result.stdout)
+            self.assertFalse((Path(directory) / 'audit.json').exists())
+            self.assertFalse((Path(directory) / 'source-overlay.svg').exists())
+
     def test_complete_actual_paving_and_separate_cemetery_extent(self):
         result, report, output = self.invoke()
         self.assertEqual(result.returncode, 0, result.stderr)
