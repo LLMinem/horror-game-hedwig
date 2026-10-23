@@ -66,6 +66,7 @@ Important exporter boundaries:
 - Preserves transforms and the source scene's **current frame** for static export. It does not normalize origins or repair topology. Ordinary modifiers are evaluated; complex dependencies still need review.
 - Requires supported mesh/empty objects, UVs, unit scene scale and available file-backed images. Instances, external parents, constraints, armatures and unsupported image types require deliberate source curation; an object-count limit is not a polygon or memory budget. Inspect CLI/implementation for exact current validation limits and export parameters.
 - Exports static GLB materials/geometry with the standard Y-up conversion and Draco, excluding animations, skinning, morph targets, cameras and lights. It checks the staged Draco extension before publication, not full Khronos validity or visual fidelity.
+- Uses explicit 16-bit Draco position quantization for site-wide meshes. The decoded-runtime comparison below verifies precision; compression defaults are not a precision guarantee.
 - Publishes atomically without clobbering. Existing output requires explicit `--overwrite`, which replaces only the derivative. Symlink outputs and source-tree destinations are refused even then.
 - **Never saves a `.blend`**. In-memory source changes die with the process; the report is stdout, not a source edit. Production export does not imply reimport or visual validation.
 
@@ -89,11 +90,30 @@ npm run browser:smoke -- 'http://127.0.0.1:4173/?mode=pilot'
 npm run browser:smoke -- --width 1728 --height 919 --dpr 2 --headless 'http://127.0.0.1:4173/?mode=pilot'
 ```
 
-This uses Node and ordinary Chrome (`CHROME_BIN` can select the executable), creates/removes an isolated temporary browser profile, and writes screenshots/report under `.local/browser-smoke-*`. It accepts a local URL plus width/height/DPR/headless options; **`--help` is unsupported**. `tools/browser-smoke.mjs` owns the argument contract. `?mode=sandbox` selects the retained sandbox check, not cemetery acceptance.
+This uses Node and ordinary Chrome (`CHROME_BIN` can select the executable), creates/removes an isolated temporary browser profile, and writes screenshots/report under `.local/browser-smoke-*`. Use `npm run browser:smoke -- --help` for options. All browser/review screenshots use **DPR 2**; other DPR values are rejected in capture mode. For a separately labelled performance run, `--measure-only --dpr 1` writes measurements but no screenshots. `?mode=sandbox` selects the retained sandbox check, not cemetery acceptance.
 
 Assert CSS viewport, DPR, renderer buffer and saved PNG dimensions in the **same session**. Apply metric overrides before startup/reload because renderer DPR is set at startup. Harness previews may be downscaled even when saved captures are correct; direct CDP capture with an explicit viewport clip and PNG-header checks avoids confusing the two. Crop saved full-resolution images for close inspection.
 
 Record hardware/GPU, browser, rendering mode, route, resolution, DPR, duration and concurrent load. Browser `requestAnimationFrame` intervals are display-limited frame observations, not GPU timer queries. Bounded route jumps do not establish trusted walking speed; check input separately. Sparse-scene M3 Max results do not establish the mid-range hardware/density target in #21, and a passing selected route does not prove every collision or visual detail.
+
+### Whole-site and photo comparison
+
+Before claiming spatial work complete, run the full-source comparison against the actual loaded scene:
+
+```sh
+npm run review:spatial -- --preset whole-site --require-complete
+npm run review:spatial -- --preset all --require-complete
+```
+
+Use `--help` for explicit source/station/output overrides. The private `.local/spatial-review/config.json` selects `source_dir` (the authored revision) and `stations` (the photo manifest). Preparation of those stations belongs to [local references](../local-references.md#reproducible-photo-stations). Without `--url`, the command starts and stops its own loopback Vite server; an explicitly supplied loopback server remains caller-owned.
+
+Open the printed private `index.html`. It contains a north-up orthographic runtime view and an independent aerial/source view with the **same metric bounds**; category toggles and source-over-render expose omissions. The Atlas preset captures every canonical geometry layer. Photo pairs preserve each original's oriented aspect, including portrait photos, instead of imposing 16:9. The manifest's pose assumptions remain visible. All browser captures verify CSS viewport, DPR, drawing buffer and saved pixel dimensions.
+
+The audit enumerates every canonical route, including routes absent from the authoring plan. It compares selected line coverage, authored paving, derived walk surfaces and **world-space triangles decoded by the running browser**. Geometry outside supported terrain is reported separately; the cemetery polygon does not silently trim the requested network. Explicit, reasoned solid/pad exceptions must name a bounded target. Unknown widths and source accuracy remain unknown; the 1 cm export tolerance is only a technical comparison threshold.
+
+`--require-complete` exits nonzero on geometric gaps or export mismatch while retaining readable evidence. Success does **not** certify visibility through foliage, every local surface height, collision, measured widths, calibrated cameras, boundary material or human art acceptance. Browser smoke and direct inspection remain separate.
+
+Reports contain private imagery, camera information and local source paths. Keep the entire output under `.local/`, never Git, `public/`, Vite serving or public PR attachments. Record commands, aggregate findings and human decisions in the issue; publish images only after a separate privacy/rights review. Heavy browser/private-source comparisons are on-demand, not pre-commit hooks. CI runs the source-free checks and build.
 
 ### Capability smoke is not acceptance
 

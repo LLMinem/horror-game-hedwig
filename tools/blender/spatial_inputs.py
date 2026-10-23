@@ -12,7 +12,7 @@ import math
 from pathlib import Path
 import shutil
 
-from shapely import constrained_delaunay_triangles
+from shapely import constrained_delaunay_triangles, make_valid
 from shapely.geometry import LineString, Point, Polygon, box
 from shapely.ops import unary_union
 
@@ -88,7 +88,11 @@ def prepare(args):
     ground = walk['ground']
     bounds = box(ground['x0'], -ground['z0']-(ground['rows']-1)*ground['step'],
                  ground['x0']+(ground['columns']-1)*ground['step'], -ground['z0'])
-    existing = unary_union([Polygon([(x, -z) for x, z in s['polygon']]) for s in walk['surfaces']])
+    # Subtract authored paving, not its rounded walking approximation. Mixing
+    # those representations creates microscopic strips along retained edges.
+    baseline_paving = load(baseline / 'inputs.json')['paving']
+    existing = unary_union([Polygon([baseline_paving['vertices'][i][:2] for i in face])
+                            for face in baseline_paving['faces']])
     old_solids = unary_union([Polygon([(x, -z) for x, z in s['polygon']]) for s in walk['obstacles']])
     routes, route_shapes, solids, pads = [], [], [], []
 
@@ -169,9 +173,23 @@ def prepare(args):
     for view in plan['views']:
         public_view = {k: v for k, v in view.items() if k not in ('photos', 'uncertainty')}
         walk['views'].append(public_view)
+    # Five-decimal runtime rounding can collapse sub-grid slivers to lines.
+    # They represent no paving area; retain their IDs as evidence, not polygons.
+    degenerate_surfaces = []
+    valid_surfaces = []
+    for surface in walk['surfaces']:
+        polygon = Polygon(surface['polygon'])
+        if polygon.area == 0 and make_valid(polygon).area == 0:
+            degenerate_surfaces.append(surface['id'])
+        elif not polygon.is_valid:
+            raise ValueError(f'Invalid rounded walking surface: {surface["id"]}')
+        else:
+            valid_surfaces.append(surface)
+    walk['surfaces'] = valid_surfaces
     inputs = {'revision': destination.name, 'baseline': str(baseline.relative_to(ROOT)),
               'baseline_sha256': {name: digest(baseline/name) for name in ('entrance-hall.blend', 'walk.json', 'inputs.json')},
               'plan': plan, 'pathSections': routes, 'surfaces': surfaces, 'solids': solids,
+              'discarded_degenerate_walk_surfaces': degenerate_surfaces,
               'source_sha256': digest(site_path), 'frame': load(ROOT/'.local/blueprint/site-frame.json'),
               'ground_policy': 'Exact accepted ground; NW-SE triangles; all new surfaces offset .025; no cemetery fence',
               'baseline_counts': {k: len(baseline_walk[k]) for k in ('surfaces', 'obstacles', 'barriers', 'vegetation', 'views')}}

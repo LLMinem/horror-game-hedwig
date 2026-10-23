@@ -54,6 +54,8 @@ Keep acquired rasters unchanged. `tools/blender/pilot_inputs.py` prepares new pi
 
 Its version-2 finite heightfield, paving offsets, solid obstacles and review views replace the obsolete path-derived walking mask. Runtime rejects version 1. Rendered ground and movement sampling must use the same north-west to south-east triangle diagonal, frame and height offset; paving follows those triangles at the recorded offset. Preserve deliberate platform adjustments and existing samples when extending ground. Platforms, kerbs and steps need separate evidence, not DOM or false-colour previews. Grid bounds define supported ground; the cemetery boundary is not permission to add invisible internal walking restrictions.
 
+Spatial preparation subtracts the retained authored paving geometry, not its rounded walking approximation; mixing these creates microscopic duplicate strips. It excludes rounded walk rings with no polygon area and records their IDs in private inputs, without repairing self-intersecting area polygons. Previous source and baseline revisions remain unchanged. Whole-network review compares all canonical line IDs and actual geometric coverage, not just selection counts. Its [comparison contract](../docs/assets/blender-workbench.md#whole-site-and-photo-comparison) distinguishes technical export precision from unknown real-world positional/width accuracy.
+
 For a bounded region, hand off the selected issue, relevant stable IDs, current frame/grid, unannotated imagery with capture limits, effective photo placements and verbatim notes, and an uncertainty list tied to evidence. Navigation groups are not work cards. Source/browser acceptance belongs to the [Blender guide](../docs/assets/blender-workbench.md).
 
 ## Rebuild and provenance

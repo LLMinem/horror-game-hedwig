@@ -92,6 +92,8 @@ def export_glb(path):
         export_skins=False, export_morph=False, export_cameras=False, export_lights=False,
         export_extras=False, export_use_gltfpack=False,
         export_draco_mesh_compression_enable=True, export_draco_mesh_compression_level=6,
+        # Whole-site paving spans hundreds of metres; retain sub-centimetre positions.
+        export_draco_position_quantization=16,
         will_save_settings=False,
     )
     require(result == {"FINISHED"}, "GLB export failed.")

@@ -1,0 +1,28 @@
+name: Project checks
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - run: npm ci
+      - name: Install reference-tool dependencies
+        run: |
+          python -m venv .local/blueprint-venv
+          .local/blueprint-venv/bin/python -m pip install -r tools/blueprint/requirements.txt
+      - run: npm run check
+      - run: npm run build

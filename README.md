@@ -23,6 +23,8 @@ The cemetery view integrates the retained pilot with an **unaccepted coarse spat
 
 A clone includes runtime derivatives, not the private photographs, acquired reference data or editable source assets. See [local references](docs/local-references.md) before source work.
 
+`npm run check` runs the source-free syntax/regression checks used by CI; CI also builds the runtime. For spatial changes with the private workspace available, run `npm run review:spatial -- --preset whole-site --require-complete`. Setup, photo comparisons and interpretation limits are in the [comparison workflow](docs/assets/blender-workbench.md#whole-site-and-photo-comparison).
+
 ## Find the right document
 
 | Need | Read |
