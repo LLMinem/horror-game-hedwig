@@ -2,7 +2,7 @@ export default {
   server: {
     host: "127.0.0.1",
     port: 3000,
-    strictPort: true,
+    strictPort: false,
     // Local authoring sources are not web assets, even inside this checkout.
     fs: {
       deny: [

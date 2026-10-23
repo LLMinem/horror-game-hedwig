@@ -13,7 +13,9 @@ npm ci
 npm run dev
 ```
 
-Open <http://127.0.0.1:3000>. Click the scene to capture the mouse. WASD moves, Shift sprints, F toggles the flashlight and Esc releases the mouse. The review panel provides neutral/dusk lighting and fixed views, including a whole-site overview and regional ground stations. Overhead views are inspection-only; select a ground view or "Walk from entrance" to resume walking. `?mode=sandbox` opens the separate lamp sandbox.
+Open the local URL printed by Vite. The dev server starts at <http://127.0.0.1:3000> and tries the next available port if that port is occupied. You can request a different starting port with `npm run dev -- --port 3100`.
+
+Click the scene to capture the mouse. WASD moves, Shift sprints, F toggles the flashlight and Esc releases the mouse. The review panel provides neutral/dusk lighting and fixed views, including a whole-site overview and regional ground stations. Overhead views are inspection-only; select a ground view or "Walk from entrance" to resume walking. `?mode=sandbox` opens the separate lamp sandbox.
 
 The cemetery view integrates the retained pilot with an **unaccepted coarse spatial candidate for [#22](https://github.com/LLMinem/horror-game-hedwig/issues/22)**. New routes, facility masses and planting are provisional; rounded foliage volumes indicate broad vegetation masses, not individual trees. Ordinary grave fields are not yet modeled. This is neither completed quality B nor human source/browser acceptance.
 
